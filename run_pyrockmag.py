@@ -42,7 +42,7 @@ from rmg_batch_plotter import rmg_batch_plotter, ALL_ROUTINES
 from rmg_plots         import rmg_data_full_analysis
 from rmg_write_tables  import rmg_stats_write_table
 from rmg_stats         import rmg_stats
-from rmg_forc          import (rmg_extract_forc_data, rmg_extract_forc_data_complete,
+from rmg_forc          import (rmg_extract_forc_data, rmg_extract_forc_data_complete, prompt_forc_axis_limits,
                                 rmg_plot_forc_curves, rmg_forc_diagram, 
                                 generate_forc_script, convert_rmg_to_forc,
                                 plot_forc_diagram_standard, plot_forc_hysteresis_complete,
@@ -470,6 +470,161 @@ def export_all_stats(loaded):
 # ─────────────────────────────────────────────────────────────────────────────
 
 
+
+
+
+
+
+
+
+
+def select_scatter_brightness():
+    """
+    Prompt user to select scatter plot brightness mode.
+    
+    Returns
+    -------
+    dict : Settings for point size and alpha
+    """
+    print("\n▼══════════════════════════════════════════════════════════▼")
+    print("           Scatter Plot Brightness")
+    print("▲══════════════════════════════════════════════════════════▲")
+    print("\nBrightness mode (for scatter plots only):")
+    print("  + [1] Standard - Subtle, transparent points")
+    print("  + [2] Bright - Larger, more opaque points")
+    print("  + [3] Maximum - Largest, fully opaque (vibrant)")
+    
+    choice = input("\nChoice [2]: ").strip() or "2"
+    
+    settings_map = {
+        '1': {'size': 1, 'alpha': 0.6, 'desc': 'Standard'},
+        '2': {'size': 3, 'alpha': 0.9, 'desc': 'Bright'},
+        '3': {'size': 5, 'alpha': 1.0, 'desc': 'Maximum'}
+    }
+    
+    settings = settings_map.get(choice, settings_map['2'])
+    
+    print(f"✓ Brightness: {settings['desc']} (size={settings['size']}, alpha={settings['alpha']})")
+    
+    return settings
+
+def select_forc_grid_resolution():
+    """
+    Prompt user to select FORC grid resolution.
+    
+    Higher resolution = more data points = smoother contours in cropped regions.
+    
+    Returns
+    -------
+    int : Grid size (number of points per axis)
+    """
+    print("\n▼══════════════════════════════════════════════════════════▼")
+    print("           FORC Data Resolution")
+    print("▲══════════════════════════════════════════════════════════▲")
+    print("\nGrid resolution (affects data smoothness when cropped):")
+    print("  + [1] Standard (100×100) - Fast, good for full range")
+    print("  + [2] Fine (200×200) - Better for moderate cropping")
+    print("  + [3] Very Fine (300×300) - Best for heavy cropping")
+    print("  + [4] Ultra Fine (500×500) - Maximum detail, slower")
+    print("\nNote: Higher resolution = smoother contours but slower processing")
+    
+    choice = input("\nChoice [2]: ").strip() or "2"
+    
+    grid_map = {
+        '1': 100,
+        '2': 200,
+        '3': 300,
+        '4': 500
+    }
+    
+    grid_size = grid_map.get(choice, 200)
+    
+    print(f"✓ Grid resolution: {grid_size}×{grid_size} = {grid_size**2:,} points")
+    
+    return grid_size
+
+def set_plot_dpi():
+    """
+    Set matplotlib DPI for high-resolution plots.
+    
+    Returns
+    -------
+    int : DPI value
+    """
+    import matplotlib as mpl
+    
+    print("\n▼══════════════════════════════════════════════════════════▼")
+    print("           Plot Resolution")
+    print("▲══════════════════════════════════════════════════════════▲")
+    print("\nResolution options:")
+    print("  + [1] Screen (100 DPI) - Fast, lower quality")
+    print("  + [2] Standard (150 DPI) - Good balance")
+    print("  + [3] High (300 DPI) - Publication quality")
+    print("  + [4] Ultra (600 DPI) - Maximum detail")
+    
+    choice = input("\nChoice [3]: ").strip() or "3"
+    
+    dpi_map = {
+        '1': 100,
+        '2': 150,
+        '3': 300,
+        '4': 600
+    }
+    
+    dpi = dpi_map.get(choice, 300)
+    
+    # Set matplotlib default DPI
+    mpl.rcParams['figure.dpi'] = dpi
+    mpl.rcParams['savefig.dpi'] = dpi
+    
+    print(f"✓ Resolution set to {dpi} DPI")
+    
+    return dpi
+
+def select_forc_colormap():
+    """
+    Prompt user to select a colormap for FORC diagrams.
+    
+    Returns
+    -------
+    str : Selected colormap name with _r suffix
+    """
+    print("\n▼══════════════════════════════════════════════════════════▼")
+    print("           Colormap Selection")
+    print("▲══════════════════════════════════════════════════════════▲")
+    print("\nAvailable colormaps:")
+    print("  + [1] viridis   - Green/blue/purple (good for weak signals)")
+    print("  + [2] inferno   - Yellow/orange/purple (high contrast)")
+    print("  + [3] rainbow   - Full spectrum (colorful)")
+    print("  + [4] spring    - Magenta/yellow (vibrant)")
+    print("  + [5] gray      - Grayscale (publication B&W)")
+    print("  + [6] hot       - White/red/black (classic)")
+    
+    choice = input("\nChoice [2]: ").strip() or "2"
+    
+    colormap_map = {
+        '1': 'viridis_r',
+        '2': 'inferno_r',
+        '3': 'rainbow',
+        '4': 'spring',
+        '5': 'gray_r',
+        '6': 'hot_r'
+    }
+    
+    colormap = colormap_map.get(choice, 'inferno_r')
+    colormap_name = {
+        'viridis_r': 'viridis',
+        'inferno_r': 'inferno',
+        'rainbow': 'rainbow',
+        'spring': 'spring',
+        'gray_r': 'gray',
+        'hot_r': 'hot'
+    }.get(colormap, 'inferno')
+    
+    print(f"✓ Selected: {colormap_name}")
+    
+    return colormap
+
 def plot_forc_data(loaded):
     """Plot FORC curves and diagram for selected sample(s)."""
     if not loaded:
@@ -543,68 +698,138 @@ def plot_forc_data(loaded):
     
     # Option 2: Hot colormap
     elif choice == '2':
-        print("\n  Plotting FORC diagrams (hot colormap)...")
+        print("\n  Plotting FORC scatter diagrams...")
+        
+        # Set grid resolution
+        grid_size = select_forc_grid_resolution()
+        
+        # Set plot resolution
+        dpi = set_plot_dpi()
+        
+        # Select colormap
+        colormap = select_forc_colormap()
+        
         for d, forc_complete in forc_complete_list:
-            print(f"  Processing {d.samplename}...")
-            result = process_forc_forcinel_workflow(d, smoothing_factor=3)
-            fig, ax = plt.subplots(figsize=(8, 9))
-            plot_forc_diagram_standard(result, ax=ax, show_points=True, colormap='hot_r')
-            ax.set_title(f'FORC Diagram: {d.samplename}')
+            print(f"\n  Processing {d.samplename}...")
+            
+            result = process_forc_forcinel_workflow(d, smoothing_factor=3, grid_size=grid_size)
+            
+            # Prompt for axis limits
+            limits = prompt_forc_axis_limits(result)
+            bc_lim = limits['bc_lim'] if limits else None
+            bu_lim = limits['bu_lim'] if limits else None
+            
+            # Generate plot
+            fig, ax = plt.subplots(figsize=(12, 10))
+            plot_forc_diagram_standard(result, ax=ax, show_points=True, colormap=colormap,
+                                      bc_lim=bc_lim, bu_lim=bu_lim)
+            ax.set_title(f'{d.samplename} - Scatter')
             plt.tight_layout()
     
-    # Option 3: Plasma colormap
+    # Option 3: Scatter diagram with user choice
     elif choice == '3':
-        print("\n  Plotting FORC diagrams (plasma colormap)...")
+        print("\n  Plotting FORC scatter diagrams...")
+        
+        # Set grid resolution
+        grid_size = select_forc_grid_resolution()
+        
+        # Set plot resolution
+        dpi = set_plot_dpi()
+        
+        # Select colormap
+        colormap = select_forc_colormap()
+        
         for d, forc_complete in forc_complete_list:
-            print(f"  Processing {d.samplename}...")
-            result = process_forc_forcinel_workflow(d, smoothing_factor=3)
-            fig, ax = plt.subplots(figsize=(8, 9))
-            plot_forc_diagram_standard(result, ax=ax, show_points=True, colormap='plasma_r')
-            ax.set_title(f'FORC Diagram: {d.samplename}')
+            print(f"\n  Processing {d.samplename}...")
+            
+            result = process_forc_forcinel_workflow(d, smoothing_factor=3, grid_size=grid_size)
+            
+            # Prompt for axis limits
+            limits = prompt_forc_axis_limits(result)
+            bc_lim = limits['bc_lim'] if limits else None
+            bu_lim = limits['bu_lim'] if limits else None
+            
+            # Generate plot
+            fig, ax = plt.subplots(figsize=(12, 10))
+            plot_forc_diagram_standard(result, ax=ax, show_points=True, colormap=colormap,
+                                      bc_lim=bc_lim, bu_lim=bu_lim)
+            ax.set_title(f'{d.samplename} - Scatter')
             plt.tight_layout()
     
-    # Option 4: Inferno colormap
+    # Option 4: Scatter diagram with user choice
     elif choice == '4':
-        print("\n  Plotting FORC diagrams (inferno colormap)...")
+        print("\n  Plotting FORC scatter diagrams...")
+        
+        # Set grid resolution
+        grid_size = select_forc_grid_resolution()
+        
+        # Set plot resolution
+        dpi = set_plot_dpi()
+        
+        # Select colormap
+        colormap = select_forc_colormap()
+        
         for d, forc_complete in forc_complete_list:
-            print(f"  Processing {d.samplename}...")
-            result = process_forc_forcinel_workflow(d, smoothing_factor=3)
-            fig, ax = plt.subplots(figsize=(8, 9))
-            plot_forc_diagram_standard(result, ax=ax, show_points=True, colormap='inferno_r')
-            ax.set_title(f'FORC Diagram: {d.samplename}')
+            print(f"\n  Processing {d.samplename}...")
+            
+            result = process_forc_forcinel_workflow(d, smoothing_factor=3, grid_size=grid_size)
+            
+            # Prompt for axis limits
+            limits = prompt_forc_axis_limits(result)
+            bc_lim = limits['bc_lim'] if limits else None
+            bu_lim = limits['bu_lim'] if limits else None
+            
+            # Generate plot
+            fig, ax = plt.subplots(figsize=(12, 10))
+            plot_forc_diagram_standard(result, ax=ax, show_points=True, colormap=colormap,
+                                      bc_lim=bc_lim, bu_lim=bu_lim)
+            ax.set_title(f'{d.samplename} - Scatter')
             plt.tight_layout()
     
     # Option 5: Contour plots (all three colormaps)
     elif choice == '5':
-        print("\n  Plotting FORC diagrams (contour - all colormaps)...")
+        print("\n  Plotting FORC contour diagrams...")
+        
+        # Set grid resolution
+        grid_size = select_forc_grid_resolution()
+        
+        # Set plot resolution
+        dpi = set_plot_dpi()
+        
+        # Select colormap
+        colormap = select_forc_colormap()
+        
         for d, forc_complete in forc_complete_list:
             print(f"\n  Processing {d.samplename}...")
-            result = process_forc_forcinel_workflow(d, smoothing_factor=3)
             
-            # Hot_r contour
-            print("    - Contour (hot_r)")
-            fig1, ax1 = plt.subplots(figsize=(8, 9))
-            plot_forc_diagram_standard(result, ax=ax1, show_points=False, colormap='hot_r')
-            ax1.set_title(f'FORC Contour (hot_r): {d.samplename}')
-            plt.tight_layout()
+            # Process FORC data first
+            result = process_forc_forcinel_workflow(d, smoothing_factor=3, grid_size=grid_size)
             
-            # Plasma_r contour
-            print("    - Contour (plasma_r)")
-            fig2, ax2 = plt.subplots(figsize=(8, 9))
-            plot_forc_diagram_standard(result, ax=ax2, show_points=False, colormap='plasma_r')
-            ax2.set_title(f'FORC Contour (plasma_r): {d.samplename}')
-            plt.tight_layout()
+            # Prompt for axis limits BEFORE plotting
+            limits = prompt_forc_axis_limits(result)
             
-            # Inferno_r contour
-            print("    - Contour (inferno_r)")
-            fig3, ax3 = plt.subplots(figsize=(8, 9))
-            plot_forc_diagram_standard(result, ax=ax3, show_points=False, colormap='inferno_r')
-            ax3.set_title(f'FORC Contour (inferno_r): {d.samplename}')
+            # Extract limits if provided
+            bc_lim = limits['bc_lim'] if limits else None
+            bu_lim = limits['bu_lim'] if limits else None
+            
+            # Generate single contour plot with chosen colormap
+            fig, ax = plt.subplots(figsize=(12, 10))
+            
+            plot_forc_diagram_standard(result, ax=ax, show_points=False, colormap=colormap,
+                                      bc_lim=bc_lim, bu_lim=bu_lim)
+            ax.set_title(f'{d.samplename} - Contour')
+            
             plt.tight_layout()
     
-    # Option 6: All plots
     elif choice == '6':
         print("\n  Creating all FORC plots...")
+        
+        # Set grid resolution
+        grid_size = select_forc_grid_resolution()
+        
+        # Set plot resolution
+        dpi = set_plot_dpi()
+        
         for d, forc_complete in forc_complete_list:
             print(f"\n  Processing {d.samplename}...")
             
@@ -616,45 +841,50 @@ def plot_forc_data(loaded):
             plt.tight_layout()
             
             # Process once for all diagrams
-            result = process_forc_forcinel_workflow(d, smoothing_factor=3)
+            result = process_forc_forcinel_workflow(d, smoothing_factor=3, grid_size=grid_size)
+            
+            # Prompt for axis limits
+            limits = prompt_forc_axis_limits(result)
+            bc_lim = limits['bc_lim'] if limits else None
+            bu_lim = limits['bu_lim'] if limits else None
             
             # Hot colormap
             print("    - FORC diagram (hot)")
             fig2, ax2 = plt.subplots(figsize=(8, 9))
-            plot_forc_diagram_standard(result, ax=ax2, show_points=True, colormap='hot_r')
+            plot_forc_diagram_standard(result, ax=ax2, show_points=True, colormap='hot_r', bc_lim=bc_lim, bu_lim=bu_lim)
             ax2.set_title(f'FORC (hot): {d.samplename}')
             plt.tight_layout()
             
             # Plasma colormap
             print("    - FORC diagram (plasma)")
             fig3, ax3 = plt.subplots(figsize=(8, 9))
-            plot_forc_diagram_standard(result, ax=ax3, show_points=True, colormap='plasma_r')
+            plot_forc_diagram_standard(result, ax=ax3, show_points=True, colormap='plasma_r', bc_lim=bc_lim, bu_lim=bu_lim)
             ax3.set_title(f'FORC (plasma): {d.samplename}')
             plt.tight_layout()
             
             # Inferno colormap
             print("    - FORC diagram (inferno)")
             fig4, ax4 = plt.subplots(figsize=(8, 9))
-            plot_forc_diagram_standard(result, ax=ax4, show_points=True, colormap='inferno_r')
+            plot_forc_diagram_standard(result, ax=ax4, show_points=True, colormap='inferno_r', bc_lim=bc_lim, bu_lim=bu_lim)
             ax4.set_title(f'FORC (inferno): {d.samplename}')
             plt.tight_layout()
             
             # Contour plots (all three colormaps)
             print("    - FORC diagram (contour hot_r)")
             fig5, ax5 = plt.subplots(figsize=(8, 9))
-            plot_forc_diagram_standard(result, ax=ax5, show_points=False, colormap='hot_r')
+            plot_forc_diagram_standard(result, ax=ax5, show_points=False, colormap='hot_r', bc_lim=bc_lim, bu_lim=bu_lim)
             ax5.set_title(f'FORC Contour (hot_r): {d.samplename}')
             plt.tight_layout()
             
             print("    - FORC diagram (contour plasma_r)")
             fig6, ax6 = plt.subplots(figsize=(8, 9))
-            plot_forc_diagram_standard(result, ax=ax6, show_points=False, colormap='plasma_r')
+            plot_forc_diagram_standard(result, ax=ax6, show_points=False, colormap='plasma_r', bc_lim=bc_lim, bu_lim=bu_lim)
             ax6.set_title(f'FORC Contour (plasma_r): {d.samplename}')
             plt.tight_layout()
             
             print("    - FORC diagram (contour inferno_r)")
             fig7, ax7 = plt.subplots(figsize=(8, 9))
-            plot_forc_diagram_standard(result, ax=ax7, show_points=False, colormap='inferno_r')
+            plot_forc_diagram_standard(result, ax=ax7, show_points=False, colormap='inferno_r', bc_lim=bc_lim, bu_lim=bu_lim)
             ax7.set_title(f'FORC Contour (inferno_r): {d.samplename}')
             plt.tight_layout()
     
@@ -663,6 +893,12 @@ def plot_forc_data(loaded):
         # FORCinel v3 workflow
         print("\n  FORCinel v3 Workflow")
         print("  " + "="*50)
+        
+        # Set grid resolution
+        grid_size = select_forc_grid_resolution()
+        
+        # Set plot resolution
+        dpi = set_plot_dpi()
         
         # Get parameters
         try:
@@ -684,12 +920,19 @@ def plot_forc_data(loaded):
             
             # Process FORC data
             try:
-                result = process_forc_forcinel_workflow(d, smoothing_factor=smoothing_factor)
+                result = process_forc_forcinel_workflow(d, smoothing_factor=smoothing_factor, grid_size=grid_size)
+                
+                # Prompt for axis limits
+                limits = prompt_forc_axis_limits(result)
+                bc_lim = limits['bc_lim'] if limits else None
+                bu_lim = limits['bu_lim'] if limits else None
                 
                 # Plot FORCinel-style diagram
-                fig, ax = plt.subplots(figsize=(9, 7))
-                plot_forc_diagram_standard(result, ax=ax, show_points=True, colormap='hot_r')
+                fig, ax = plt.subplots(figsize=(12, 10))
+                plot_forc_diagram_standard(result, ax=ax, show_points=True, colormap='hot_r',
+                                          bc_lim=bc_lim, bu_lim=bu_lim)
                 ax.set_title(f'FORC Diagram: {d.samplename} (SF={smoothing_factor})')
+                plt.show()
                 
                 # Save plot
                 plot_path = os.path.join(output_dir, f"{d.samplename}_forc_SF{smoothing_factor}.png")

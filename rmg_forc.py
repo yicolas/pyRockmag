@@ -419,7 +419,7 @@ def convert_rmg_to_forc(rmg_path: str, output_path: Optional[str] = None,
     return output_path, np.array(forc_array)
 
 
-def process_forc_forcinel_workflow(data, smoothing_factor: int = 3,
+def process_forc_forcinel_workflow(data, smoothing_factor: int = 3, grid_size: int = 100,
                                    output_dir: str = None,
                                    samplename: str = None) -> dict:
     """
@@ -439,6 +439,9 @@ def process_forc_forcinel_workflow(data, smoothing_factor: int = 3,
     smoothing_factor : int
         FORCinel smoothing parameter (default: 3)
         FORCinel recommends 2-4, with 2 for noisy data
+    grid_size : int
+        Grid resolution (default: 100)
+        Higher values (200, 300) give finer detail but slower processing
     output_dir : str, optional
         Directory for output files
     samplename : str, optional
@@ -478,8 +481,8 @@ def process_forc_forcinel_workflow(data, smoothing_factor: int = 3,
     Ha_all = np.array(Ha_all)
     M_all = np.array(M_all)
     
-    # Create regular grid (100x100 is typical)
-    grid_size = 100
+    # Create regular grid (default 100x100, user can increase)
+    # grid_size is now a parameter
     Hr_min, Hr_max = Hr_all.min(), Hr_all.max()
     Ha_min, Ha_max = Ha_all.min(), Ha_all.max()
     
@@ -607,8 +610,172 @@ import matplotlib.pyplot as plt
 from matplotlib.colors import Normalize
 
 
+
+
+
+
+def prompt_forc_axis_limits(result):
+    """
+    Prompt user for custom Bc and Bu axis limits BEFORE plotting.
+    
+    Shows the data range and asks if user wants to set custom limits.
+    
+    Parameters
+    ----------
+    result : dict
+        Result from process_forc_forcinel_workflow containing Bc and Bu data
+    
+    Returns
+    -------
+    dict or None : Dictionary with 'bc_lim' and 'bu_lim' tuples, or None for auto
+    """
+    import numpy as np
+    
+    # Extract Bc and Bu from result
+    # The result uses 'Hc' and 'Hu' as keys
+    bc_data = result['Hc']
+    bu_data = result['Hu']
+    
+    # Calculate data ranges (data is in Tesla, convert to mT for display)
+    bc_min, bc_max = np.nanmin(bc_data) * 1000, np.nanmax(bc_data) * 1000
+    bu_min, bu_max = np.nanmin(bu_data) * 1000, np.nanmax(bu_data) * 1000
+    
+    print("\n▼══════════════════════════════════════════════════════════▼")
+    print("           FORC Axis Range Settings")
+    print("▲══════════════════════════════════════════════════════════▲")
+    print(f"\nData range:")
+    print(f"  Bc (coercivity):      {bc_min:.1f} to {bc_max:.1f} mT")
+    print(f"  Bu (interaction):     {bu_min:.1f} to {bu_max:.1f} mT")
+    print("\nNote: Enter limits in mT (milliTesla)")
+    
+    # Ask if user wants custom limits
+    print("\nOptions:")
+    print("  [1] Auto-scale (use full data range)")
+    print("  [2] Set custom Bc and Bu limits")
+    
+    choice = input("\nChoice [1]: ").strip() or "1"
+    
+    if choice != "2":
+        print("✓ Using auto-scale")
+        return None
+    
+    # Get custom limits
+    print("\n--- Set Custom Limits ---")
+    print("(Press Enter to keep default)")
+    
+    try:
+        print("\nBc Axis (Coercivity):")
+        bc_min_input = input(f"  Min (mT) [{bc_min:.1f}]: ").strip()
+        bc_min_new = float(bc_min_input) if bc_min_input else bc_min
+        
+        bc_max_input = input(f"  Max (mT) [{bc_max:.1f}]: ").strip()
+        bc_max_new = float(bc_max_input) if bc_max_input else bc_max
+        
+        print("\nBu Axis (Interaction Field):")
+        bu_min_input = input(f"  Min (mT) [{bu_min:.1f}]: ").strip()
+        bu_min_new = float(bu_min_input) if bu_min_input else bu_min
+        
+        bu_max_input = input(f"  Max (mT) [{bu_max:.1f}]: ").strip()
+        bu_max_new = float(bu_max_input) if bu_max_input else bu_max
+        
+        print(f"\n✓ Custom limits: Bc [{bc_min_new:.1f}, {bc_max_new:.1f}] mT, Bu [{bu_min_new:.1f}, {bu_max_new:.1f}] mT")
+        
+        # Convert from mT back to Tesla for internal use (plot function will convert to mT again)
+        # NO - keep in mT since plot_forc_diagram_standard expects mT after *1000 conversion
+        return {
+            'bc_lim': (bc_min_new, bc_max_new),
+            'bu_lim': (bu_min_new, bu_max_new)
+        }
+        
+    except ValueError:
+        print("✗ Invalid input, using auto-scale")
+        return None
+
+def adjust_forc_axis_limits(result, current_bc_lim=None, current_bu_lim=None):
+    """
+    Interactive axis limit adjustment for FORC diagrams.
+    
+    Prompts user to set custom Bc and Bu axis limits after viewing initial plot.
+    
+    Parameters
+    ----------
+    result : dict
+        Result from process_forc_forcinel_workflow containing Bc and Bu data
+    current_bc_lim : tuple, optional
+        Current Bc limits (min, max) in mT
+    current_bu_lim : tuple, optional
+        Current Bu limits (min, max) in mT
+    
+    Returns
+    -------
+    dict : Dictionary with 'bc_lim' and 'bu_lim' tuples, or None if no adjustment
+    """
+    import numpy as np
+    
+    # Extract Bc and Bu from result
+    # The result uses 'Hc' and 'Hu' as keys
+    bc_data = result['Hc']
+    bu_data = result['Hu']
+    
+    # Calculate current data ranges
+    bc_min, bc_max = np.nanmin(bc_data), np.nanmax(bc_data)
+    bu_min, bu_max = np.nanmin(bu_data), np.nanmax(bu_data)
+    
+    # Show current ranges
+    print("\n▼══════════════════════════════════════════════════════════▼")
+    print("           FORC Axis Limit Adjustment")
+    print("▲══════════════════════════════════════════════════════════▲")
+    
+    if current_bc_lim:
+        print(f"\nCurrent Bc range: {current_bc_lim[0]:.1f} - {current_bc_lim[1]:.1f} mT")
+    else:
+        print(f"\nCurrent Bc range (auto): {bc_min:.1f} - {bc_max:.1f} mT")
+    
+    if current_bu_lim:
+        print(f"Current Bu range: {current_bu_lim[0]:.1f} - {current_bu_lim[1]:.1f} mT")
+    else:
+        print(f"Current Bu range (auto): {bu_min:.1f} - {bu_max:.1f} mT")
+    
+    # Ask if user wants to adjust
+    adjust = input("\n+ Adjust axis limits? (y/n) [n]: ").strip().lower()
+    
+    if adjust != 'y':
+        return None
+    
+    # Get new Bc limits
+    print("\n--- Bc Axis (Coercivity) ---")
+    try:
+        bc_min_input = input(f"Bc min (mT) [{bc_min:.1f}]: ").strip()
+        bc_min_new = float(bc_min_input) if bc_min_input else bc_min
+        
+        bc_max_input = input(f"Bc max (mT) [{bc_max:.1f}]: ").strip()
+        bc_max_new = float(bc_max_input) if bc_max_input else bc_max
+    except ValueError:
+        print("Invalid input, using auto-scale for Bc")
+        bc_min_new, bc_max_new = bc_min, bc_max
+    
+    # Get new Bu limits
+    print("\n--- Bu Axis (Interaction Field) ---")
+    try:
+        bu_min_input = input(f"Bu min (mT) [{bu_min:.1f}]: ").strip()
+        bu_min_new = float(bu_min_input) if bu_min_input else bu_min
+        
+        bu_max_input = input(f"Bu max (mT) [{bu_max:.1f}]: ").strip()
+        bu_max_new = float(bu_max_input) if bu_max_input else bu_max
+    except ValueError:
+        print("Invalid input, using auto-scale for Bu")
+        bu_min_new, bu_max_new = bu_min, bu_max
+    
+    print(f"\n✓ New limits: Bc [{bc_min_new:.1f}, {bc_max_new:.1f}] mT, Bu [{bu_min_new:.1f}, {bu_max_new:.1f}] mT")
+    
+    return {
+        'bc_lim': (bc_min_new, bc_max_new),
+        'bu_lim': (bu_min_new, bu_max_new)
+    }
+
 def plot_forc_diagram_standard(result, ax=None, show_points=True, 
-                               colormap='hot', vmin=None, vmax=None):
+                               colormap='hot', vmin=None, vmax=None,
+                               bc_lim=None, bu_lim=None):
     """
     Plot FORC diagram in standard format matching published figures.
     
@@ -654,18 +821,22 @@ def plot_forc_diagram_standard(result, ax=None, show_points=True,
     
     # Determine color scale
     if vmin is None or vmax is None:
-        # Use percentiles to avoid outliers
-        vmin_auto = np.percentile(rho_flat, 1)
-        vmax_auto = np.percentile(rho_flat, 99)
+        # Use tighter percentiles for better color contrast
+        # 5-95 instead of 1-99 makes colors more vibrant
+        vmin_auto = np.percentile(rho_flat, 5)
+        vmax_auto = np.percentile(rho_flat, 95)
         if vmin is None:
             vmin = vmin_auto
         if vmax is None:
             vmax = vmax_auto
     
     if show_points:
-        # Scatter plot (matches your Image 2 and 3)
+        # Scatter plot - BRIGHT MODE for vibrant colors
+        # Larger points (s=2-3) for better coverage
+        # Higher alpha (0.8-1.0) for more saturated colors
+        # Tighter vmin/vmax (5-95 percentile) for better contrast
         scatter = ax.scatter(Bc_flat, Bu_flat, c=rho_flat, 
-                            cmap=colormap, s=1, alpha=0.6,
+                            cmap=colormap, s=3, alpha=0.9,
                             vmin=vmin, vmax=vmax)
     else:
         # Contour plot with FIXED color scale
@@ -682,13 +853,51 @@ def plot_forc_diagram_standard(result, ax=None, show_points=True,
         ax.contour(Bc, Bu, rho_clipped_masked, 
                   levels=levels, colors='k', linewidths=0.3, alpha=0.2)
     
+    # Convert to mT for display (data is in Tesla)
+    # Get current data limits
+    current_xlim = ax.get_xlim()
+    current_ylim = ax.get_ylim()
+    
+    # Convert Tesla to mT (multiply by 1000)
+    # This affects both the data and the axis limits
+    ax.set_xlim(current_xlim[0] * 1000, current_xlim[1] * 1000)
+    ax.set_ylim(current_ylim[0] * 1000, current_ylim[1] * 1000)
+    
+    # Re-plot with mT units
+    ax.clear()
+    Bc_mT = Bc * 1000
+    Bu_mT = Bu * 1000
+    Bc_flat_mT = Bc_flat * 1000
+    Bu_flat_mT = Bu_flat * 1000
+    
+    if show_points:
+        # Scatter plot - BRIGHT MODE for vibrant colors
+        scatter = ax.scatter(Bc_flat_mT, Bu_flat_mT, c=rho_flat, 
+                            cmap=colormap, s=3, alpha=0.9,
+                            vmin=vmin, vmax=vmax)
+    else:
+        rho_clipped = np.clip(rho, vmin, vmax)
+        rho_clipped_masked = np.ma.masked_where(~mask, rho_clipped)
+        levels = np.linspace(vmin, vmax, 20)
+        scatter = ax.contourf(Bc_mT, Bu_mT, rho_clipped_masked, 
+                             levels=levels, cmap=colormap,
+                             vmin=vmin, vmax=vmax, extend='neither')
+        ax.contour(Bc_mT, Bu_mT, rho_clipped_masked, 
+                  levels=levels, colors='k', linewidths=0.3, alpha=0.2)
+    
     # Formatting
-    ax.set_xlabel('$B_c$ (T)', fontsize=12)
-    ax.set_ylabel('$B_u$ (T)', fontsize=12)
+    ax.set_xlabel('$B_c$ (mT)', fontsize=12)
+    ax.set_ylabel('$B_u$ (mT)', fontsize=12)
     ax.set_aspect('equal')
     ax.grid(True, alpha=0.3, linestyle='-', linewidth=0.5)
     ax.axhline(0, color='k', linewidth=0.8, linestyle='--', alpha=0.5)
     ax.axvline(0, color='k', linewidth=0.8, alpha=0.3)
+    
+    # Apply user-specified axis limits (in mT)
+    if bc_lim is not None:
+        ax.set_xlim(bc_lim)
+    if bu_lim is not None:
+        ax.set_ylim(bu_lim)
     
     # Colorbar
     cbar = plt.colorbar(scatter, ax=ax, label='Am²/T²')
