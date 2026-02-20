@@ -318,7 +318,24 @@ def generate_forc_script(start_mT: float, stop_mT: float, step_mT: float,
     
     # Generate FORC curves
     # Field values are in Oersted (multiply mT by 10)
-    curve_max_vals = np.arange(start_mT, stop_mT + step_mT, step_mT)
+    
+    if exponential:
+        # Exponential spacing: field = start + step * (exp_base^i - 1)
+        range_mT = stop_mT - start_mT
+        num_steps = int(np.log(range_mT / step_mT + 1) / np.log(exp_base))
+        
+        curve_max_vals = []
+        for i in range(num_steps + 1):
+            field = start_mT + step_mT * (exp_base**i - 1)
+            if field > stop_mT:
+                field = stop_mT
+            curve_max_vals.append(round(field, 1))
+            if field >= stop_mT:
+                break
+        curve_max_vals = np.array(curve_max_vals)
+    else:
+        # Linear spacing
+        curve_max_vals = np.arange(start_mT, stop_mT + step_mT, step_mT)
     
     for curve_max in curve_max_vals:
         # Start each curve with reversal field (negative)
