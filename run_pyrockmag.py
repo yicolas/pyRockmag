@@ -958,8 +958,22 @@ def generate_forc_measurement():
     
     try:
         start = float(input("  Start field (mT) [default: 0]: ").strip() or "0")
-        stop = float(input("  Stop field (mT) [default: 300]: ").strip() or "300")
-        step = float(input("  Step size (mT) [default: 5]: ").strip() or "5")
+        stop = float(input("  Stop field (mT) [default: 500]: ").strip() or "500")
+        
+        # Ask for linear or exponential spacing
+        print("\n  Field Spacing:")
+        print("  + [1] Linear (constant step size)")
+        print("  + [2] Exponential (growing step size)")
+        spacing_choice = input("  Choice [1]: ").strip() or "1"
+        exponential = (spacing_choice == '2')
+        
+        if exponential:
+            step = float(input("  Minimum step size (mT) [default: 5]: ").strip() or "5")
+            exp_base = float(input("  Exponential base (typically 1.2-1.5) [default: 1.3]: ").strip() or "1.3")
+        else:
+            step = float(input("  Step size (mT) [default: 5]: ").strip() or "5")
+            exp_base = 1.3  # Not used for linear
+            
     except ValueError:
         print("  Invalid input.")
         return
@@ -974,15 +988,22 @@ def generate_forc_measurement():
     # Output path
     output_dir = input("\n  Output directory [current dir]: ").strip() or "."
     
-    if saturation:
-        filename = f"FORCz_{start:.1f}_to_{stop:.1f}_in_{step:.1f}mT_saturation.rmg"
+    if exponential:
+        if saturation:
+            filename = f"FORCz_{start:.1f}_to_{stop:.1f}mT_in_exp{exp_base:.2f}_saturation.rmg"
+        else:
+            filename = f"FORCz_{start:.1f}_to_{stop:.1f}mT_in_exp{exp_base:.2f}_Steps.rmg"
     else:
-        filename = f"FORCz_{start:.1f}_to_{stop:.1f}_in_{step:.1f}mT_steps.rmg"
+        if saturation:
+            filename = f"FORCz_{start:.1f}_to_{stop:.1f}mT_in_{step:.1f}mT_saturation.rmg"
+        else:
+            filename = f"FORCz_{start:.1f}_to_{stop:.1f}mT_in_{step:.1f}mT_steps.rmg"
     
     output_path = os.path.join(output_dir, filename)
     
     try:
-        result = generate_forc_script(start, stop, step, output_path, saturation)
+        result = generate_forc_script(start, stop, step, output_path, saturation, 
+                                      exponential, exp_base)
         print(f"\n  ✓ Generated FORC script: {result}")
         
         # Calculate number of measurements

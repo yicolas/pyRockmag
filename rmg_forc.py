@@ -272,7 +272,8 @@ def rmg_forc_diagram(data, smoothing_factor=3, ax=None):
 
 
 def generate_forc_script(start_mT: float, stop_mT: float, step_mT: float,
-                        output_path: str, saturation: bool = False):
+                        output_path: str, saturation: bool = False, 
+                        exponential: bool = False, exp_base: float = 1.3):
     """
     Generate a .rmg template file for FORC measurement.
     
@@ -291,6 +292,12 @@ def generate_forc_script(start_mT: float, stop_mT: float, step_mT: float,
     saturation : bool
         If True, measure full saturation curve at each reversal
         If False, only measure up to the reversal field (standard FORC)
+    exponential : bool
+        If True, use exponential spacing (step_mT * exp_base^i)
+        If False, use linear spacing (default)
+    exp_base : float
+        Exponential base for field steps (default: 1.3)
+        Formula: field = start + step * (exp_base^i - 1)
     
     Returns
     -------
