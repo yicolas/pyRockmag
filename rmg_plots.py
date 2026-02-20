@@ -177,7 +177,7 @@ def rmg_sirm_derivative_plot(data_list, ax: Axes = None,
 # ─────────────────────────────────────────────────────────────────────────────
 
 def rmg_arm_plot(data_list, af_levels=None, ax: Axes = None):
-    """ARM acquisition curves."""
+    """ARM acquisition curves. Plots only the last replicate if multiple exist."""
     if not isinstance(data_list, list):
         data_list = [data_list]
     if ax is None:
@@ -185,11 +185,12 @@ def rmg_arm_plot(data_list, af_levels=None, ax: Axes = None):
 
     for i, d in enumerate(data_list):
         arms = rmg_arm_curve(d)
-        for arm in arms:
-            if not arm.doesExist:
-                continue
-            if not hasattr(arm, 'fracmags'):
-                continue
+        # Filter to only existing ARM curves with fracmags
+        valid_arms = [arm for arm in arms if arm.doesExist and hasattr(arm, 'fracmags')]
+        
+        # Plot only the LAST replicate (most recent measurement)
+        if valid_arms:
+            arm = valid_arms[-1]
             af_lev = arm.treatmentAFFields[0] if len(arm.treatmentAFFields) > 0 else np.nan
             lbl = f'{arm.samplename} ({round(af_lev * 1000)} mT)' if np.isfinite(af_lev) else arm.samplename
             ax.plot(arm.treatmentDCFields * 1000, arm.fracmags, _style(i), label=lbl)
@@ -215,6 +216,7 @@ def rmg_lowrie_fuller_plot(data_list, af_levels=None,
     """
     Lowrie-Fuller plot: normalised AF demagnetisation of ARM and IRM.
     single_mode=True plots only the ARM curve (MATLAB '1' flag).
+    Plots only the last replicate if multiple measurements exist.
     """
     if not isinstance(data_list, list):
         data_list = [data_list]
@@ -229,9 +231,12 @@ def rmg_lowrie_fuller_plot(data_list, af_levels=None,
 
     for i, d in enumerate(data_list):
         curves = rmg_lowrie_fuller_curves(d)
-        for lf in curves:
-            if not lf.doesExist:
-                continue
+        # Filter to existing curves
+        valid_curves = [lf for lf in curves if lf.doesExist]
+        
+        # Plot only the LAST replicate
+        if valid_curves:
+            lf = valid_curves[-1]
             arm_af = lf.ARMAF
             irm_af = lf.IRMAF
             if arm_af.doesExist:
@@ -262,7 +267,7 @@ def rmg_lowrie_fuller_plot(data_list, af_levels=None,
 # ─────────────────────────────────────────────────────────────────────────────
 
 def rmg_fuller_plot(data_list, af_levels=None, ax: Axes = None):
-    """Fuller plot: NRM/ARM vs IRM (log-log)."""
+    """Fuller plot: NRM/ARM vs IRM (log-log). Plots only the last ARM replicate."""
     if not isinstance(data_list, list):
         data_list = [data_list]
     if ax is None:
@@ -286,12 +291,14 @@ def rmg_fuller_plot(data_list, af_levels=None, ax: Axes = None):
                       label=f'{fc.NRM.samplename} NRM')
             count_nrm += 1
 
-        for j, (arm, calc_arm) in enumerate(zip(fc.ARM, fc.calcARM)):
-            if arm.doesExist:
-                ax.loglog(fc.calcIRM, calc_arm,
-                          ARM_COLORS[count_arm % 3] + SYMS[(count_arm * 2) % 4] + '-',
-                          label=f'{arm.samplename} ARM')
-                count_arm += 1
+        # Plot only the LAST ARM replicate
+        valid_arms = [(arm, calc) for arm, calc in zip(fc.ARM, fc.calcARM) if arm.doesExist]
+        if valid_arms:
+            arm, calc_arm = valid_arms[-1]
+            ax.loglog(fc.calcIRM, calc_arm,
+                      ARM_COLORS[count_arm % 3] + SYMS[(count_arm * 2) % 4] + '-',
+                      label=f'{arm.samplename} ARM')
+            count_arm += 1
 
     if ax.lines:
         # Reference lines

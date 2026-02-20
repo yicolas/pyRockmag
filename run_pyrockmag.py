@@ -59,12 +59,40 @@ except Exception:
     MATPLOTLIB_OK = False
 
 
-BANNER = textwrap.dedent("""
-    ╔══════════════════════════════════════════════════════╗
-    ║          matRockmag  –  Python Port                  ║
-    ║  Rock-magnetic analysis of .rmg data files           ║
-    ╚══════════════════════════════════════════════════════╝
-""")
+BANNER = """
+===============================================================
+          ░▒▓███████▓▒░░▒▓█▓▒░░▒▓█▓▒░ 
+          ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░ 
+          ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░ 
+          ░▒▓███████▓▒░ ░▒▓██████▓▒░  
+          ░▒▓█▓▒░         ░▒▓█▓▒░     
+          ░▒▓█▓▒░         ░▒▓█▓▒░     
+          ░▒▓█▓▒░         ░▒▓█▓▒░     
+
+     ░▒▓███████▓▒░ ░▒▓██████▓▒░  ░▒▓██████▓▒░░▒▓█▓▒░░▒▓█▓▒░ 
+     ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░ 
+     ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░      ░▒▓█▓▒░░▒▓█▓▒░ 
+     ░▒▓███████▓▒░ ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░      ░▒▓███████▓▒░  
+     ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░      ░▒▓█▓▒░░▒▓█▓▒░ 
+     ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░ 
+     ░▒▓█▓▒░░▒▓█▓▒░░▒▓██████▓▒░ ░▒▓██████▓▒░░▒▓█▓▒░░▒▓█▓▒░ 
+
+     ░▒▓██████████████▓▒░ ░▒▓██████▓▒░ ░▒▓██████▓▒░░▒▓█▓▒░ 
+     ░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░      ░▒▓█▓▒░ 
+     ░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░             
+     ░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░▒▓████████▓▒░▒▓█▓▒▒▓███▓▒░▒▓█▓▒░ 
+     ░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░       
+     ░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░ 
+     ░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░░▒▓██████▓▒░░▒▓█▓▒░ 
+
+                    v1.0 - CIT Format Suite
+        
+[ANALYSIS] Hysteresis • Coercivity • IRM • ARM • Backfield
+[FORC] Diagrams • FORCinel v3.0.8 • Multiple Colormaps
+[PALEOMAG] .SAM Generation • Sun Compass • IGRF • 8.3 Format
+[UTILITIES] Batch Plotting • Lowrie-Fuller • Statistics Export
+===============================================================
+"""
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -196,10 +224,10 @@ def group_samples(loaded):
             print(f"    Group {g_idx}: {names}")
         
         print("\n  Options:")
-        print("    [N] Create new group")
-        print("    [D] Done (proceed with current groups)")
-        print("    [A] All together (one group with all samples)")
-        print("    [S] All separate (one sample per group)")
+        print("  + [N] Create new group")
+        print("  + [D] Done (proceed with current groups)")
+        print("  + [A] All together (one group with all samples)")
+        print("  + [S] All separate (one sample per group)")
         
         choice = input("  Choice: ").strip().upper()
         
@@ -360,9 +388,9 @@ def show_coercivities(loaded):
     # Ask for filtering/sorting options
     print(f"\n  Found {len(valid_stats)} sample(s) with coercivity data.")
     print("  Options:")
-    print("    [A] Show all samples")
-    print("    [R] Filter by Hcr range")
-    print("    [S] Sort by parameter")
+    print("  + [A] Show all samples")
+    print("  + [R] Filter by Hcr range")
+    print("  + [S] Sort by parameter")
     
     choice = input("  Choice [A]: ").strip().upper() or 'A'
     
@@ -387,10 +415,10 @@ def show_coercivities(loaded):
     
     elif choice == 'S':
         print("  Sort by:")
-        print("    [1] Hcr")
-        print("    [2] MDF_IRM")
-        print("    [3] MDF_ARM")
-        print("    [4] Sample name")
+        print("  + [1] Hcr")
+        print("  + [2] MDF_IRM")
+        print("  + [3] MDF_ARM")
+        print("  + [4] Sample name")
         sort_choice = input("  Choice [1]: ").strip() or '1'
         
         if sort_choice == '1':
@@ -483,13 +511,13 @@ def plot_forc_data(loaded):
     
     # Plot options
     print("\n  FORC Plot Options:")
-    print("    [1] Complete hysteresis (all curves with reversals)")
-    print("    [2] FORC diagram - hot_r colormap (classic red/orange)")
-    print("    [3] FORC diagram - plasma_r colormap (yellow/pink/purple)")
-    print("    [4] FORC diagram - inferno_r colormap (high contrast)")
-    print("    [5] FORC diagrams - contour plots (hot_r + plasma_r + inferno_r)")
-    print("    [6] All plots (hysteresis + 3 scatter + 3 contour = 7 plots)")
-    print("    [7] FORCinel v3 workflow (export .frc + processed)")
+    print("  + [1] Complete hysteresis (all curves with reversals)")
+    print("  + [2] FORC diagram - hot_r colormap (classic red/orange)")
+    print("  + [3] FORC diagram - plasma_r colormap (yellow/pink/purple)")
+    print("  + [4] FORC diagram - inferno_r colormap (high contrast)")
+    print("  + [5] FORC diagrams - contour plots (hot_r + plasma_r + inferno_r)")
+    print("  + [6] All plots (hysteresis + 3 scatter + 3 contour = 7 plots)")
+    print("  + [7] FORCinel v3 workflow (export .frc + processed)")
     
     choice = input("  Choice [6]: ").strip() or '6'
     
@@ -695,8 +723,8 @@ def generate_forc_measurement():
     
     # Ask for saturation or standard FORC
     print("\n  FORC Type:")
-    print("    [1] Standard FORC (measure up to reversal field)")
-    print("    [2] Saturation FORC (measure full curve at each reversal)")
+    print("  + [1] Standard FORC (measure up to reversal field)")
+    print("  + [2] Saturation FORC (measure full curve at each reversal)")
     choice = input("  Choice [1]: ").strip() or "1"
     saturation = (choice == '2')
     
@@ -822,22 +850,22 @@ def main():
 
     # ── interactive menu loop ──────────────────────────────────────────────
     while True:
-        print("\n── Loaded samples ──────────────────────────────────────────")
+        print("\n▼═══════════════════════════════════════════════════════════▼")
         show_loaded(loaded)
 
-        print("\n── Actions ─────────────────────────────────────────────────")
-        print("    [L] Load more files from a directory")
-        print("    [X] Remove samples from loaded list")
-        print("    [R] Run selected routines (batch plotter)")
-        print("    [F] Full 3×3 analysis dashboard")
-        print("    [I] Inspect one sample (show detailed stats)")
-        print("    [H] Show coercivity values (Hcr, MDF) for all samples")
-        print("    [E] Export all statistics to table")
-        print("    [P] Plot FORC data (First Order Reversal Curves)")
-        print("    [G] Generate FORC measurement script")
-        print("    [S] Generate SAM header files (paleomag)")
-        print("    [C] Clear all loaded samples")
-        print("    [Q] Quit")
+        print("\n▼═══════════════════════════════════════════════════════════▼")
+        print("  + [L] Load more files from a directory")
+        print("  + [X] Remove samples from loaded list")
+        print("  + [R] Run selected routines (batch plotter)")
+        print("  + [F] Full 3×3 analysis dashboard")
+        print("  + [I] Inspect one sample (show detailed stats)")
+        print("  + [H] Show coercivity values (Hcr, MDF) for all samples")
+        print("  + [E] Export all statistics to table")
+        print("  + [P] Plot FORC data (First Order Reversal Curves)")
+        print("  + [G] Generate FORC measurement script")
+        print("  + [S] Generate SAM header files (paleomag)")
+        print("  + [C] Clear all loaded samples")
+        print("  + [Q] Quit")
 
         choice = input("\n  Choice: ").strip().upper()
 
