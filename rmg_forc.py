@@ -345,13 +345,36 @@ def generate_forc_script(start_mT: float, stop_mT: float, step_mT: float,
         output += f"FORCz, {int(curve_max * -10)} , 0 , 0 , 0 , {dummy_vals}\r\n"
         
         # Measurement sweep (positive fields)
-        if saturation:
-            # Saturation FORC: measure from 0 to stop field
-            # CRITICAL: Must include 0 mT measurement after reversal!
-            field_vals = np.arange(0, stop_mT + step_mT, step_mT)
+        if exponential:
+            # Exponential forward steps (same spacing as reversals)
+            if saturation:
+                # Saturation FORC: measure from 0 to stop field
+                max_field = stop_mT
+            else:
+                # Standard FORC: measure from 0 to reversal field
+                max_field = curve_max
+            
+            # Generate exponential forward steps
+            field_vals = [0]  # Always start at zero
+            i = 0
+            while True:
+                field = start_mT + step_mT * (exp_base**i - 1)
+                if field > max_field:
+                    if field_vals[-1] < max_field:  # Add final point if not there
+                        field_vals.append(max_field)
+                    break
+                if field > 0:  # Skip negative values
+                    field_vals.append(round(field, 1))
+                i += 1
+            field_vals = np.array(field_vals)
         else:
-            # Standard FORC: measure from 0 to reversal field
-            field_vals = np.arange(0, curve_max + step_mT, step_mT)
+            # Linear forward steps
+            if saturation:
+                # Saturation FORC: measure from 0 to stop field
+                field_vals = np.arange(0, stop_mT + step_mT, step_mT)
+            else:
+                # Standard FORC: measure from 0 to reversal field
+                field_vals = np.arange(0, curve_max + step_mT, step_mT)
         
         for field in field_vals:
             output += f"FORCz, {int(field * 10)} , 0 , 0 , 0 , {dummy_vals}\r\n"
