@@ -72,14 +72,14 @@ def rmg_sirm_plot(data_list, ax: Axes = None):
         # skip zero-field baseline steps before semilogx
         pos = dc > 0
         if np.sum(pos) > 1:
-            ax.semilogx(dc[pos] * 1000, frac[pos],
+            ax.plot(dc[pos] * 1000, frac[pos],
                         _style(i), label=data_list[i].samplename)
         if irm.AF.doesExist and hasattr(irm.AF, 'fracmags'):
             af_f = irm.AF.treatmentAFFields
             af_frac = irm.AF.fracmags
             pos_af = af_f > 0
             if np.sum(pos_af) > 1:
-                ax.semilogx(af_f[pos_af] * 1000, af_frac[pos_af], _style(i))
+                ax.plot(af_f[pos_af] * 1000, af_frac[pos_af], _style(i))
 
     if any(irm.doesExist for irm in irm_list):
         ax.set_xlabel('B (mT)')
@@ -135,7 +135,7 @@ def rmg_sirm_derivative_plot(data_list, ax: Axes = None,
 
         if (mode in ('both', 'acq') and hasattr(irm.IRM, 'logDerivFields')
                 and len(irm.IRM.logDerivFields) > 0):
-            x_acq  = irm.IRM.logDerivFields + 3
+            x_acq  = 10**(irm.IRM.logDerivFields + 3)  # Convert log to linear mT
             ld     = irm.IRM.logderiv
             lds    = irm.IRM.logderivSmooth
             finite = np.isfinite(ld)
@@ -149,7 +149,7 @@ def rmg_sirm_derivative_plot(data_list, ax: Axes = None,
 
         if (mode in ('both', 'af') and has_af
                 and len(irm.AF.logDerivFields) > 0):
-            x_af   = irm.AF.logDerivFields + 3
+            x_af   = 10**(irm.AF.logDerivFields + 3)  # Convert log to linear mT
             ld     = irm.AF.logderiv
             lds    = irm.AF.logderivSmooth
             finite = np.isfinite(ld)
@@ -162,12 +162,11 @@ def rmg_sirm_derivative_plot(data_list, ax: Axes = None,
                         label=f'{data_list[i].samplename} AF')
 
     if any(irm.doesExist for irm in irm_list):
-        ax.set_xlabel('log B (mT)')
+        ax.set_xlabel('B (mT)')  # Linear scale now
         ax.set_ylabel('df$_{IRM}$/dB')
         ax.set_title(f'dIRM/dB{title_suffix}')
         ax.set_ylim(bottom=0)
-        if len(data_list) > 1:
-            ax.legend(loc='upper left', fontsize='small')
+        ax.legend(loc='upper left', fontsize='small')  # Always show legend
     else:
         ax.axis('off')
 
@@ -182,6 +181,42 @@ def rmg_arm_plot(data_list, af_levels=None, ax: Axes = None):
         data_list = [data_list]
     if ax is None:
         ax = plt.gca()
+    
+    # Reference curves from RmgARMPlot.m
+    # Chiton: biogenic single-domain magnetite (Kirschvink & Lowenstam 1979)
+    # MS1: synthetic PSD magnetite standard
+    _emuConvert   = 1e-3
+    _GaussConvert = 1e-4   # Oe → T; ×1000 → mT
+    
+    _chiton_DC_mT  = np.arange(0, 21) * _GaussConvert * 1000
+    _chiton_mz     = _emuConvert * np.array([
+        1.02e-06, 1.745e-05, 3.845e-05, 5.815e-05, 7.521e-05,
+        9.431e-05, 1.107e-04, 1.297e-04, 1.466e-04, 1.596e-04,
+        1.751e-04, 1.916e-04, 2.064e-04, 2.214e-04, 2.379e-04,
+        2.520e-04, 2.652e-04, 2.832e-04, 2.941e-04, 3.066e-04, 3.190e-04
+    ])
+    _chiton_IRM100 = 0.001936 * _emuConvert
+    
+    _MS1_DC_mT  = np.arange(0, 21) * _GaussConvert * 1000
+    _MS1_mz     = _emuConvert * np.array([
+        4.002e-04, 1.099e-02, 2.553e-02, 3.462e-02, 4.089e-02,
+        4.560e-02, 4.913e-02, 5.138e-02, 5.335e-02, 5.458e-02,
+        5.582e-02, 5.672e-02, 5.742e-02, 5.808e-02, 5.862e-02,
+        5.909e-02, 5.947e-02, 5.977e-02, 6.013e-02, 6.040e-02, 6.072e-02
+    ])
+    _MS1_IRM100 = 0.06725 * _emuConvert
+    
+    # Clip to 0-1 mT to match plot x-axis
+    _mask_c = _chiton_DC_mT <= 1.0
+    _mask_m = _MS1_DC_mT    <= 1.0
+    
+    # Plot reference curves
+    ax.plot(_chiton_DC_mT[_mask_c], _chiton_mz[_mask_c] / _chiton_IRM100,
+            color='grey', linewidth=1.5, linestyle='--',
+            zorder=1, label='Chiton (SD ref.)')
+    ax.plot(_MS1_DC_mT[_mask_m], _MS1_mz[_mask_m] / _MS1_IRM100,
+            color='lightgrey', linewidth=1.5, linestyle='--',
+            zorder=1, label='MS1 (PSD ref.)')
 
     for i, d in enumerate(data_list):
         arms = rmg_arm_curve(d)
@@ -197,12 +232,12 @@ def rmg_arm_plot(data_list, af_levels=None, ax: Axes = None):
 
     if ax.lines:
         ax.set_xlabel('B$_{DC}$ (mT)')
+        ax.set_xlim(0, 1)  # X-axis 0-1 mT
+        ax.set_ylim(0, 1)  # Y-axis 0-1
         title_suffix = '' if len(data_list) > 1 else f': {data_list[0].samplename}'
-        # label depends on whether fracmags is relative to IRM or self-normalised
-        ax.set_ylabel('ARM / IRM  (or normalised)')
+        ax.set_ylabel('fIRM100')  # Fractional IRM at 100 mT
         ax.set_title(f'ARM{title_suffix}')
-        if len(data_list) > 1:
-            ax.legend(loc='upper left', fontsize='small')
+        ax.legend(loc='lower right', fontsize='small')
     else:
         ax.axis('off')
 
@@ -254,7 +289,8 @@ def rmg_lowrie_fuller_plot(data_list, af_levels=None,
 
     if ax.lines:
         ax.set_xlabel('B (mT)')
-        ax.set_ylabel('Normalised moment')
+        ax.set_ylabel('Fractional Mag.')  # Changed from 'Normalised moment'
+        ax.set_xlim(right=150)  # X-axis ends at 150 mT
         title_suffix = '' if len(data_list) > 1 else f': {data_list[0].samplename}'
         ax.set_title(f'Lowrie-Fuller{title_suffix}')
         ax.legend(loc='upper right', fontsize='small')
@@ -326,6 +362,42 @@ def rmg_rrm_plot(data_list, af_levels=None, ax: Axes = None):
         data_list = [data_list]
     if ax is None:
         ax = plt.gca()
+    
+    # Reference curves from RmgARMPlot.m
+    # Chiton: biogenic single-domain magnetite (Kirschvink & Lowenstam 1979)
+    # MS1: synthetic PSD magnetite standard
+    _emuConvert   = 1e-3
+    _GaussConvert = 1e-4   # Oe → T; ×1000 → mT
+    
+    _chiton_DC_mT  = np.arange(0, 21) * _GaussConvert * 1000
+    _chiton_mz     = _emuConvert * np.array([
+        1.02e-06, 1.745e-05, 3.845e-05, 5.815e-05, 7.521e-05,
+        9.431e-05, 1.107e-04, 1.297e-04, 1.466e-04, 1.596e-04,
+        1.751e-04, 1.916e-04, 2.064e-04, 2.214e-04, 2.379e-04,
+        2.520e-04, 2.652e-04, 2.832e-04, 2.941e-04, 3.066e-04, 3.190e-04
+    ])
+    _chiton_IRM100 = 0.001936 * _emuConvert
+    
+    _MS1_DC_mT  = np.arange(0, 21) * _GaussConvert * 1000
+    _MS1_mz     = _emuConvert * np.array([
+        4.002e-04, 1.099e-02, 2.553e-02, 3.462e-02, 4.089e-02,
+        4.560e-02, 4.913e-02, 5.138e-02, 5.335e-02, 5.458e-02,
+        5.582e-02, 5.672e-02, 5.742e-02, 5.808e-02, 5.862e-02,
+        5.909e-02, 5.947e-02, 5.977e-02, 6.013e-02, 6.040e-02, 6.072e-02
+    ])
+    _MS1_IRM100 = 0.06725 * _emuConvert
+    
+    # Clip to 0-1 mT to match plot x-axis
+    _mask_c = _chiton_DC_mT <= 1.0
+    _mask_m = _MS1_DC_mT    <= 1.0
+    
+    # Plot reference curves
+    ax.plot(_chiton_DC_mT[_mask_c], _chiton_mz[_mask_c] / _chiton_IRM100,
+            color='grey', linewidth=1.5, linestyle='--',
+            zorder=1, label='Chiton (SD ref.)')
+    ax.plot(_MS1_DC_mT[_mask_m], _MS1_mz[_mask_m] / _MS1_IRM100,
+            color='lightgrey', linewidth=1.5, linestyle='--',
+            zorder=1, label='MS1 (PSD ref.)')
 
     for i, d in enumerate(data_list):
         curves = rmg_rrm_curve(d)
@@ -432,7 +504,7 @@ def rmg_stat_box(data_list, af_levels=None, ax: Axes = None):
 
 def rmg_data_full_analysis(data_list, af_levels=None):
     """
-    Reproduce the 3×3 subplot dashboard from RmgDataFullAnalysis.m.
+    9-Panel Rock-Mag Dashboard: IRM, ARM, Backfield, Lowrie-Fuller, etc.
 
     Parameters
     ----------
@@ -454,7 +526,7 @@ def rmg_data_full_analysis(data_list, af_levels=None):
 
     sample_title = data_list[0].samplename if len(data_list) == 1 else 'Multiple samples'
     fig, axes = plt.subplots(3, 3, figsize=(15, 11))
-    fig.suptitle(f'Rock-Mag Full Analysis – {sample_title}', fontsize=12, y=1.01)
+    fig.suptitle(f'8-Panel Rock-Mag Analysis – {sample_title}', fontsize=14, y=0.995)
 
     rmg_sirm_plot(data_list,            ax=axes[0, 0])
     rmg_sirm_derivative_plot(data_list, ax=axes[0, 1])
@@ -462,9 +534,9 @@ def rmg_data_full_analysis(data_list, af_levels=None):
     rmg_lowrie_fuller_plot(data_list,   ax=axes[1, 0])
     rmg_lowrie_fuller_plot(data_list, single_mode=True, ax=axes[1, 1])
     rmg_fuller_plot(data_list,          ax=axes[1, 2])
-    rmg_rrm_plot(data_list,             ax=axes[2, 0])
-    rmg_backfield_plot(data_list,       ax=axes[2, 1])
-    rmg_stat_box(data_list,             ax=axes[2, 2])
+    rmg_backfield_plot(data_list,       ax=axes[2, 0])
+    rmg_stat_box(data_list,             ax=axes[2, 1])
+    axes[2, 2].axis('off')  # Empty plot where RRM was
 
-    plt.tight_layout()
+    plt.tight_layout(h_pad=3.0, w_pad=2.0)  # 0.5x more spacing
     return fig

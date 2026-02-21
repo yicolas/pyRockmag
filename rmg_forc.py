@@ -316,6 +316,9 @@ def generate_forc_script(start_mT: float, stop_mT: float, step_mT: float,
     # NRM baseline
     output += f"NRM, 0 , 0 , 0 , 0 , {dummy_vals}\r\n"
     
+    # Initial saturation step (go to max field before starting FORC curves)
+    output += f"FORCz, {int(stop_mT * 10)} , 0 , 0 , 0 , {dummy_vals}\r\n"
+    
     # Generate FORC curves
     # Field values are in Oersted (multiply mT by 10)
     
@@ -343,22 +346,15 @@ def generate_forc_script(start_mT: float, stop_mT: float, step_mT: float,
         
         # Measurement sweep (positive fields)
         if saturation:
-            # Go all the way to stop field (saturation FORC)
-            field_vals = np.arange(start_mT, stop_mT + step_mT, step_mT)
+            # Saturation FORC: measure from 0 to stop field
+            # CRITICAL: Must include 0 mT measurement after reversal!
+            field_vals = np.arange(0, stop_mT + step_mT, step_mT)
         else:
-            # Go only up to reversal field (standard FORC)
-            field_vals = np.arange(start_mT, curve_max + step_mT, step_mT)
+            # Standard FORC: measure from 0 to reversal field
+            field_vals = np.arange(0, curve_max + step_mT, step_mT)
         
         for field in field_vals:
             output += f"FORCz, {int(field * 10)} , 0 , 0 , 0 , {dummy_vals}\r\n"
-        
-        # Add AFmax at end of each curve for saturation FORC
-        if saturation:
-            output += f"AFmax, 1250 , 0 , 0 , 0 , {dummy_vals}\r\n"
-    
-    # Final AFmax
-    if not saturation:
-        output += f"AFmax, 1250 , 0 , 0 , 0 , {dummy_vals}\r\n"
     
     # Write to file
     with open(output_path, 'w', newline='') as f:
@@ -594,11 +590,11 @@ def plot_forc_forcinel_style(result: dict, ax=None, colormap='RdBu_r',
     rho = result['rho']
     mask = result['valid_mask']
     
-    # Mask invalid region and focus on lower half (Hu <= 0)
-    rho_masked = np.ma.masked_where(~mask | (Hu > 0), rho)
+    # Mask only the invalid region (where Ha < Hr)
+    rho_masked = np.ma.masked_where(~mask, rho)
     
     # Determine contour levels from valid data
-    valid_rho = rho[mask & (Hu <= 0)]
+    valid_rho = rho[mask]
     if np.any(np.isfinite(valid_rho)):
         vmin, vmax = np.percentile(valid_rho[np.isfinite(valid_rho)], [2, 98])
     else:
@@ -827,17 +823,25 @@ def plot_forc_diagram_standard(result, ax=None, show_points=True,
         fig, ax = plt.subplots(figsize=(8, 9))
     
     # Use Bc/Bu notation (standard in FORC literature)
-    Bc = result['Hc']  # Already calculated as (Ha - Hr)/2
-    Bu = result['Hu']  # Already calculated as (Ha + Hr)/2
+    Bc = result['Hc']  # Already calculated as (Ha - Hr)/2, in Tesla
+    Bu = result['Hu']  # Already calculated as (Ha + Hr)/2, in Tesla
     rho = result['rho']
     mask = result['valid_mask']
     
-    # Flatten for scatter plot
-    Bc_flat = Bc[mask].flatten()
-    Bu_flat = Bu[mask].flatten()
-    rho_flat = rho[mask].flatten()
+    # Convert to mT FIRST (before any plotting)
+    Bc_mT = Bc * 1000
+    Bu_mT = Bu * 1000
     
-    # Remove NaN
+    # Handle NaN values in rho (common in sparse upper Bu region)
+    # Replace NaN with zero for visualization
+    rho_clean = np.where(np.isnan(rho), 0, rho)
+    
+    # Flatten for scatter plot
+    Bc_flat = Bc_mT[mask].flatten()
+    Bu_flat = Bu_mT[mask].flatten()
+    rho_flat = rho_clean[mask].flatten()
+    
+    # Remove remaining NaN (if any)
     finite = np.isfinite(rho_flat)
     Bc_flat = Bc_flat[finite]
     Bu_flat = Bu_flat[finite]
@@ -846,7 +850,6 @@ def plot_forc_diagram_standard(result, ax=None, show_points=True,
     # Determine color scale
     if vmin is None or vmax is None:
         # Use tighter percentiles for better color contrast
-        # 5-95 instead of 1-99 makes colors more vibrant
         vmin_auto = np.percentile(rho_flat, 5)
         vmax_auto = np.percentile(rho_flat, 95)
         if vmin is None:
@@ -856,53 +859,15 @@ def plot_forc_diagram_standard(result, ax=None, show_points=True,
     
     if show_points:
         # Scatter plot - BRIGHT MODE for vibrant colors
-        # Larger points (s=2-3) for better coverage
-        # Higher alpha (0.8-1.0) for more saturated colors
-        # Tighter vmin/vmax (5-95 percentile) for better contrast
         scatter = ax.scatter(Bc_flat, Bu_flat, c=rho_flat, 
                             cmap=colormap, s=3, alpha=0.9,
                             vmin=vmin, vmax=vmax)
     else:
-        # Contour plot with FIXED color scale
-        # CRITICAL FIX: Clip data to vmin/vmax to prevent interpolation artifacts
-        rho_clipped = np.clip(rho, vmin, vmax)
-        rho_clipped_masked = np.ma.masked_where(~mask, rho_clipped)
-        
-        # Create levels within the percentile range
-        levels = np.linspace(vmin, vmax, 20)
-        
-        scatter = ax.contourf(Bc, Bu, rho_clipped_masked, 
-                             levels=levels, cmap=colormap,
-                             vmin=vmin, vmax=vmax, extend='neither')
-        ax.contour(Bc, Bu, rho_clipped_masked, 
-                  levels=levels, colors='k', linewidths=0.3, alpha=0.2)
-    
-    # Convert to mT for display (data is in Tesla)
-    # Get current data limits
-    current_xlim = ax.get_xlim()
-    current_ylim = ax.get_ylim()
-    
-    # Convert Tesla to mT (multiply by 1000)
-    # This affects both the data and the axis limits
-    ax.set_xlim(current_xlim[0] * 1000, current_xlim[1] * 1000)
-    ax.set_ylim(current_ylim[0] * 1000, current_ylim[1] * 1000)
-    
-    # Re-plot with mT units
-    ax.clear()
-    Bc_mT = Bc * 1000
-    Bu_mT = Bu * 1000
-    Bc_flat_mT = Bc_flat * 1000
-    Bu_flat_mT = Bu_flat * 1000
-    
-    if show_points:
-        # Scatter plot - BRIGHT MODE for vibrant colors
-        scatter = ax.scatter(Bc_flat_mT, Bu_flat_mT, c=rho_flat, 
-                            cmap=colormap, s=3, alpha=0.9,
-                            vmin=vmin, vmax=vmax)
-    else:
-        rho_clipped = np.clip(rho, vmin, vmax)
+        # Contour plot (use cleaned rho without NaN)
+        rho_clipped = np.clip(rho_clean, vmin, vmax)
         rho_clipped_masked = np.ma.masked_where(~mask, rho_clipped)
         levels = np.linspace(vmin, vmax, 20)
+        
         scatter = ax.contourf(Bc_mT, Bu_mT, rho_clipped_masked, 
                              levels=levels, cmap=colormap,
                              vmin=vmin, vmax=vmax, extend='neither')

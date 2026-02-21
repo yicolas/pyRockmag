@@ -988,16 +988,19 @@ def generate_forc_measurement():
     # Output path
     output_dir = input("\n  Output directory [current dir]: ").strip() or "."
     
+    # Generate descriptive filename with all settings
     if exponential:
+        # Exponential: include min step and base
         if saturation:
-            filename = f"FORCz_{start:.1f}_to_{stop:.1f}mT_in_exp{exp_base:.2f}_saturation.rmg"
+            filename = f"FORC_{start:.1f}-{stop:.1f}mT_exp{exp_base:.2f}_min{step:.1f}mT_SATURATION.rmg"
         else:
-            filename = f"FORCz_{start:.1f}_to_{stop:.1f}mT_in_exp{exp_base:.2f}_Steps.rmg"
+            filename = f"FORC_{start:.1f}-{stop:.1f}mT_exp{exp_base:.2f}_min{step:.1f}mT_standard.rmg"
     else:
+        # Linear: include step size
         if saturation:
-            filename = f"FORCz_{start:.1f}_to_{stop:.1f}mT_in_{step:.1f}mT_saturation.rmg"
+            filename = f"FORC_{start:.1f}-{stop:.1f}mT_linear_{step:.1f}mT_SATURATION.rmg"
         else:
-            filename = f"FORCz_{start:.1f}_to_{stop:.1f}mT_in_{step:.1f}mT_steps.rmg"
+            filename = f"FORC_{start:.1f}-{stop:.1f}mT_linear_{step:.1f}mT_standard.rmg"
     
     output_path = os.path.join(output_dir, filename)
     
@@ -1121,7 +1124,7 @@ def main():
         print("  + [L] Load more files from a directory")
         print("  + [X] Remove samples from loaded list")
         print("  + [R] Run selected routines (batch plotter)")
-        print("  + [F] Full 3×3 analysis dashboard")
+        print("  + [F] 8-Panel Rock-Mag Dashboard (IRM, ARM, Backfield, etc.)")
         print("  + [I] Inspect one sample (show detailed stats)")
         print("  + [H] Show coercivity values (Hcr, MDF) for all samples")
         print("  + [E] Export all statistics to table")
@@ -1181,7 +1184,7 @@ def main():
             
             groups = group_samples(loaded)
             
-            print(f"\nGenerating 3×3 dashboard for {len(groups)} group(s)…")
+            print(f"\nGenerating 8-panel dashboard for {len(groups)} group(s)…")
             all_figs = []
             
             for g_idx, grp in enumerate(groups, start=1):
