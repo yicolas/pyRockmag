@@ -324,17 +324,20 @@ def generate_forc_script(start_mT: float, stop_mT: float, step_mT: float,
     
     if exponential:
         # Exponential spacing: field = start + step * (exp_base^i - 1)
-        range_mT = stop_mT - start_mT
-        num_steps = int(np.log(range_mT / step_mT + 1) / np.log(exp_base))
-        
+        # Keep generating until we reach or exceed stop_mT
         curve_max_vals = []
-        for i in range(num_steps + 1):
+        i = 0
+        while True:
             field = start_mT + step_mT * (exp_base**i - 1)
             if field > stop_mT:
-                field = stop_mT
+                # Add stop_mT as final point if not already there
+                if len(curve_max_vals) == 0 or curve_max_vals[-1] < stop_mT:
+                    curve_max_vals.append(stop_mT)
+                break
             curve_max_vals.append(round(field, 1))
             if field >= stop_mT:
                 break
+            i += 1
         curve_max_vals = np.array(curve_max_vals)
     else:
         # Linear spacing

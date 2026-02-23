@@ -82,12 +82,26 @@ def rmg_sirm_plot(data_list, ax: Axes = None):
                 ax.plot(af_f[pos_af] * 1000, af_frac[pos_af], _style(i))
 
     if any(irm.doesExist for irm in irm_list):
+        ax.set_xscale('log')  # Log scale
         ax.set_xlabel('B (mT)')
         ax.set_ylabel('f$_{SIRM}$')
         title_suffix = '' if len(data_list) > 1 else f': {data_list[0].samplename}'
         ax.set_title(f'IRM{title_suffix}')
         if len(data_list) > 1:
             ax.legend(loc='upper left', fontsize='small')
+        
+        # Show multiples of 5 and 10: 1, 5, 10, 50, 100, 500, 1000
+        from matplotlib.ticker import FixedLocator, ScalarFormatter
+        # Set specific tick locations
+        ticks = [1, 5, 10, 50, 100, 500, 1000]
+        ax.xaxis.set_major_locator(FixedLocator(ticks))
+        # Format as plain numbers (not scientific notation)
+        formatter = ScalarFormatter()
+        formatter.set_scientific(False)
+        ax.xaxis.set_major_formatter(formatter)
+        
+        # Angle labels at 45 degrees
+        ax.tick_params(axis='x', rotation=45)
     else:
         ax.axis('off')
 
@@ -162,11 +176,26 @@ def rmg_sirm_derivative_plot(data_list, ax: Axes = None,
                         label=f'{data_list[i].samplename} AF')
 
     if any(irm.doesExist for irm in irm_list):
-        ax.set_xlabel('B (mT)')  # Linear scale now
-        ax.set_ylabel('df$_{IRM}$/dB')
+        ax.set_xscale('log')  # Log scale
+        ax.set_xlabel('B (mT)')
+        ax.set_ylabel('dIRM/d(log B)')
         ax.set_title(f'dIRM/dB{title_suffix}')
         ax.set_ylim(bottom=0)
-        ax.legend(loc='upper left', fontsize='small')  # Always show legend
+        # Always show legend (even for single sample)
+        ax.legend(loc='upper right', fontsize='small')
+        
+        # Show multiples of 5 and 10: 1, 5, 10, 50, 100, 500, 1000
+        from matplotlib.ticker import FixedLocator, ScalarFormatter
+        # Set specific tick locations
+        ticks = [1, 5, 10, 50, 100, 500, 1000]
+        ax.xaxis.set_major_locator(FixedLocator(ticks))
+        # Format as plain numbers (not scientific notation)
+        formatter = ScalarFormatter()
+        formatter.set_scientific(False)
+        ax.xaxis.set_major_formatter(formatter)
+        
+        # Angle labels at 45 degrees
+        ax.tick_params(axis='x', rotation=45)
     else:
         ax.axis('off')
 
@@ -231,6 +260,7 @@ def rmg_arm_plot(data_list, af_levels=None, ax: Axes = None):
             ax.plot(arm.treatmentDCFields * 1000, arm.fracmags, _style(i), label=lbl)
 
     if ax.lines:
+        # LINEAR axis (not log)
         ax.set_xlabel('B$_{DC}$ (mT)')
         ax.set_xlim(0, 1)  # X-axis 0-1 mT
         ax.set_ylim(0, 1)  # Y-axis 0-1
