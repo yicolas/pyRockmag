@@ -324,9 +324,12 @@ def _xscale_tanh(x, y):
         return yres + 0.5 * ymax * (1 - np.tanh(a * (xv ** p - xmedian ** p)))
 
     try:
-        p0 = [miny, maxy, 5 / max((xmax - xmin) ** 0.05, 1e-10), 0.05, (xmax + xmin) / 2]
         lo = [0, 0, -np.inf, 0, -np.inf]
         hi = [np.inf, np.inf, np.inf, 1.0, np.inf]
+        # clamp p0 inside bounds so curve_fit doesn't raise immediately
+        a0   = 5 / max((xmax - xmin) ** 0.05, 1e-10)
+        xmed = (xmax + xmin) / 2
+        p0 = [max(miny, 0.0), max(maxy, 0.0), a0, 0.05, xmed]
         popt, _ = curve_fit(tanh_model, x, y, p0=p0, bounds=(lo, hi), maxfev=10000)
     except Exception:
         popt = [miny, maxy, 1.0, 0.05, np.mean(x)]

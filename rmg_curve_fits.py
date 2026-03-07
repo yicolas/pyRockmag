@@ -299,3 +299,165 @@ def rmg_af_derivative_curve_fits(af_curve):
     y.mzlogderivbestfit           = fits[best_n - 1]
     y.mzlogderivbestfitgaussians  = best_n
     return y
+
+
+# =============================================================================
+#  NEW: fit_sgg_comps                         (fitSGGComps.m)
+#  NEW: rmg_sirm_derivative_curve_fit_comps_sgg  (component-constrained SGG)
+# =============================================================================
+
+def fit_sgg_comps(x, y, means, stds, qs, ps=None):
+    """
+    Fit a weighted sum of SGG components where shapes are fixed and only
+    amplitudes (a_i) are free parameters.
+
+    Port of fitSGGComps.m (Kopp 2008).
+
+    Parameters
+    ----------
+    x, y   : array-like — data to fit
+    means  : array-like — fixed component means
+    stds   : array-like — fixed component standard deviations
+    qs     : array-like — fixed SGG skewness parameters
+    ps     : array-like, optional — SGG shape exponents (default 2 = Gaussian)
+
+    Returns
+    -------
+    dict with: a, m, s, q, p  (a fitted, rest fixed)
+               a_error95, m_error95, s_error95, q_error95, p_error95
+               x, expected
+               y  (n_points × n_components array of component curves)
+               totalArea, mean, dispersion, skewness  (per component)
+               goodness  (sse, rsquare, dfe)
+    """
+    _trapz = np.trapezoid if hasattr(np, 'trapezoid') else np.trapz
+
+    x     = np.asarray(x,     dtype=float).ravel()
+    y     = np.asarray(y,     dtype=float).ravel()
+    means = np.asarray(means, dtype=float)
+    stds  = np.asarray(stds,  dtype=float)
+    qs    = np.asarray(qs,    dtype=float)
+    n     = len(means)
+    ps    = np.full(n, 2.0) if ps is None else np.asarray(ps, dtype=float)
+
+    try:
+        from sgg import sgg as _sgg
+    except ImportError:
+        def _sgg(xd, m, s, q, p=2):
+            z = (xd - m) / max(abs(s), 1e-30)
+            return np.exp(-0.5 * np.abs(z) ** p)
+
+    def _model(xdata, *amplitudes):
+        out = np.zeros_like(xdata, dtype=float)
+        for i, a in enumerate(amplitudes):
+            out += a * _sgg(xdata, means[i], stds[i], qs[i], ps[i])
+        return out
+
+    start = np.full(n, max(float(_trapz(y, x)) / n, 1e-30))
+
+    try:
+        popt, pcov = curve_fit(_model, x, y, p0=start,
+                               bounds=(np.zeros(n), np.full(n, np.inf)),
+                               maxfev=10_000)
+    except Exception:
+        popt = start.copy()
+        pcov = np.full((n, n), np.nan)
+
+    diag = np.diag(pcov)
+    perr = (np.sqrt(np.where(diag >= 0, diag, np.nan))
+            if not np.any(np.isnan(pcov)) else np.full(n, np.nan))
+
+    expected = _model(x, *popt)
+
+    y_comps  = np.zeros((len(x), n))
+    totalArea  = np.zeros(n)
+    comp_mean  = np.zeros(n)
+    comp_disp  = np.zeros(n)
+    comp_skew  = np.zeros(n)
+
+    for i in range(n):
+        comp = popt[i] * _sgg(x, means[i], stds[i], qs[i], ps[i])
+        y_comps[:, i] = comp
+        area = float(_trapz(comp, x))
+        totalArea[i] = area
+        if area > 0:
+            comp_mean[i] = float(_trapz(comp * x, x)) / area
+            comp_disp[i] = float(np.sqrt(_trapz(comp * (x - comp_mean[i])**2, x) / area))
+            if comp_disp[i] > 0:
+                comp_skew[i] = float(_trapz(comp * (x - comp_mean[i])**3, x) /
+                                     (area * comp_disp[i]**3))
+
+    residuals = y - expected
+    sse = float(np.sum(residuals**2))
+    sst = float(np.sum((y - np.mean(y))**2))
+    dfe = max(len(x) - n, 1)
+
+    return {
+        'a':          popt,
+        'm':          means.copy(),
+        's':          stds.copy(),
+        'q':          qs.copy(),
+        'p':          ps.copy(),
+        'a_error95':  1.96 * perr,
+        'm_error95':  np.zeros(n),
+        's_error95':  np.zeros(n),
+        'q_error95':  np.zeros(n),
+        'p_error95':  np.zeros(n),
+        'x':          x,
+        'expected':   expected,
+        'y':          y_comps,
+        'totalArea':  totalArea,
+        'mean':       comp_mean,
+        'dispersion': comp_disp,
+        'skewness':   comp_skew,
+        'goodness':   {
+            'sse':     sse,
+            'rsquare': 1.0 - sse / sst if sst > 0 else np.nan,
+            'dfe':     dfe,
+        },
+    }
+
+
+def rmg_sirm_derivative_curve_fit_comps_sgg(sirm_curve, means, stds, qs=None):
+    """
+    Fit IRM and AF derivative curves with component shapes fixed externally
+    using SGG components (amplitudes only are free).
+
+    Port of RmgSIRMDerivativeCurveFitComps.m — extended to support SGG shapes.
+    Pass qs=None for symmetric Gaussian behaviour identical to MATLAB original.
+
+    Parameters
+    ----------
+    sirm_curve : SIRM curve object from rmg_sirm_curve()
+    means      : array-like — component means in log10(mT)
+    stds       : array-like — component standard deviations
+    qs         : array-like, optional — SGG skewness (default: zeros)
+
+    Returns
+    -------
+    dict with keys 'IRM' and 'AF', each containing a fit_sgg_comps result dict,
+    plus 'means', 'stds', 'qs'
+    """
+    import copy
+
+    means = np.asarray(means, dtype=float)
+    stds  = np.asarray(stds,  dtype=float)
+    qs    = np.zeros(len(means)) if qs is None else np.asarray(qs, dtype=float)
+
+    result = {'means': means, 'stds': stds, 'qs': qs}
+
+    if hasattr(sirm_curve, 'AF') and getattr(sirm_curve.AF, 'doesExist', False):
+        af_x = np.asarray(sirm_curve.AF.logDerivFields,  dtype=float).ravel()
+        af_y = np.asarray(sirm_curve.AF.logderivSmooth,  dtype=float).ravel()
+        result['AF'] = fit_sgg_comps(af_x, af_y, means, stds, qs)
+    else:
+        result['AF'] = None
+
+    if hasattr(sirm_curve, 'IRM') and len(getattr(sirm_curve.IRM, 'logDerivFields', [])) > 0:
+        irm_x = np.asarray(sirm_curve.IRM.logDerivFields, dtype=float).ravel()
+        irm_y = np.asarray(sirm_curve.IRM.logderivSmooth, dtype=float).ravel()
+        result['IRM'] = fit_sgg_comps(irm_x, irm_y, means, stds, qs)
+    else:
+        result['IRM'] = None
+
+    return result

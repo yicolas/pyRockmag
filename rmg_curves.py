@@ -877,3 +877,163 @@ def rmg_fuller_curves(data):
         y.ARMtoIRM = np.array([])
 
     return y
+
+
+# =============================================================================
+#  NEW: rmg_arm_curve_subtract  (RmgARMCurveSubtract.m)
+#  NEW: rmg_fractional_arm      (RmgFractionalARM.m)
+# =============================================================================
+
+def rmg_arm_curve_subtract(curve1, curve2, weights=None):
+    """
+    Subtract two ARM acquisition curves (weighted difference).
+
+    Port of RmgARMCurveSubtract.m (Kopp 2008).
+
+    Useful for isolating a magnetic component by differencing two ARM
+    curves acquired at different AF levels.
+
+    Parameters
+    ----------
+    curve1 : ARM curve object from rmg_arm_curve()
+    curve2 : ARM curve object from rmg_arm_curve()
+    weights : tuple (w1, w2), optional — default (1, 1)
+
+    Returns
+    -------
+    dict with doesExist, treatmentDCFields, Mz1, Mz2, Mz, mvectorIRM,
+         fracmags, derivfields, fracmagsderiv,
+         ARMsusceptibility, ARMsusceptibilityToIRM, ARMtoIRMat100uT
+    """
+    from scipy.interpolate import interp1d as _interp1d
+
+    w1, w2 = (1.0, 1.0) if weights is None else (float(weights[0]), float(weights[1]))
+
+    fields1 = np.asarray(curve1.treatmentDCFields, dtype=float)
+    fields2 = np.asarray(curve2.treatmentDCFields, dtype=float)
+    common_dc = np.intersect1d(fields1, fields2)
+
+    if len(common_dc) == 0:
+        return {'doesExist': False}
+
+    mz1_raw = curve1.mvector[2, :]
+    mz2_raw = curve2.mvector[2, :]
+
+    Mz1 = _interp1d(fields1, mz1_raw, bounds_error=False, fill_value='extrapolate')(common_dc) * w1
+    Mz2 = _interp1d(fields2, mz2_raw, bounds_error=False, fill_value='extrapolate')(common_dc) * w2
+    Mz  = Mz1 - Mz2
+
+    mvIRM1 = np.asarray(curve1.mvectorIRM, dtype=float) * w1
+    mvIRM2 = np.asarray(curve2.mvectorIRM, dtype=float) * w2
+    mvIRM  = mvIRM1 - mvIRM2
+    irm_z  = mvIRM[2]
+
+    fracmags = np.abs(Mz / irm_z) if irm_z != 0 else np.full_like(Mz, np.nan)
+
+    dfields = np.diff(common_dc)
+    deriv_fields   = common_dc[:-1] + 0.5 * dfields
+    fracmags_deriv = np.diff(fracmags) / dfields
+
+    ref_field = 1e-4  # T (0.1 mT)
+    mz_at_ref = float(_interp1d(common_dc, np.abs(Mz),
+                                bounds_error=False, fill_value='extrapolate')(ref_field))
+    arm_susc         = mz_at_ref / (ref_field / MU0)
+    arm_susc_to_irm  = arm_susc / abs(irm_z) if irm_z != 0 else np.nan
+    arm_to_irm_100   = arm_susc_to_irm * (ref_field / MU0)
+
+    return {
+        'doesExist':              True,
+        'treatmentDCFields':      common_dc,
+        'treatmentACField1':      getattr(curve1, 'treatmentACField',
+                                          curve1.treatmentAFFields[0] if len(curve1.treatmentAFFields) else np.nan),
+        'treatmentACField2':      getattr(curve2, 'treatmentACField',
+                                          curve2.treatmentAFFields[0] if len(curve2.treatmentAFFields) else np.nan),
+        'mvectorIRM1':            mvIRM1,
+        'mvectorIRM2':            mvIRM2,
+        'Mz1':                    Mz1,
+        'Mz2':                    Mz2,
+        'Mz':                     Mz,
+        'mvectorIRM':             mvIRM,
+        'fracmags':               fracmags,
+        'derivfields':            deriv_fields,
+        'fracmagsderiv':          fracmags_deriv,
+        'ARMsusceptibility':      arm_susc,
+        'ARMsusceptibilityToIRM': arm_susc_to_irm,
+        'ARMtoIRMat100uT':        arm_to_irm_100,
+    }
+
+
+def rmg_fractional_arm(data, af_level=None):
+    """
+    Extract the fractional ARM acquisition curve at a given AF level.
+
+    Port of RmgFractionalARM.m (Kopp 2008).
+
+    Parameters
+    ----------
+    data     : RmgData object
+    af_level : float (T), optional — defaults to rmg_af_level_find()
+
+    Returns
+    -------
+    dict with doesExist, bias, treatmentDCField, treatmentACField,
+              mvectorUnsub, mvector, mvectorIRM, fracmags
+    """
+    if af_level is None:
+        af_level = rmg_af_level_find([data])[0]
+
+    arm_steps = np.asarray(data.stepsARM, dtype=int)
+    af_fields = np.asarray(data.treatmentAFFields, dtype=float)
+    dc_fields = np.asarray(data.treatmentDCFields, dtype=float)
+
+    at_af   = arm_steps[np.isclose(af_fields[arm_steps], af_level, rtol=1e-4)]
+    zero_dc = at_af[np.isclose(dc_fields[at_af], 0.0, atol=1e-9)]
+
+    if len(zero_dc) == 0:
+        return {'doesExist': False}
+
+    stepnum = zero_dc[-1]
+
+    all_steps      = np.arange(stepnum + 1, len(data.levels))
+    subsequent_arm = np.intersect1d(all_steps, arm_steps)
+    subsequent_non = np.setdiff1d(all_steps, arm_steps)
+
+    if len(subsequent_non) == 0:
+        arm_range = subsequent_arm
+    else:
+        first_non = subsequent_non[0]
+        arm_range = (np.arange(subsequent_arm[0], first_non)
+                     if len(subsequent_arm) > 0 else np.array([], dtype=int))
+
+    if len(arm_range) == 0:
+        return {'doesExist': False}
+
+    irm_types = {'irm', 'irmz', 'irmx'}
+    steps_irm    = np.array([i for i, s in enumerate(data.steptypes) if s.lower() in irm_types])
+    at_irm_level = steps_irm[np.isclose(dc_fields[steps_irm], af_level, rtol=1e-4)]
+
+    if len(at_irm_level) == 0:
+        return {'doesExist': False}
+
+    stepnum_irm = at_irm_level[-1]
+    mvectors    = np.asarray(data.mvector, dtype=float)
+
+    mv_unsub = mvectors[:, arm_range]
+    baseline = mv_unsub[:, 0:1]
+    mv       = mv_unsub - baseline
+    mv_irm   = mvectors[:, stepnum_irm] - baseline[:, 0]
+
+    irm_z    = mv_irm[2]
+    fracmags = (np.abs(mv[2, :] / irm_z)
+                if irm_z != 0 else np.full(mv.shape[1], np.nan))
+
+    return {
+        'doesExist':        True,
+        'bias':             np.asarray(data.bias[arm_range], dtype=float),
+        'treatmentDCField': dc_fields[arm_range],
+        'treatmentACField': float(af_level),
+        'mvectorUnsub':     mv_unsub,
+        'mvector':          mv,
+        'mvectorIRM':       mv_irm,
+        'fracmags':         fracmags,
+    }

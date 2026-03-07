@@ -570,3 +570,193 @@ def rmg_data_full_analysis(data_list, af_levels=None):
 
     plt.tight_layout(h_pad=3.0, w_pad=2.0)  # 0.5x more spacing
     return fig
+
+
+# =============================================================================
+#  NEW: rmg_stat_depth_profiles         (RmgStatDepthProfiles.m)
+#  NEW: rmg_lowrie_fuller_derivative_plot (RmgLowrieFullerDerivativePlot.m)
+# =============================================================================
+
+def rmg_stat_depth_profiles(data_list, depths, mass_factor=1.0, ax=None):
+    """
+    Plot rock-magnetic statistics vs depth / stratigraphy.
+
+    Port of RmgStatDepthProfiles.m (Kopp 2008).
+
+    Parameters
+    ----------
+    data_list   : list of RmgData
+    depths      : array-like — same length as data_list
+    mass_factor : float, optional — scaling applied to sIRMperkg (default 1.0)
+    ax          : array of 4 matplotlib Axes, optional
+
+    Returns
+    -------
+    fig, axes (1×4)
+    """
+    if not isinstance(data_list, list):
+        data_list = [data_list]
+
+    depths = np.asarray(depths, dtype=float)
+    if len(depths) != len(data_list):
+        raise ValueError('rmg_stat_depth_profiles: len(depths) must equal len(data_list)')
+
+    stats_list = []
+    for d in data_list:
+        try:
+            stats_list.append(rmg_stats([d])[0])
+        except Exception:
+            stats_list.append(None)
+
+    def _get(st, key):
+        if st is None:
+            return np.nan
+        v = st.get(key, np.nan) if isinstance(st, dict) else getattr(st, key, np.nan)
+        return float(v) if v is not None and np.isfinite(float(v)) else np.nan
+
+    sIRM_vol      = np.array([_get(s, 'sIRMperkg')             for s in stats_list]) * mass_factor
+    ARM_susc_IRM  = np.array([_get(s, 'ARMsusceptibilityToIRM') for s in stats_list])
+    R             = np.array([_get(s, 'CisowskiR')              for s in stats_list])
+    DP            = np.array([_get(s, 'DPofIRMAcq')             for s in stats_list])
+    Hcr           = np.array([_get(s, 'Hcr')                    for s in stats_list])
+    MAF           = np.array([_get(s, 'MAFofIRM')               for s in stats_list])
+    MDF_IRM       = np.array([_get(s, 'MDFofIRM')               for s in stats_list])
+    MDF_ARM       = np.array([_get(s, 'MDFofARM')               for s in stats_list])
+    MDF_IRM_ARM   = np.array([_get(s, 'MDFofIRMatARM')          for s in stats_list])
+
+    if ax is None:
+        fig, axes = plt.subplots(1, 4, figsize=(14, 6), sharey=True)
+        fig.subplots_adjust(wspace=0.38)
+    else:
+        axes = ax
+        fig  = axes[0].get_figure()
+
+    # Panel 1 — sIRM per kg
+    a = axes[0]
+    mask = np.isfinite(sIRM_vol)
+    if mask.any():
+        a.plot(sIRM_vol[mask], depths[mask], 'bx')
+    field_val = _get(stats_list[0], 'dfIRMdBatField') if stats_list else np.nan
+    field_lbl = f'{field_val:.0f} mT' if np.isfinite(field_val) else 'peak field'
+    a.set_xlabel('A m² / kg')
+    a.set_ylabel('Depth')
+    a.set_title(f'IRM @ {field_lbl}')
+    a.invert_yaxis()
+
+    # Panel 2 — χ_ARM / IRM
+    a = axes[1]
+    mask = np.isfinite(ARM_susc_IRM)
+    if mask.any():
+        a.plot(ARM_susc_IRM[mask], depths[mask], 'bx')
+    a.set_xlabel('χ_ARM / IRM (m/A)')
+    a.set_title('χ_ARM / IRM')
+
+    # Panel 3 — Cisowski R and DP
+    a = axes[2]
+    mask_r  = np.isfinite(R)
+    mask_dp = np.isfinite(DP)
+    if mask_r.any():
+        a.plot(R[mask_r],   depths[mask_r],  'bx', label='R')
+    if mask_dp.any():
+        a.plot(DP[mask_dp], depths[mask_dp], 'r.', label='DP - IRM Acq')
+    a.set_title('R and DP of IRM Acq')
+    a.legend(fontsize=8)
+
+    # Panel 4 — Hcr, MAF, MDF suite
+    a = axes[3]
+    for vals, marker, color, label in [
+        (Hcr,       'x', 'blue',    'H_cr'),
+        (MAF,       '.', 'red',     'IRM - MAF'),
+        (MDF_IRM,   '.', 'green',   'IRM - MDF'),
+        (MDF_ARM,   's', 'magenta', 'ARM - MDF'),
+        (MDF_IRM_ARM,'s','orange',  'IRM_ARM - MDF'),
+    ]:
+        mask = np.isfinite(vals)
+        if mask.any():
+            a.plot(vals[mask], depths[mask], marker=marker,
+                   color=color, linestyle='none', label=label)
+    a.legend(fontsize=7)
+    a.set_xlabel('mT')
+    a.set_title('H_cr, MAF, and MDF')
+
+    fig.suptitle('Rock-Magnetic Depth Profiles', fontsize=11, y=1.01)
+    return fig, axes
+
+
+def rmg_lowrie_fuller_derivative_plot(data_list, multi_af=False, ax=None):
+    """
+    Plot dM/d(log B) derivatives of Lowrie-Fuller AF demagnetisation curves.
+
+    Port of RmgLowrieFullerDerivativePlot.m (Kopp 2008).
+
+    Parameters
+    ----------
+    data_list : list of RmgData
+    multi_af  : bool — if True also include NRM AF curve from Fuller curves
+    ax        : matplotlib Axes, optional
+
+    Returns
+    -------
+    fig, ax
+    """
+    if not isinstance(data_list, list):
+        data_list = [data_list]
+    if ax is None:
+        fig, ax = plt.subplots(figsize=(6, 5))
+    else:
+        fig = ax.get_figure()
+
+    af_curves     = []
+    legend_labels = []
+
+    for d in data_list:
+        try:
+            lf_list = rmg_lowrie_fuller_curves(d)
+        except Exception:
+            lf_list = []
+
+        for lf in lf_list:
+            if not getattr(lf, 'doesExist', False):
+                continue
+            for af_obj, steptype in [
+                (getattr(lf, 'ARMAF', None), 'ARM-AF'),
+                (getattr(lf, 'IRMAF', None), 'IRM-AF'),
+            ]:
+                if af_obj is not None and getattr(af_obj, 'doesExist', False):
+                    af_curves.append((af_obj, d.samplename, steptype))
+
+        if multi_af:
+            try:
+                fc = rmg_fuller_curves(d)
+                if getattr(fc, 'doesExist', False) and hasattr(fc, 'NRM'):
+                    if getattr(fc.NRM, 'doesExist', False):
+                        af_curves.append((fc.NRM, d.samplename, 'NRM-AF'))
+            except Exception:
+                pass
+
+    plot_count = 0
+    for i, (af, samplename, steptype) in enumerate(af_curves):
+        try:
+            log_fields = np.asarray(af.log10treatmentAFderivFields) + 3  # log10(T) → log10(mT)
+            deriv      = np.asarray(af.mzlogderiv)
+            mask = np.isfinite(log_fields) & np.isfinite(deriv)
+            if not mask.any():
+                continue
+            ax.plot(log_fields[mask], deriv[mask],
+                    LINE_COLORS[i % len(LINE_COLORS)] + LINE_SYMS[i % len(LINE_SYMS)] + '-',
+                    linewidth=1.2, markersize=4)
+            legend_labels.append(f'{samplename} {steptype}')
+            plot_count += 1
+        except Exception:
+            continue
+
+    if plot_count > 0:
+        ax.legend(legend_labels, loc='upper right', fontsize='small')
+        ax.set_xlabel('log₁₀(B)  [mT]')
+        ax.set_ylabel('dM / d(log B)')
+        suffix = f': {data_list[0].samplename}' if len(data_list) == 1 else ''
+        ax.set_title(('AF Derivative' if multi_af else 'Lowrie-Fuller Derivative') + suffix)
+    else:
+        ax.axis('off')
+
+    return fig, ax
