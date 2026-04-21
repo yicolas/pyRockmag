@@ -283,5 +283,90 @@ def rmg_import(filename: str) -> RmgData:
     y.treatmentTemps = np.full(n, 298.0)
     for idx in y.stepsThermal:
         y.treatmentTemps[idx] = levels_T[idx]   # thermal steps use Level as temp
+
+    # ── Multi-run deduplication ───────────────────────────────────────────────
+    # The Shoemaker 2G software sometimes appends multiple complete protocol runs
+    # to a single file (e.g. if the operator re-ran the experiment).  Each run
+    # starts with an ARM acquisition block (the first ARM block in the protocol).
+    # When more than one ARM block is present, we discard all but the LAST run,
+    # which is the operator's final/intended measurement.
+    #
+    # Detection: find every ARM block; if there are multiple, take the step index
+    # of the last ARM block's first step as the start of the final run.
+    arm_block_ids   = [i+1 for i,bt in enumerate(y.BlockType) if bt == 'ARM']
+    if len(arm_block_ids) > 1:
+        # Find the first step that belongs to the last ARM block
+        last_arm_bid   = arm_block_ids[-1]
+        run_start_step = int(np.where(y.stepBlock == last_arm_bid)[0][0])
+
+        # Trim every per-step array to [run_start_step:]
+        keep = np.arange(run_start_step, n)
+
+        def _trim1d(arr):
+            return arr[keep] if len(arr) == n else arr
+        def _trim2d(arr):
+            return arr[:, keep] if arr.ndim == 2 and arr.shape[1] == n else arr
+
+        y.mz      = _trim1d(y.mz)
+        y.mx      = _trim1d(y.mx)
+        y.my      = _trim1d(y.my)
+        y.mzperkg = _trim1d(y.mzperkg)
+        y.suscep  = _trim1d(y.suscep)
+        y.spin    = _trim1d(y.spin)
+        y.mvector = _trim2d(y.mvector)
+        y.mvectorperkg = _trim2d(y.mvectorperkg)
+        y.levels         = _trim1d(y.levels)
+        y.treatmentAFFields = _trim1d(y.treatmentAFFields)
+        y.treatmentDCFields = _trim1d(y.treatmentDCFields)
+        y.bias           = _trim1d(y.bias)
+        y.treatmentTemps = _trim1d(y.treatmentTemps)
+
+        new_steptypes = steptypes[run_start_step:]
+        y.steptypes   = new_steptypes
+        n_new = len(keep)
+
+        # Rebuild step-index arrays on trimmed data
+        def match2(pattern, exact=False):
+            pat = pattern.lower()
+            out = []
+            for i, s in enumerate(new_steptypes):
+                sl = s.lower()
+                if exact:
+                    if sl == pat: out.append(i)
+                else:
+                    if sl.startswith(pat): out.append(i)
+            return np.array(out, dtype=int)
+
+        y.stepsNRM     = match2('nrm')
+        y.stepsAFmax   = match2('afmax')
+        y.stepsAFz     = match2('afz')
+        y.stepsAF_nrm  = match2('af', exact=True)
+        y.stepsAF      = np.sort(np.union1d(y.stepsAFz, y.stepsAF_nrm))
+        y.stepsIRM     = match2('irm')
+        y.stepsARM     = match2('arm')
+        y.stepsRRM     = match2('rrm')
+        y.stepsThermal = np.sort(np.union1d(match2('tt'), match2('trm')))
+
+        # Rebuild block structure on trimmed data
+        norm2 = [_canon(s) for s in new_steptypes]
+        stepBlock2 = np.zeros(n_new, dtype=int)
+        blockType2 = []
+        blockSize2 = []
+        if n_new > 0:
+            stepBlock2[0] = 1
+            blockType2.append(norm2[0])
+            blockSize2.append(1)
+            for i in range(1, n_new):
+                if norm2[i] != norm2[i-1]:
+                    stepBlock2[i] = stepBlock2[i-1] + 1
+                    blockType2.append(norm2[i])
+                    blockSize2.append(1)
+                else:
+                    stepBlock2[i] = stepBlock2[i-1]
+                    blockSize2[-1] += 1
+        y.stepBlock = stepBlock2
+        y.BlockType = blockType2
+        y.BlockSize = np.array(blockSize2, dtype=int)
+
     return y
 
