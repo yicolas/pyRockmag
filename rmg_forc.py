@@ -104,6 +104,29 @@ def _curve_dict_from_rows(curve_rows):
     }
 
 
+def _forc_zero_crossing(field_arr, moment_arr):
+    """Return the first linear zero crossing on a sorted positive-field branch."""
+    field_arr = np.asarray(field_arr, dtype=float)
+    moment_arr = np.asarray(moment_arr, dtype=float)
+    if len(field_arr) < 2:
+        return np.nan
+    exact = np.where(moment_arr == 0)[0]
+    if len(exact) > 0:
+        return float(field_arr[exact[0]])
+    for i in range(len(field_arr) - 1):
+        m0 = moment_arr[i]
+        m1 = moment_arr[i + 1]
+        if m0 == 0:
+            return float(field_arr[i])
+        if m0 * m1 > 0:
+            continue
+        dM = m1 - m0
+        if dM == 0:
+            return float(field_arr[i])
+        return float(field_arr[i] - m0 * (field_arr[i + 1] - field_arr[i]) / dM)
+    return np.nan
+
+
 def rmg_extract_forc_data(data):
     """
     Extract FORC curves from an RmgData object.
@@ -1165,31 +1188,11 @@ def forc_extract_reversal_remanence(forc_complete):
         )
         return uniq, collapsed
 
-    def _zero_crossing(field_arr, moment_arr):
-        field_arr, moment_arr = _collapse_curve(field_arr, moment_arr)
-        if len(field_arr) < 2:
-            return np.nan
-        exact = np.where(moment_arr == 0)[0]
-        if len(exact) > 0:
-            return float(field_arr[exact[0]])
-        for i in range(len(field_arr) - 1):
-            m0 = moment_arr[i]
-            m1 = moment_arr[i + 1]
-            if m0 == 0:
-                return float(field_arr[i])
-            if m0 * m1 > 0:
-                continue
-            dM = m1 - m0
-            if dM == 0:
-                return float(field_arr[i])
-            return float(field_arr[i] - m0 * (field_arr[i + 1] - field_arr[i]) / dM)
-        return np.nan
-
     def _remanence_spectrum(field_arr, moment_norm):
-        field_arr, moment_norm = _collapse_curve(field_arr, moment_norm)
-        if len(field_arr) < 2:
+        field_collapsed, moment_collapsed = _collapse_curve(field_arr, moment_norm)
+        if len(field_collapsed) < 2:
             return np.array([]), np.array([])
-        return field_arr, -np.gradient(moment_norm, np.log10(field_arr))
+        return field_collapsed, -np.gradient(moment_collapsed, np.log10(field_collapsed))
 
     sat_moments = []
     H_desc_raw, M_desc_raw = [], []
@@ -1230,7 +1233,7 @@ def forc_extract_reversal_remanence(forc_complete):
 
     M_desc_norm = (M_desc / norm) if np.isfinite(norm) else np.full_like(M_desc, np.nan)
     M_asc_norm = (M_asc / norm) if np.isfinite(norm) else np.full_like(M_asc, np.nan)
-    Bcr = _zero_crossing(H_desc, M_desc_norm)
+    Bcr = _forc_zero_crossing(H_desc, M_desc_norm)
     spectrum_field, spectrum = _remanence_spectrum(H_desc, M_desc_norm)
     modal_remanence_coercivity = np.nan
     if len(spectrum_field) > 0 and np.any(np.isfinite(spectrum)):
@@ -1288,23 +1291,6 @@ def forc_measure_bu_baseline(forc_complete):
     H_asc = np.asarray(rem['H_asc'], dtype=float)
     Ma = np.asarray(rem['M_asc'], dtype=float)
 
-    def _zero_crossing(H_arr, M_arr):
-        if len(H_arr) < 2:
-            return np.nan
-        exact = np.where(M_arr == 0)[0]
-        if len(exact) > 0:
-            return float(H_arr[exact[0]])
-        for i in range(len(H_arr) - 1):
-            m0 = M_arr[i]
-            m1 = M_arr[i + 1]
-            if m0 * m1 > 0:
-                continue
-            dM = m1 - m0
-            if dM == 0:
-                return float(H_arr[i])
-            return float(H_arr[i] - m0 * (H_arr[i + 1] - H_arr[i]) / dM)
-        return np.nan
-
     H_common = None
     Md_common = None
     Ma_common = None
@@ -1317,8 +1303,8 @@ def forc_measure_bu_baseline(forc_complete):
             Md_common = np.interp(np.log10(H_common), np.log10(H_desc), Md)
             Ma_common = np.interp(np.log10(H_common), np.log10(H_asc), Ma)
 
-    Bcr_desc = _zero_crossing(H_common, Md_common) if H_common is not None else _zero_crossing(H_desc, Md)
-    Bcr_asc = _zero_crossing(H_common, Ma_common) if H_common is not None else _zero_crossing(H_asc, Ma)
+    Bcr_desc = _forc_zero_crossing(H_common, Md_common) if H_common is not None else _forc_zero_crossing(H_desc, Md)
+    Bcr_asc = _forc_zero_crossing(H_common, Ma_common) if H_common is not None else _forc_zero_crossing(H_asc, Ma)
 
     if np.isnan(Bcr_desc) and np.isnan(Bcr_asc):
         delta, BcrTrue = 0.0, np.nan
