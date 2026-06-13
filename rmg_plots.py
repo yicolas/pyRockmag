@@ -527,8 +527,9 @@ def rmg_stat_box(data_list, af_levels=None, ax: Axes = None):
         forc_keys = [
             ('forc_SIRM',      'SIRM (FORC)',    'Am²'),
             ('forc_SIRMperkg', 'SIRM/kg (FORC)', 'Am²/kg'),
-            ('forc_Bcr',       'Bcr (FORC)',      'mT'),
-            ('forc_modal_Bcr', 'modal Bc (FORC)', 'mT'),
+            ('forc_Bcr',       'Bcr (FORC)',     'mT'),
+            ('forc_modal_Bcr', 'modal remanence coercivity (FORC)', 'mT'),
+            ('forc_delta',     'ΔBu (FORC)',     'mT'),
         ]
         forc_lines = []
         for key, label, unit in forc_keys:
@@ -816,8 +817,8 @@ def rmg_forc_dcd_plot(rem_data, Bcr_mT=None, samplename='', ax: Axes = None):
         ax.axis('off')
         return ax
 
-    H_mT  = rem_data['H_common'] * 1000   # T → mT
-    M_norm = rem_data['M_desc_norm']
+    H_mT  = rem_data['H_backfield'] * 1000   # T → mT
+    M_norm = rem_data['M_backfield_norm']
 
     ax.plot(H_mT, M_norm, 'k.-', linewidth=1.2, markersize=3)
     ax.axhline(0, color='k', linewidth=0.8, alpha=0.7)
@@ -825,7 +826,7 @@ def rmg_forc_dcd_plot(rem_data, Bcr_mT=None, samplename='', ax: Axes = None):
     ax.set_xlabel('$|B|$ (mT)')
     ax.set_ylabel('$M / M_{SIRM}$')
     suffix = f': {samplename}' if samplename else ''
-    ax.set_title(f'DCD (FORC){suffix}')
+    ax.set_title(f'DC backfield demag (DCD) — from FORC{suffix}')
 
     if Bcr_mT is not None and np.isfinite(Bcr_mT) and Bcr_mT > 0:
         ax.axvline(Bcr_mT, color='royalblue', linewidth=1.2,
@@ -865,30 +866,31 @@ def rmg_forc_spectrum_plot(rem_data, modal_Bcr_mT=None, samplename='',
         ax.axis('off')
         return ax
 
-    H_mT   = rem_data['H_common'] * 1000   # T → mT
-    M_norm = rem_data['M_desc_norm']
+    H_mT = rem_data['spectrum_field'] * 1000   # T → mT
+    spectrum = rem_data['spectrum']
 
-    # Derivative in log-field space: -dM / d(log10 H)
-    log_H  = np.log10(H_mT)
-    deriv  = -np.gradient(M_norm, log_H)
-
-    # Smooth lightly (3-point uniform filter)
-    from scipy.ndimage import uniform_filter1d
-    deriv_smooth = uniform_filter1d(deriv, size=3, mode='nearest')
-
-    ax.plot(H_mT, deriv_smooth, 'g-', linewidth=1.2)
+    ax.plot(H_mT, spectrum, 'g-', linewidth=1.2)
     ax.set_xscale('log')
     ax.set_xlabel('$|B|$ (mT)')
-    ax.set_ylabel('$-dM / d(\\log B)$')
+    ax.set_ylabel('$-d(M_r/M_{SIRM}) / d(\\log_{10} B)$')
     suffix = f': {samplename}' if samplename else ''
-    ax.set_title(f'Coercivity Spectrum (FORC){suffix}')
+    ax.set_title(f'Remanence coercivity spectrum — from FORC{suffix}')
     ax.set_ylim(bottom=0)
 
     if modal_Bcr_mT is not None and np.isfinite(modal_Bcr_mT) and modal_Bcr_mT > 0:
         ax.axvline(modal_Bcr_mT, color='darkgreen', linewidth=1.2,
                    linestyle=':', alpha=0.85,
-                   label=f'modal $B_{{c}}$ = {modal_Bcr_mT:.1f} mT')
+                   label=f'modal remanence coercivity = {modal_Bcr_mT:.1f} mT')
         ax.legend(fontsize='small', loc='upper right')
+
+    ax.text(
+        0.02, 0.02,
+        'Tracks bulk remanence; not the FORC central-ridge modal $B_c$.',
+        transform=ax.transAxes,
+        fontsize=7,
+        color='gray',
+        verticalalignment='bottom'
+    )
 
     from matplotlib.ticker import LogFormatter, LogLocator
     ax.xaxis.set_major_locator(LogLocator(base=10))
@@ -919,15 +921,15 @@ def rmg_forc_irm_plot(rem_data, samplename='', ax: Axes = None):
         ax.axis('off')
         return ax
 
-    H_mT   = rem_data['H_common'] * 1000   # T → mT
-    M_norm = rem_data['M_asc_norm']
+    H_mT   = rem_data['H_irm'] * 1000   # T → mT
+    M_norm = rem_data['M_irm_norm']
 
     ax.plot(H_mT, M_norm, 'r.-', linewidth=1.2, markersize=3)
     ax.axhline(0, color='k', linewidth=0.8, alpha=0.7)
     ax.set_xlabel('$B$ (mT)')
     ax.set_ylabel('$M / M_{SIRM}$')
     suffix = f': {samplename}' if samplename else ''
-    ax.set_title(f'IRM approx (FORC){suffix}')
+    ax.set_title(f'IRM acquisition (approx) — from FORC{suffix}')
 
     return ax
 
@@ -1086,8 +1088,8 @@ def _rmg_forc_stat_box(data_list, forc_stats, ax: Axes = None):
             for key, label, unit in [
                 ('forc_SIRM',      'SIRM',          'Am²'),
                 ('forc_SIRMperkg', 'SIRM/kg',       'Am²/kg'),
-                ('forc_Bcr',       'Bcr (true)',     'mT'),
-                ('forc_modal_Bcr', 'modal Bc',       'mT'),
+                ('forc_Bcr',       'Bcr',            'mT'),
+                ('forc_modal_Bcr', 'modal remanence coercivity', 'mT'),
                 ('forc_delta',     'Δ Bu',           'mT'),
             ]:
                 v = forc_stats.get(key, np.nan)
