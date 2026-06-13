@@ -26,6 +26,106 @@ import numpy as np
 import os
 from typing import List, Tuple, Optional
 
+FORC_STEP_TYPES = ('forcz', 'irmz', 'irm')
+OE_TO_T = 1e-4
+
+
+def _iter_forc_rows(data):
+    """Return FORC-capable rows as parsed field/moment records."""
+    rows = []
+    steptypes = getattr(data, 'steptypes', [])
+    levels = getattr(data, 'levels', np.array([]))
+    moments = getattr(data, 'mvector', np.zeros((3, 0)))
+
+    for i, stype in enumerate(steptypes):
+        if stype.lower() not in FORC_STEP_TYPES:
+            continue
+        rows.append({
+            'index': i,
+            'step': stype,
+            'bias_g': float(levels[i]),
+            'field_T': float(levels[i]) * OE_TO_T,
+            'moment': float(moments[2, i]),
+        })
+
+    return rows
+
+
+def _group_forc_rows_by_curve(data):
+    """
+    Segment parsed FORC rows into curves using the per-file saturation row.
+
+    The source rows are conceptually equivalent to:
+        { level: 'FORCz', biasG, mzEmu }
+    """
+    rows = _iter_forc_rows(data)
+    if not rows:
+        return [], np.nan
+
+    sat_bias_g = float(np.nanmax([row['bias_g'] for row in rows]))
+    tol = max(1e-9, abs(sat_bias_g) * 1e-9)
+
+    def _is_saturation(row):
+        return np.isfinite(row['bias_g']) and np.isclose(
+            row['bias_g'], sat_bias_g, rtol=0.0, atol=tol
+        )
+
+    curves = []
+    current = []
+    for row in rows:
+        current.append(row)
+        if _is_saturation(row):
+            if any(r['bias_g'] < sat_bias_g for r in current[:-1]):
+                curves.append(current)
+            current = []
+
+    if current and any(r['bias_g'] < sat_bias_g for r in current):
+        curves.append(current)
+
+    return curves, sat_bias_g
+
+
+def _curve_dict_from_rows(curve_rows):
+    """Build the curve structure used elsewhere in this module."""
+    biases = np.array([row['bias_g'] for row in curve_rows], dtype=float)
+    rev_idx = int(np.nanargmin(biases))
+    rev_row = curve_rows[rev_idx]
+    sweep_rows = curve_rows[rev_idx + 1:]
+    sat_row = curve_rows[-1]
+
+    return {
+        'Hr': rev_row['field_T'],
+        'Mr': rev_row['moment'],
+        'Ha': np.array([row['field_T'] for row in sweep_rows], dtype=float),
+        'M': np.array([row['moment'] for row in sweep_rows], dtype=float),
+        'saturation_field_T': sat_row['field_T'],
+        'saturation_moment': sat_row['moment'],
+        'rows': curve_rows,
+    }
+
+
+def _forc_zero_crossing(field_arr, moment_arr):
+    """Return the first linear zero crossing on a sorted positive-field branch."""
+    field_arr = np.asarray(field_arr, dtype=float)
+    moment_arr = np.asarray(moment_arr, dtype=float)
+    if len(field_arr) < 2:
+        return np.nan
+    exact = np.where(moment_arr == 0)[0]
+    if len(exact) > 0:
+        return float(field_arr[exact[0]])
+    for i in range(len(field_arr) - 1):
+        m0 = moment_arr[i]
+        m1 = moment_arr[i + 1]
+        if m0 == 0:
+            return float(field_arr[i])
+        if m0 * m1 > 0:
+            continue
+        dM = m1 - m0
+        if dM == 0:
+            return float(field_arr[i])
+        return float(field_arr[i] - m0 * (field_arr[i + 1] - field_arr[i]) / dM)
+    return np.nan
+
 
 def rmg_extract_forc_data(data):
     """
@@ -49,54 +149,18 @@ def rmg_extract_forc_data(data):
     y.exists = False
     y.curves = []
     
-    # Find FORC steps
-    forc_steps = []
-    for i, stype in enumerate(data.steptypes):
-        if stype.lower() in ('forcz', 'irmz', 'irm'):
-            forc_steps.append(i)
-    
-    if len(forc_steps) == 0:
-        return y
-    
-    # CRITICAL: Fields are in data.levels (raw Oe), not treatmentDCFields
-    OE_TO_T = 1e-4
-    
-    current_curve = None
-    skip_first_positive = True
-    
-    for i in forc_steps:
-        field_oe = data.levels[i]
-        field_T = field_oe * OE_TO_T
-        mz = data.mvector[2, i]
-        
-        # Skip initial saturation pulse
-        if skip_first_positive and field_oe > 0:
-            skip_first_positive = False
-            continue
-        
-        # Negative = new curve (reversal)
-        if field_oe < 0:
-            if current_curve is not None and len(current_curve['Ha']) > 0:
-                y.curves.append(current_curve)
-            
-            current_curve = {
-                'Hr': field_T,
-                'Ha': [],
-                'M': []
-            }
-        
-        # Positive/zero = measurement point
-        elif current_curve is not None:
-            current_curve['Ha'].append(field_T)
-            current_curve['M'].append(mz)
-    
-    if current_curve is not None and len(current_curve['Ha']) > 0:
-        y.curves.append(current_curve)
-    
-    for curve in y.curves:
-        curve['Ha'] = np.array(curve['Ha'])
-        curve['M'] = np.array(curve['M'])
-    
+    y.source_data = data
+    curve_rows, sat_bias_g = _group_forc_rows_by_curve(data)
+    y.saturation_bias_g = sat_bias_g
+
+    for rows in curve_rows:
+        curve = _curve_dict_from_rows(rows)
+        y.curves.append({
+            'Hr': curve['Hr'],
+            'Ha': curve['Ha'],
+            'M': curve['M'],
+        })
+
     y.exists = len(y.curves) > 0
     return y
 
@@ -571,18 +635,36 @@ def process_forc_forcinel_workflow(data, smoothing_factor: int = 3, grid_size: i
     
     # Mask unphysical region (Ha < Hr)
     valid_mask = Ha_grid >= Hr_grid
-    
+
+    # ── Bu baseline registration ──────────────────────────────────────────────
+    # Compute per-file delta from descending/ascending branch coercivity asymmetry
+    # and store on the data object so rmg_stats can read it later.
+    forc_complete = rmg_extract_forc_data_complete(data)
+    baseline      = forc_measure_bu_baseline(forc_complete)
+    delta         = baseline['delta']    # T
+    BcrTrue       = baseline['BcrTrue']  # T
+
+    # Apply Bu-axis correction: BuCorrected = Hu - delta
+    Hu_corrected = Hu - delta
+
+    # Store on data object for stats access
+    data.forc_delta   = float(delta * 1000)   # mT
+    data.forc_BcrTrue = float(BcrTrue * 1000) if np.isfinite(BcrTrue) else np.nan
+
     return {
-        'forc_data': forc,
-        'Hr_grid': Hr_grid,
-        'Ha_grid': Ha_grid,
-        'M_grid': M_grid,
-        'M_smooth': M_smooth,
-        'Hc': Hc,
-        'Hu': Hu,
-        'rho': rho,
-        'valid_mask': valid_mask,
-        'smoothing_factor': smoothing_factor
+        'forc_data':         forc,
+        'Hr_grid':           Hr_grid,
+        'Ha_grid':           Ha_grid,
+        'M_grid':            M_grid,
+        'M_smooth':          M_smooth,
+        'Hc':                Hc,
+        'Hu':                Hu,
+        'Hu_corrected':      Hu_corrected,
+        'rho':               rho,
+        'valid_mask':        valid_mask,
+        'smoothing_factor':  smoothing_factor,
+        'delta':             delta,        # T
+        'BcrTrue':           BcrTrue,      # T
     }
 
 
@@ -824,11 +906,11 @@ def plot_forc_diagram_standard(result, ax=None, show_points=True,
                                bc_lim=None, bu_lim=None):
     """
     Plot FORC diagram in standard format matching published figures.
-    
+
     Shows scatter plot of (Bc, Bu) points with FORC distribution values.
     Bc = coercivity = (Ha - Hr) / 2
-    Bu = interaction field = (Ha + Hr) / 2
-    
+    Bu = interaction field = (Ha + Hr) / 2  [Bu-axis corrected if baseline present]
+
     Parameters
     ----------
     result : dict from process_forc_forcinel_workflow
@@ -847,78 +929,81 @@ def plot_forc_diagram_standard(result, ax=None, show_points=True,
     """
     if ax is None:
         fig, ax = plt.subplots(figsize=(8, 9))
-    
+
     # Use Bc/Bu notation (standard in FORC literature)
-    Bc = result['Hc']  # Already calculated as (Ha - Hr)/2, in Tesla
-    Bu = result['Hu']  # Already calculated as (Ha + Hr)/2, in Tesla
-    rho = result['rho']
+    Bc  = result['Hc']                                  # (Ha - Hr)/2, Tesla
+    # Use Bu-corrected axis when available (baseline registration)
+    Bu  = result.get('Hu_corrected', result['Hu'])      # Tesla
+    rho  = result['rho']
     mask = result['valid_mask']
-    
-    # Convert to mT FIRST (before any plotting)
+
+    # Convert to mT
     Bc_mT = Bc * 1000
     Bu_mT = Bu * 1000
-    
-    # Handle NaN values in rho (common in sparse upper Bu region)
+
     # Replace NaN with zero for visualization
     rho_clean = np.where(np.isnan(rho), 0, rho)
-    
+
     # Flatten for scatter plot
-    Bc_flat = Bc_mT[mask].flatten()
-    Bu_flat = Bu_mT[mask].flatten()
+    Bc_flat  = Bc_mT[mask].flatten()
+    Bu_flat  = Bu_mT[mask].flatten()
     rho_flat = rho_clean[mask].flatten()
-    
-    # Remove remaining NaN (if any)
-    finite = np.isfinite(rho_flat)
-    Bc_flat = Bc_flat[finite]
-    Bu_flat = Bu_flat[finite]
-    rho_flat = rho_flat[finite]
-    
-    # Determine color scale
-    if vmin is None or vmax is None:
-        # Use tighter percentiles for better color contrast
-        vmin_auto = np.percentile(rho_flat, 5)
-        vmax_auto = np.percentile(rho_flat, 95)
+
+    finite    = np.isfinite(rho_flat)
+    Bc_flat   = Bc_flat[finite]
+    Bu_flat   = Bu_flat[finite]
+    rho_flat  = rho_flat[finite]
+
+    # Color scale
+    if len(rho_flat) > 0:
         if vmin is None:
-            vmin = vmin_auto
+            vmin = np.percentile(rho_flat, 5)
         if vmax is None:
-            vmax = vmax_auto
-    
-    if show_points:
-        # Scatter plot - BRIGHT MODE for vibrant colors
-        scatter = ax.scatter(Bc_flat, Bu_flat, c=rho_flat, 
-                            cmap=colormap, s=3, alpha=0.9,
-                            vmin=vmin, vmax=vmax)
+            vmax = np.percentile(rho_flat, 95)
     else:
-        # Contour plot (use cleaned rho without NaN)
-        rho_clipped = np.clip(rho_clean, vmin, vmax)
+        vmin = vmin if vmin is not None else 0
+        vmax = vmax if vmax is not None else 1
+
+    if show_points:
+        scatter = ax.scatter(Bc_flat, Bu_flat, c=rho_flat,
+                             cmap=colormap, s=3, alpha=0.9,
+                             vmin=vmin, vmax=vmax)
+    else:
+        rho_clipped        = np.clip(rho_clean, vmin, vmax)
         rho_clipped_masked = np.ma.masked_where(~mask, rho_clipped)
-        levels = np.linspace(vmin, vmax, 20)
-        
-        scatter = ax.contourf(Bc_mT, Bu_mT, rho_clipped_masked, 
-                             levels=levels, cmap=colormap,
-                             vmin=vmin, vmax=vmax, extend='neither')
-        ax.contour(Bc_mT, Bu_mT, rho_clipped_masked, 
-                  levels=levels, colors='k', linewidths=0.3, alpha=0.2)
-    
-    # Formatting
+        levels             = np.linspace(vmin, vmax, 20)
+        scatter = ax.contourf(Bc_mT, Bu_mT, rho_clipped_masked,
+                              levels=levels, cmap=colormap,
+                              vmin=vmin, vmax=vmax, extend='neither')
+        ax.contour(Bc_mT, Bu_mT, rho_clipped_masked,
+                   levels=levels, colors='k', linewidths=0.3, alpha=0.2)
+
     ax.set_xlabel('$B_c$ (mT)', fontsize=12)
     ax.set_ylabel('$B_u$ (mT)', fontsize=12)
     ax.set_aspect('equal')
     ax.grid(True, alpha=0.3, linestyle='-', linewidth=0.5)
     ax.axhline(0, color='k', linewidth=0.8, linestyle='--', alpha=0.5)
     ax.axvline(0, color='k', linewidth=0.8, alpha=0.3)
-    
-    # Apply user-specified axis limits (in mT)
+
     if bc_lim is not None:
         ax.set_xlim(bc_lim)
     if bu_lim is not None:
         ax.set_ylim(bu_lim)
-    
-    # Colorbar
+
+    # Caption: baseline registration info
+    delta = result.get('delta', None)
+    if delta is not None:
+        delta_mT = float(delta * 1000)
+        caption  = f'Bu baseline-registered to 0 (measured offset δ = {delta_mT:.2f} mT removed)'
+        ax.text(0.02, 0.02, caption,
+                transform=ax.transAxes, fontsize=8,
+                verticalalignment='bottom',
+                color='gray')
+
     cbar = plt.colorbar(scatter, ax=ax, label='Am²/T²')
     cbar.formatter.set_powerlimits((-3, 3))
     cbar.update_ticks()
-    
+
     return ax
 
 
@@ -981,58 +1066,10 @@ def rmg_extract_forc_data_complete(data):
     y.exists = False
     y.curves = []
     
-    # Find FORC steps
-    forc_steps = []
-    for i, stype in enumerate(data.steptypes):
-        if stype.lower() in ('forcz', 'irmz', 'irm'):
-            forc_steps.append(i)
-    
-    if len(forc_steps) == 0:
-        return y
-    
-    OE_TO_T = 1e-4
-    
-    current_curve = None
-    skip_first_positive = True
-    
-    for i in forc_steps:
-        field_oe = data.levels[i]
-        field_T = field_oe * OE_TO_T
-        mz = data.mvector[2, i]
-        
-        # Skip initial saturation
-        if skip_first_positive and field_oe > 0:
-            skip_first_positive = False
-            continue
-        
-        # Negative = new curve (reversal)
-        if field_oe < 0:
-            # Save previous curve
-            if current_curve is not None and len(current_curve['Ha']) > 0:
-                y.curves.append(current_curve)
-            
-            # Start new curve WITH the reversal point
-            current_curve = {
-                'Hr': field_T,      # reversal field
-                'Mr': mz,           # magnetization AT reversal
-                'Ha': [],           # applied fields (sweep)
-                'M': []             # magnetization during sweep
-            }
-        
-        # Positive/zero = measurement point
-        elif current_curve is not None:
-            current_curve['Ha'].append(field_T)
-            current_curve['M'].append(mz)
-    
-    # Add last curve
-    if current_curve is not None and len(current_curve['Ha']) > 0:
-        y.curves.append(current_curve)
-    
-    # Convert to arrays
-    for curve in y.curves:
-        curve['Ha'] = np.array(curve['Ha'])
-        curve['M'] = np.array(curve['M'])
-    
+    y.source_data = data
+    curve_rows, sat_bias_g = _group_forc_rows_by_curve(data)
+    y.saturation_bias_g = sat_bias_g
+    y.curves = [_curve_dict_from_rows(rows) for rows in curve_rows]
     y.exists = len(y.curves) > 0
     return y
 
@@ -1098,3 +1135,254 @@ def plot_forc_hysteresis_complete(forc_data, ax=None):
             verticalalignment='top', bbox=props)
     
     return ax
+
+
+# =============================================================================
+#  FORC-derived remanence extraction and Bu baseline registration
+# =============================================================================
+
+def forc_extract_reversal_remanence(forc_complete):
+    """
+    Extract FORC-derived remanence branches and statistics from parsed curves.
+
+    Descending branch: one reversal-point remanence per curve (|Hr|, Mr).
+    Ascending branch: deepest-reversal curve positive sweep, excluding the
+    saturation row.
+
+    Parameters
+    ----------
+    forc_complete : FORCData
+        Output from rmg_extract_forc_data_complete.
+
+    Returns
+    -------
+    dict or None  (None if fewer than 3 curves or no reversal moment stored).
+    Keys:
+        'H_backfield' ndarray  raw DCD field axis (T)
+        'M_backfield' ndarray  raw DCD moments (Am²)
+        'H_irm'       ndarray  deepest-reversal positive sweep (T)
+        'M_irm'       ndarray  deepest-reversal sweep moments (Am²)
+        'M_backfield_norm' ndarray  DCD / |SIRM|
+        'M_irm_norm'  ndarray  IRM approx / |SIRM|
+        'SIRM'        float    SIRM estimate (Am²)
+        'Bcr'         float    raw DCD zero-crossing field (T)
+        'spectrum_field' ndarray
+        'spectrum'    ndarray  -d(MrNorm)/d(log10 Hb)
+        'modal_remanence_coercivity' float (T)
+    """
+    if not forc_complete.exists or len(forc_complete.curves) < 3:
+        return None
+
+    def _collapse_curve(field_arr, moment_arr):
+        field_arr = np.asarray(field_arr, dtype=float)
+        moment_arr = np.asarray(moment_arr, dtype=float)
+        mask = np.isfinite(field_arr) & np.isfinite(moment_arr) & (field_arr > 0)
+        if not np.any(mask):
+            return np.array([]), np.array([])
+        field_arr = field_arr[mask]
+        moment_arr = moment_arr[mask]
+        uniq = np.unique(field_arr)
+        collapsed = np.array(
+            [np.median(moment_arr[np.isclose(field_arr, h)]) for h in uniq],
+            dtype=float
+        )
+        return uniq, collapsed
+
+    def _remanence_spectrum(field_arr, moment_norm):
+        field_collapsed, moment_collapsed = _collapse_curve(field_arr, moment_norm)
+        if len(field_collapsed) < 2:
+            return np.array([]), np.array([])
+        return field_collapsed, -np.gradient(moment_collapsed, np.log10(field_collapsed))
+
+    sat_moments = []
+    H_desc_raw, M_desc_raw = [], []
+    deepest_curve = None
+
+    for curve in forc_complete.curves:
+        Hr = float(curve['Hr'])
+        Mr = float(curve.get('Mr', np.nan))
+        Hrev = abs(Hr)
+
+        if np.isfinite(curve.get('saturation_moment', np.nan)):
+            sat_moments.append(float(curve['saturation_moment']))
+        elif len(curve['M']) > 0 and np.isfinite(curve['M'][-1]):
+            sat_moments.append(float(curve['M'][-1]))
+
+        if Hrev > 0 and np.isfinite(Mr):
+            H_desc_raw.append(Hrev)
+            M_desc_raw.append(Mr)
+
+        if deepest_curve is None or Hr < deepest_curve['Hr']:
+            deepest_curve = curve
+
+    H_desc, M_desc = _collapse_curve(H_desc_raw, M_desc_raw)
+    if len(H_desc) < 2 or len(sat_moments) == 0 or deepest_curve is None:
+        return None
+
+    H_asc_raw = np.asarray(deepest_curve['Ha'], dtype=float)
+    M_asc_raw = np.asarray(deepest_curve['M'], dtype=float)
+    sat_field = float(deepest_curve.get('saturation_field_T', np.nan))
+    if len(H_asc_raw) > 0 and np.isfinite(sat_field) and np.isclose(H_asc_raw[-1], sat_field):
+        H_asc_raw = H_asc_raw[:-1]
+        M_asc_raw = M_asc_raw[:-1]
+    H_asc, M_asc = _collapse_curve(H_asc_raw, M_asc_raw)
+
+    SIRM_signed = float(np.median(np.asarray(sat_moments, dtype=float)))
+    SIRM = abs(SIRM_signed) if np.isfinite(SIRM_signed) else np.nan
+    norm = SIRM if (np.isfinite(SIRM) and SIRM != 0) else np.nan
+
+    M_desc_norm = (M_desc / norm) if np.isfinite(norm) else np.full_like(M_desc, np.nan)
+    M_asc_norm = (M_asc / norm) if np.isfinite(norm) else np.full_like(M_asc, np.nan)
+    Bcr = _forc_zero_crossing(H_desc, M_desc_norm)
+    spectrum_field, spectrum = _remanence_spectrum(H_desc, M_desc_norm)
+    modal_remanence_coercivity = np.nan
+    if len(spectrum_field) > 0 and np.any(np.isfinite(spectrum)):
+        modal_idx = int(np.nanargmax(spectrum))
+        modal_remanence_coercivity = float(spectrum_field[modal_idx])
+
+    return {
+        'H_backfield': H_desc,
+        'M_backfield': M_desc,
+        'H_irm': H_asc,
+        'M_irm': M_asc,
+        'M_backfield_norm': M_desc_norm,
+        'M_irm_norm': M_asc_norm,
+        'SIRM':        SIRM,
+        'SIRM_signed': SIRM_signed,
+        'Bcr':         Bcr,
+        'spectrum_field': spectrum_field,
+        'spectrum':    spectrum,
+        'modal_remanence_coercivity': modal_remanence_coercivity,
+        'H_desc':      H_desc,
+        'M_desc':      M_desc,
+        'H_asc':       H_asc,
+        'M_asc':       M_asc,
+    }
+
+
+def forc_measure_bu_baseline(forc_complete):
+    """
+    Measure per-file Bu baseline offset (delta) from FORC reversal-branch
+    coercivity asymmetry.
+
+    Resamples descending and ascending branches onto a common log-spaced field
+    axis, finds the zero-crossing of each branch, then computes:
+        delta   = (Bcr_desc - Bcr_asc) / 2    [Bu offset, T]
+        BcrTrue = (Bcr_desc + Bcr_asc) / 2    [true Bcr, T]
+
+    Parameters
+    ----------
+    forc_complete : FORCData
+        Output from rmg_extract_forc_data_complete.
+
+    Returns
+    -------
+    dict with keys:
+        'delta'   float  Bu baseline offset (T); 0 if indeterminate
+        'BcrTrue' float  true remanence coercivity (T); NaN if indeterminate
+        'rem'     dict   reversal-remanence dict (or None)
+    """
+    rem = forc_extract_reversal_remanence(forc_complete)
+    if rem is None:
+        return {'delta': 0.0, 'BcrTrue': np.nan, 'rem': None}
+
+    H_desc = np.asarray(rem['H_backfield'], dtype=float)
+    Md = np.asarray(rem['M_backfield'], dtype=float)
+    H_asc = np.asarray(rem['H_asc'], dtype=float)
+    Ma = np.asarray(rem['M_asc'], dtype=float)
+
+    H_common = None
+    Md_common = None
+    Ma_common = None
+    if len(H_desc) >= 2 and len(H_asc) >= 2:
+        H_lo = max(float(np.nanmin(H_desc[H_desc > 0])), float(np.nanmin(H_asc[H_asc > 0])))
+        H_hi = min(float(np.nanmax(H_desc)), float(np.nanmax(H_asc)))
+        if np.isfinite(H_lo) and np.isfinite(H_hi) and H_hi > H_lo:
+            n_pts = max(50, len(H_desc), len(H_asc))
+            H_common = np.logspace(np.log10(H_lo), np.log10(H_hi), n_pts)
+            Md_common = np.interp(np.log10(H_common), np.log10(H_desc), Md)
+            Ma_common = np.interp(np.log10(H_common), np.log10(H_asc), Ma)
+
+    Bcr_desc = _forc_zero_crossing(H_common, Md_common) if H_common is not None else _forc_zero_crossing(H_desc, Md)
+    Bcr_asc = _forc_zero_crossing(H_common, Ma_common) if H_common is not None else _forc_zero_crossing(H_asc, Ma)
+
+    if np.isnan(Bcr_desc) and np.isnan(Bcr_asc):
+        delta, BcrTrue = 0.0, np.nan
+    elif np.isnan(Bcr_asc):
+        delta, BcrTrue = 0.0, Bcr_desc
+    elif np.isnan(Bcr_desc):
+        delta, BcrTrue = 0.0, Bcr_asc
+    else:
+        delta   = (Bcr_desc - Bcr_asc) / 2.0
+        BcrTrue = (Bcr_desc + Bcr_asc) / 2.0
+
+    return {
+        'delta': float(delta),
+        'BcrTrue': float(BcrTrue),
+        'rem': rem,
+        'H_common': H_common,
+        'M_desc_common': Md_common,
+        'M_asc_common': Ma_common,
+    }
+
+
+def forc_compute_rockmag_stats(data):
+    """
+    Compute FORC-derived rock-mag statistics and store them on the RmgData object.
+
+    Sets the following attributes on *data*:
+        data.forc_SIRM        – SIRM estimate (Am²)
+        data.forc_SIRMperkg   – SIRM / mass (Am²/kg), NaN if mass unknown
+        data.forc_delta       – Bu baseline offset (mT)
+        data.forc_BcrTrue     – true remanence coercivity Bcr (mT)
+        data.forc_modal_Bcr   – modal remanence coercivity from the remanence coercivity spectrum (mT)
+        data._forc_rem_data   – cached reversal-remanence dict for plotting
+
+    Parameters
+    ----------
+    data : RmgData
+
+    Returns
+    -------
+    dict  (subset of rmg_stats format), or {} if no FORC data present.
+    """
+    forc_complete = rmg_extract_forc_data_complete(data)
+    if not forc_complete.exists:
+        return {}
+
+    baseline = forc_measure_bu_baseline(forc_complete)
+    delta    = baseline['delta']      # T
+    BcrTrue  = baseline['BcrTrue']    # T
+    rem      = baseline['rem']
+
+    # ── SIRM ─────────────────────────────────────────────────────────────────
+    SIRM = float(rem['SIRM']) if rem is not None and np.isfinite(rem['SIRM']) else np.nan
+    if np.isfinite(SIRM) and SIRM < 0:
+        SIRM = -SIRM   # physical SIRM is positive
+
+    mass      = float(getattr(data, 'mass', np.nan))
+    SIRMperkg = (float(SIRM / mass) if (np.isfinite(SIRM) and
+                                         np.isfinite(mass) and
+                                         mass > 0) else float('nan'))
+
+    modal_Bc = (
+        float(rem['modal_remanence_coercivity'] * 1000)
+        if rem is not None and np.isfinite(rem.get('modal_remanence_coercivity', np.nan))
+        else np.nan
+    )
+
+    # ── Store on data object ─────────────────────────────────────────────────
+    data.forc_SIRM      = float(SIRM) if np.isfinite(SIRM) else np.nan
+    data.forc_SIRMperkg = float(SIRMperkg)
+    data.forc_delta     = float(delta * 1000)   # mT
+    data.forc_BcrTrue   = float(BcrTrue * 1000) if np.isfinite(BcrTrue) else np.nan
+    data.forc_modal_Bcr = float(modal_Bc)
+    data._forc_rem_data = rem
+
+    return {
+        'forc_SIRM':      data.forc_SIRM,
+        'forc_SIRMperkg': data.forc_SIRMperkg,
+        'forc_Bcr':       data.forc_BcrTrue,
+        'forc_modal_Bcr': data.forc_modal_Bcr,
+        'forc_delta':     data.forc_delta,
+    }
