@@ -1,0 +1,3697 @@
+Last login: Thu Mar 19 07:59:45 on ttys003
+(base) nicolasanderson@Nicolass-MacBook-Pro-3 ~ % python run_pyrockmag.py
+python: can't open file '/Users/nicolasanderson/run_pyrockmag.py': [Errno 2] No such file or directory
+(base) nicolasanderson@Nicolass-MacBook-Pro-3 ~ % cd /Users/nicolasanderson/Documents/Github/pyRockmag
+(base) nicolasanderson@Nicolass-MacBook-Pro-3 pyRockmag % python run_pyrockmag.py
+
+===============================================================
+          ░▒▓███████▓▒░░▒▓█▓▒░░▒▓█▓▒░ 
+          ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░ 
+          ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░ 
+          ░▒▓███████▓▒░ ░▒▓██████▓▒░  
+          ░▒▓█▓▒░         ░▒▓█▓▒░     
+          ░▒▓█▓▒░         ░▒▓█▓▒░     
+          ░▒▓█▓▒░         ░▒▓█▓▒░     
+
+     ░▒▓███████▓▒░ ░▒▓██████▓▒░  ░▒▓██████▓▒░░▒▓█▓▒░░▒▓█▓▒░ 
+     ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░ 
+     ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░      ░▒▓█▓▒░░▒▓█▓▒░ 
+     ░▒▓███████▓▒░ ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░      ░▒▓███████▓▒░  
+     ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░      ░▒▓█▓▒░░▒▓█▓▒░ 
+     ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░ 
+     ░▒▓█▓▒░░▒▓█▓▒░░▒▓██████▓▒░ ░▒▓██████▓▒░░▒▓█▓▒░░▒▓█▓▒░ 
+
+     ░▒▓██████████████▓▒░ ░▒▓██████▓▒░ ░▒▓██████▓▒░░▒▓█▓▒░ 
+     ░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░      ░▒▓█▓▒░ 
+     ░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░             
+     ░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░▒▓████████▓▒░▒▓█▓▒▒▓███▓▒░▒▓█▓▒░ 
+     ░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░       
+     ░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░ 
+     ░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░░▒▓██████▓▒░░▒▓█▓▒░ 
+
+                    v1.0 - CIT Format Suite
+        
+[ANALYSIS] Hysteresis • Coercivity • IRM • ARM • Backfield
+[FORC] Diagrams • FORCinel v3.0.8 • Multiple Colormaps
+[PALEOMAG] .SAM Generation • Sun Compass • IGRF • 8.3 Format
+[UTILITIES] Batch Plotting • Lowrie-Fuller • Statistics Export
+===============================================================
+
+
+▼═══════════════════════════════════════════════════════════▼
+  (no samples loaded)
+
+▼═══════════════════════════════════════════════════════════▼
+  + [L] Load more files from a directory
+  + [X] Remove samples from loaded list
+  + [R] Run selected routines (batch plotter)
+  + [F] 8-Panel Rock-Mag Dashboard (IRM, ARM, Backfield, etc.)
+  + [I] Inspect one sample (show detailed stats)
+  + [H] Show coercivity values (Hcr, MDF) for all samples
+  + [E] Export all statistics to table
+  + [P] Plot FORC data (First Order Reversal Curves)
+  + [G] Generate FORC measurement script
+  + [S] Generate SAM header files (paleomag)
+  + [C] Clear all loaded samples
+  + [Q] Quit
+
+  Choice: l
+
+── Load files ──────────────────────────────────────────────
+  Enter directory path (or press Enter for current dir): /Users/nicolasanderson/Downloads/Furkan
+
+  Found 26 .rmg file(s) under /Users/nicolasanderson/Downloads/Furkan:
+    [  1] JOE_FORC_5.0-200.0mT_exp1.20_min1.0mT_SATURATION.rmg
+    [  2] BIF/BIF1.1.rmg
+    [  3] BIF/BIF1.1_og.rmg
+    [  4] Basalt/Basalt1.1.rmg
+    [  5] Basalt/Basalt1.15.rmg
+    [  6] CryptoC/CryptoC1.coe.rmg
+    [  7] CryptoC/CryptoC1.frc.rmg
+    [  8] FORC Routines/FORC_5.0-200.0mT_exp1.20_min4.0mT_SATURATION.rmg
+    [  9] FORC Routines/FORCz_5.0_to_200.0mT_in_exp1.20_saturation.rmg
+    [ 10] FORC Routines/FORCz_5.0_to_200.0mT_in_exp1.20_saturation_4mT_step.rmg
+    [ 11] FORC Routines/JOE_FORC_5.0-200.0mT_exp1.20_min1.0mT_SATURATION.rmg
+    [ 12] FORC Routines/rockmag_theworks.rmg
+    [ 13] Greg/Greg001.cor.rmg
+    [ 14] Komat/FORCz_5.0_to_200.0mT_in_exp1.20_Steps.rmg
+    [ 15] Komat/FORCz_5.0_to_200.0mT_in_exp1.20_saturation_CORRECT.rmg
+    [ 16] Komat/Komat003.cor.rmg
+    [ 17] Komat/Komat003.frc.rmg
+    [ 18] Komat/Komat004.frc.rmg
+    [ 19] MaChi-ObsidianFireN-/MaChi-ObsidianFireN-clear.rmg
+    [ 20] MaChi-ObsidianFireN-/MaChi-ObsidianFireN-dark.rmg
+    [ 21] MaChi-ObsidianFireN-/old/MaChi-ObsidianFireN-clear.rmg
+    [ 22] MaChi-ObsidianFireN-/old/MaChi-ObsidianFireN-dark.rmg
+    [ 23] ObsFORC/FORCz_5.0_to_500.0mT_in_exp1.30_Steps.rmg
+    [ 24] ObsFORC/ObsFORC1.FRC.rmg
+    [ 25] Obsid-D/Obsid-D1.1.rmg
+    [ 26] Obsid-L/Obsid-L1.1.rmg
+
+  Enter numbers to load (e.g. 1 3 4), or 'all': 13
+  ✓ Loaded: Greg001.cor  (97 steps, mass=100 g)  [Greg/Greg001.cor.rmg]
+
+▼═══════════════════════════════════════════════════════════▼
+    [1] Greg001.cor
+
+▼═══════════════════════════════════════════════════════════▼
+  + [L] Load more files from a directory
+  + [X] Remove samples from loaded list
+  + [R] Run selected routines (batch plotter)
+  + [F] 8-Panel Rock-Mag Dashboard (IRM, ARM, Backfield, etc.)
+  + [I] Inspect one sample (show detailed stats)
+  + [H] Show coercivity values (Hcr, MDF) for all samples
+  + [E] Export all statistics to table
+  + [P] Plot FORC data (First Order Reversal Curves)
+  + [G] Generate FORC measurement script
+  + [S] Generate SAM header files (paleomag)
+  + [C] Clear all loaded samples
+  + [Q] Quit
+
+  Choice: F
+
+── Group samples for plotting ──────────────────────────────
+  Samples in the same group will be overlaid on the same axes.
+  Each group gets its own figure set.
+    [1] Greg001.cor
+
+  Current groups: 0
+
+  Options:
+  + [N] Create new group
+  + [D] Done (proceed with current groups)
+  + [A] All together (one group with all samples)
+  + [S] All separate (one sample per group)
+  Choice: d
+
+Generating 8-panel dashboard for 1 group(s)…
+  Save group 1 dashboard as PNG? [y/N] y
+    ✓ Saved → Greg001.cor_rockmag.png
+2026-03-23 16:24:59.793 python[13600:1054882] The class 'NSSavePanel' overrides the method identifier.  This method is implemented by class 'NSWindow'
+
+▼═══════════════════════════════════════════════════════════▼
+    [1] Greg001.cor
+
+▼═══════════════════════════════════════════════════════════▼
+  + [L] Load more files from a directory
+  + [X] Remove samples from loaded list
+  + [R] Run selected routines (batch plotter)
+  + [F] 8-Panel Rock-Mag Dashboard (IRM, ARM, Backfield, etc.)
+  + [I] Inspect one sample (show detailed stats)
+  + [H] Show coercivity values (Hcr, MDF) for all samples
+  + [E] Export all statistics to table
+  + [P] Plot FORC data (First Order Reversal Curves)
+  + [G] Generate FORC measurement script
+  + [S] Generate SAM header files (paleomag)
+  + [C] Clear all loaded samples
+  + [Q] Quit
+
+  Choice: l
+
+── Load files ──────────────────────────────────────────────
+  Enter directory path (or press Enter for current dir): /Users/nicolasanderson/Downloads/Furkan
+
+  Found 28 .rmg file(s) under /Users/nicolasanderson/Downloads/Furkan:
+    [  1] JOE_FORC_5.0-200.0mT_exp1.20_min1.0mT_SATURATION.rmg
+    [  2] BIF/BIF1.1.rmg
+    [  3] BIF/BIF1.1_og.rmg
+    [  4] Basalt/Basalt1.1.rmg
+    [  5] Basalt/Basalt1.15.rmg
+    [  6] CryptoC/CryptoC1.coe.rmg
+    [  7] CryptoC/CryptoC1.frc.rmg
+    [  8] FORC Routines/FORC_5.0-200.0mT_exp1.20_min4.0mT_SATURATION.rmg
+    [  9] FORC Routines/FORCz_5.0_to_200.0mT_in_exp1.20_saturation.rmg
+    [ 10] FORC Routines/FORCz_5.0_to_200.0mT_in_exp1.20_saturation_4mT_step.rmg
+    [ 11] FORC Routines/JOE_FORC_5.0-200.0mT_exp1.20_min1.0mT_SATURATION.rmg
+    [ 12] FORC Routines/Rockmag_theworks_FORC_5-200mT_exp1.2_log1.0mTstep_saturated.rmg
+    [ 13] FORC Routines/rockmag_theworks.rmg
+    [ 14] Greg/Greg001.cor.rmg
+    [ 15] Greg/Greg001.frc.rmg
+    [ 16] Komat/FORCz_5.0_to_200.0mT_in_exp1.20_Steps.rmg
+    [ 17] Komat/FORCz_5.0_to_200.0mT_in_exp1.20_saturation_CORRECT.rmg
+    [ 18] Komat/Komat003.cor.rmg
+    [ 19] Komat/Komat003.frc.rmg
+    [ 20] Komat/Komat004.frc.rmg
+    [ 21] MaChi-ObsidianFireN-/MaChi-ObsidianFireN-clear.rmg
+    [ 22] MaChi-ObsidianFireN-/MaChi-ObsidianFireN-dark.rmg
+    [ 23] MaChi-ObsidianFireN-/old/MaChi-ObsidianFireN-clear.rmg
+    [ 24] MaChi-ObsidianFireN-/old/MaChi-ObsidianFireN-dark.rmg
+    [ 25] ObsFORC/FORCz_5.0_to_500.0mT_in_exp1.30_Steps.rmg
+    [ 26] ObsFORC/ObsFORC1.FRC.rmg
+    [ 27] Obsid-D/Obsid-D1.1.rmg
+    [ 28] Obsid-L/Obsid-L1.1.rmg
+
+  Enter numbers to load (e.g. 1 3 4), or 'all': 15
+  ✓ Loaded: Greg001.frc  (956 steps, mass=100 g)  [Greg/Greg001.frc.rmg]
+
+▼═══════════════════════════════════════════════════════════▼
+    [1] Greg001.cor
+    [2] Greg001.frc
+
+▼═══════════════════════════════════════════════════════════▼
+  + [L] Load more files from a directory
+  + [X] Remove samples from loaded list
+  + [R] Run selected routines (batch plotter)
+  + [F] 8-Panel Rock-Mag Dashboard (IRM, ARM, Backfield, etc.)
+  + [I] Inspect one sample (show detailed stats)
+  + [H] Show coercivity values (Hcr, MDF) for all samples
+  + [E] Export all statistics to table
+  + [P] Plot FORC data (First Order Reversal Curves)
+  + [G] Generate FORC measurement script
+  + [S] Generate SAM header files (paleomag)
+  + [C] Clear all loaded samples
+  + [Q] Quit
+
+  Choice: p
+
+── FORC Analysis ───────────────────────────────────────────
+    [1] Greg001.cor
+    [2] Greg001.frc
+
+  Enter sample number(s) to plot (e.g. 1 3 4): 
+  No valid samples selected.
+
+▼═══════════════════════════════════════════════════════════▼
+    [1] Greg001.cor
+    [2] Greg001.frc
+
+▼═══════════════════════════════════════════════════════════▼
+  + [L] Load more files from a directory
+  + [X] Remove samples from loaded list
+  + [R] Run selected routines (batch plotter)
+  + [F] 8-Panel Rock-Mag Dashboard (IRM, ARM, Backfield, etc.)
+  + [I] Inspect one sample (show detailed stats)
+  + [H] Show coercivity values (Hcr, MDF) for all samples
+  + [E] Export all statistics to table
+  + [P] Plot FORC data (First Order Reversal Curves)
+  + [G] Generate FORC measurement script
+  + [S] Generate SAM header files (paleomag)
+  + [C] Clear all loaded samples
+  + [Q] Quit
+
+  Choice: p
+
+── FORC Analysis ───────────────────────────────────────────
+    [1] Greg001.cor
+    [2] Greg001.frc
+
+  Enter sample number(s) to plot (e.g. 1 3 4): 2
+  ✓ Greg001.frc: 30 FORC curves
+
+  FORC Plot Options:
+  + [1] Complete hysteresis (all curves with reversals)
+  + [2] FORC diagram - hot_r colormap (classic red/orange)
+  + [3] FORC diagram - plasma_r colormap (yellow/pink/purple)
+  + [4] FORC diagram - inferno_r colormap (high contrast)
+  + [5] FORC diagrams - contour plots (hot_r + plasma_r + inferno_r)
+  + [6] All plots (hysteresis + 3 scatter + 3 contour = 7 plots)
+  + [7] FORCinel v3 workflow (export .frc + processed)
+  Choice [6]: 6
+
+  Creating all FORC plots...
+
+▼══════════════════════════════════════════════════════════▼
+           FORC Data Resolution
+▲══════════════════════════════════════════════════════════▲
+
+Grid resolution (affects data smoothness when cropped):
+  + [1] Standard (100×100) - Fast, good for full range
+  + [2] Fine (200×200) - Better for moderate cropping
+  + [3] Very Fine (300×300) - Best for heavy cropping
+  + [4] Ultra Fine (500×500) - Maximum detail, slower
+
+Note: Higher resolution = smoother contours but slower processing
+
+Choice [2]: 1
+✓ Grid resolution: 100×100 = 10,000 points
+
+▼══════════════════════════════════════════════════════════▼
+           Plot Resolution
+▲══════════════════════════════════════════════════════════▲
+
+Resolution options:
+  + [1] Screen (100 DPI) - Fast, lower quality
+  + [2] Standard (150 DPI) - Good balance
+  + [3] High (300 DPI) - Publication quality
+  + [4] Ultra (600 DPI) - Maximum detail
+
+Choice [3]: 1
+✓ Resolution set to 100 DPI
+
+  Processing Greg001.frc...
+    - Complete hysteresis
+
+▼══════════════════════════════════════════════════════════▼
+           FORC Axis Range Settings
+▲══════════════════════════════════════════════════════════▲
+
+Data range:
+  Bc (coercivity):      2.5 to 200.0 mT
+  Bu (interaction):     -100.0 to 97.5 mT
+
+Note: Enter limits in mT (milliTesla)
+
+Options:
+  [1] Auto-scale (use full data range)
+  [2] Set custom Bc and Bu limits
+
+Choice [1]: 1
+✓ Using auto-scale
+    - FORC diagram (hot)
+    - FORC diagram (plasma)
+    - FORC diagram (inferno)
+    - FORC diagram (contour hot_r)
+    - FORC diagram (contour plasma_r)
+    - FORC diagram (contour inferno_r)
+
+▼═══════════════════════════════════════════════════════════▼
+    [1] Greg001.cor
+    [2] Greg001.frc
+
+▼═══════════════════════════════════════════════════════════▼
+  + [L] Load more files from a directory
+  + [X] Remove samples from loaded list
+  + [R] Run selected routines (batch plotter)
+  + [F] 8-Panel Rock-Mag Dashboard (IRM, ARM, Backfield, etc.)
+  + [I] Inspect one sample (show detailed stats)
+  + [H] Show coercivity values (Hcr, MDF) for all samples
+  + [E] Export all statistics to table
+  + [P] Plot FORC data (First Order Reversal Curves)
+  + [G] Generate FORC measurement script
+  + [S] Generate SAM header files (paleomag)
+  + [C] Clear all loaded samples
+  + [Q] Quit
+
+  Choice: l
+
+── Load files ──────────────────────────────────────────────
+  Enter directory path (or press Enter for current dir): /Users/nicolasanderson/Downloads/Furkan
+
+  Found 29 .rmg file(s) under /Users/nicolasanderson/Downloads/Furkan:
+    [  1] JOE_FORC_5.0-200.0mT_exp1.20_min1.0mT_SATURATION.rmg
+    [  2] BIF/BIF1.1.rmg
+    [  3] BIF/BIF1.1_og.rmg
+    [  4] Basalt/Basalt1.1.rmg
+    [  5] Basalt/Basalt1.15.rmg
+    [  6] CryptoC/CryptoC1.coe.rmg
+    [  7] CryptoC/CryptoC1.frc.rmg
+    [  8] FORC Routines/FORC_5.0-200.0mT_exp1.20_min4.0mT_SATURATION.rmg
+    [  9] FORC Routines/FORCz_5.0_to_200.0mT_in_exp1.20_saturation.rmg
+    [ 10] FORC Routines/FORCz_5.0_to_200.0mT_in_exp1.20_saturation_4mT_step.rmg
+    [ 11] FORC Routines/JOE_FORC_5.0-200.0mT_exp1.20_min1.0mT_SATURATION.rmg
+    [ 12] FORC Routines/Rockmag_theworks_FORC_5-200mT_exp1.2_log1.0mTstep_saturated.rmg
+    [ 13] FORC Routines/rockmag_theworks.rmg
+    [ 14] Greg/Greg001.1.frc.rmg
+    [ 15] Greg/Greg001.cor.rmg
+    [ 16] Greg/Greg001.frc.rmg
+    [ 17] Komat/FORCz_5.0_to_200.0mT_in_exp1.20_Steps.rmg
+    [ 18] Komat/FORCz_5.0_to_200.0mT_in_exp1.20_saturation_CORRECT.rmg
+    [ 19] Komat/Komat003.cor.rmg
+    [ 20] Komat/Komat003.frc.rmg
+    [ 21] Komat/Komat004.frc.rmg
+    [ 22] MaChi-ObsidianFireN-/MaChi-ObsidianFireN-clear.rmg
+    [ 23] MaChi-ObsidianFireN-/MaChi-ObsidianFireN-dark.rmg
+    [ 24] MaChi-ObsidianFireN-/old/MaChi-ObsidianFireN-clear.rmg
+    [ 25] MaChi-ObsidianFireN-/old/MaChi-ObsidianFireN-dark.rmg
+    [ 26] ObsFORC/FORCz_5.0_to_500.0mT_in_exp1.30_Steps.rmg
+    [ 27] ObsFORC/ObsFORC1.FRC.rmg
+    [ 28] Obsid-D/Obsid-D1.1.rmg
+    [ 29] Obsid-L/Obsid-L1.1.rmg
+
+  Enter numbers to load (e.g. 1 3 4), or 'all': 14
+  ✓ Loaded: Greg001.frc  (963 steps, mass=100 g)  [Greg/Greg001.1.frc.rmg]
+
+▼═══════════════════════════════════════════════════════════▼
+    [1] Greg001.cor
+    [2] Greg001.frc
+    [3] Greg001.frc
+
+▼═══════════════════════════════════════════════════════════▼
+  + [L] Load more files from a directory
+  + [X] Remove samples from loaded list
+  + [R] Run selected routines (batch plotter)
+  + [F] 8-Panel Rock-Mag Dashboard (IRM, ARM, Backfield, etc.)
+  + [I] Inspect one sample (show detailed stats)
+  + [H] Show coercivity values (Hcr, MDF) for all samples
+  + [E] Export all statistics to table
+  + [P] Plot FORC data (First Order Reversal Curves)
+  + [G] Generate FORC measurement script
+  + [S] Generate SAM header files (paleomag)
+  + [C] Clear all loaded samples
+  + [Q] Quit
+
+  Choice: p
+
+── FORC Analysis ───────────────────────────────────────────
+    [1] Greg001.cor
+    [2] Greg001.frc
+    [3] Greg001.frc
+
+  Enter sample number(s) to plot (e.g. 1 3 4): 3
+  ✓ Greg001.frc: 30 FORC curves
+
+  FORC Plot Options:
+  + [1] Complete hysteresis (all curves with reversals)
+  + [2] FORC diagram - hot_r colormap (classic red/orange)
+  + [3] FORC diagram - plasma_r colormap (yellow/pink/purple)
+  + [4] FORC diagram - inferno_r colormap (high contrast)
+  + [5] FORC diagrams - contour plots (hot_r + plasma_r + inferno_r)
+  + [6] All plots (hysteresis + 3 scatter + 3 contour = 7 plots)
+  + [7] FORCinel v3 workflow (export .frc + processed)
+  Choice [6]: 6
+
+  Creating all FORC plots...
+
+▼══════════════════════════════════════════════════════════▼
+           FORC Data Resolution
+▲══════════════════════════════════════════════════════════▲
+
+Grid resolution (affects data smoothness when cropped):
+  + [1] Standard (100×100) - Fast, good for full range
+  + [2] Fine (200×200) - Better for moderate cropping
+  + [3] Very Fine (300×300) - Best for heavy cropping
+  + [4] Ultra Fine (500×500) - Maximum detail, slower
+
+Note: Higher resolution = smoother contours but slower processing
+
+Choice [2]: 1
+✓ Grid resolution: 100×100 = 10,000 points
+
+▼══════════════════════════════════════════════════════════▼
+           Plot Resolution
+▲══════════════════════════════════════════════════════════▲
+
+Resolution options:
+  + [1] Screen (100 DPI) - Fast, lower quality
+  + [2] Standard (150 DPI) - Good balance
+  + [3] High (300 DPI) - Publication quality
+  + [4] Ultra (600 DPI) - Maximum detail
+
+Choice [3]: 1
+✓ Resolution set to 100 DPI
+
+  Processing Greg001.frc...
+    - Complete hysteresis
+
+▼══════════════════════════════════════════════════════════▼
+           FORC Axis Range Settings
+▲══════════════════════════════════════════════════════════▲
+
+Data range:
+  Bc (coercivity):      2.5 to 200.0 mT
+  Bu (interaction):     -100.0 to 97.5 mT
+
+Note: Enter limits in mT (milliTesla)
+
+Options:
+  [1] Auto-scale (use full data range)
+  [2] Set custom Bc and Bu limits
+
+Choice [1]: 1
+✓ Using auto-scale
+    - FORC diagram (hot)
+    - FORC diagram (plasma)
+    - FORC diagram (inferno)
+    - FORC diagram (contour hot_r)
+    - FORC diagram (contour plasma_r)
+    - FORC diagram (contour inferno_r)
+
+▼═══════════════════════════════════════════════════════════▼
+    [1] Greg001.cor
+    [2] Greg001.frc
+    [3] Greg001.frc
+
+▼═══════════════════════════════════════════════════════════▼
+  + [L] Load more files from a directory
+  + [X] Remove samples from loaded list
+  + [R] Run selected routines (batch plotter)
+  + [F] 8-Panel Rock-Mag Dashboard (IRM, ARM, Backfield, etc.)
+  + [I] Inspect one sample (show detailed stats)
+  + [H] Show coercivity values (Hcr, MDF) for all samples
+  + [E] Export all statistics to table
+  + [P] Plot FORC data (First Order Reversal Curves)
+  + [G] Generate FORC measurement script
+  + [S] Generate SAM header files (paleomag)
+  + [C] Clear all loaded samples
+  + [Q] Quit
+
+  Choice: p
+
+── FORC Analysis ───────────────────────────────────────────
+    [1] Greg001.cor
+    [2] Greg001.frc
+    [3] Greg001.frc
+
+  Enter sample number(s) to plot (e.g. 1 3 4): 3
+  ✓ Greg001.frc: 30 FORC curves
+
+  FORC Plot Options:
+  + [1] Complete hysteresis (all curves with reversals)
+  + [2] FORC diagram - hot_r colormap (classic red/orange)
+  + [3] FORC diagram - plasma_r colormap (yellow/pink/purple)
+  + [4] FORC diagram - inferno_r colormap (high contrast)
+  + [5] FORC diagrams - contour plots (hot_r + plasma_r + inferno_r)
+  + [6] All plots (hysteresis + 3 scatter + 3 contour = 7 plots)
+  + [7] FORCinel v3 workflow (export .frc + processed)
+  Choice [6]: 5
+
+  Plotting FORC contour diagrams...
+
+▼══════════════════════════════════════════════════════════▼
+           FORC Data Resolution
+▲══════════════════════════════════════════════════════════▲
+
+Grid resolution (affects data smoothness when cropped):
+  + [1] Standard (100×100) - Fast, good for full range
+  + [2] Fine (200×200) - Better for moderate cropping
+  + [3] Very Fine (300×300) - Best for heavy cropping
+  + [4] Ultra Fine (500×500) - Maximum detail, slower
+
+Note: Higher resolution = smoother contours but slower processing
+
+Choice [2]: 1
+✓ Grid resolution: 100×100 = 10,000 points
+
+▼══════════════════════════════════════════════════════════▼
+           Plot Resolution
+▲══════════════════════════════════════════════════════════▲
+
+Resolution options:
+  + [1] Screen (100 DPI) - Fast, lower quality
+  + [2] Standard (150 DPI) - Good balance
+  + [3] High (300 DPI) - Publication quality
+  + [4] Ultra (600 DPI) - Maximum detail
+
+Choice [3]: 1
+✓ Resolution set to 100 DPI
+
+▼══════════════════════════════════════════════════════════▼
+           Colormap Selection
+▲══════════════════════════════════════════════════════════▲
+
+Available colormaps:
+  + [1] viridis   - Green/blue/purple (good for weak signals)
+  + [2] inferno   - Yellow/orange/purple (high contrast)
+  + [3] rainbow   - Full spectrum (colorful)
+  + [4] spring    - Magenta/yellow (vibrant)
+  + [5] gray      - Grayscale (publication B&W)
+  + [6] hot       - White/red/black (classic)
+
+Choice [2]: 1
+✓ Selected: viridis
+
+  Processing Greg001.frc...
+
+▼══════════════════════════════════════════════════════════▼
+           FORC Axis Range Settings
+▲══════════════════════════════════════════════════════════▲
+
+Data range:
+  Bc (coercivity):      2.5 to 200.0 mT
+  Bu (interaction):     -100.0 to 97.5 mT
+
+Note: Enter limits in mT (milliTesla)
+
+Options:
+  [1] Auto-scale (use full data range)
+  [2] Set custom Bc and Bu limits
+
+Choice [1]: 1
+✓ Using auto-scale
+
+▼═══════════════════════════════════════════════════════════▼
+    [1] Greg001.cor
+    [2] Greg001.frc
+    [3] Greg001.frc
+
+▼═══════════════════════════════════════════════════════════▼
+  + [L] Load more files from a directory
+  + [X] Remove samples from loaded list
+  + [R] Run selected routines (batch plotter)
+  + [F] 8-Panel Rock-Mag Dashboard (IRM, ARM, Backfield, etc.)
+  + [I] Inspect one sample (show detailed stats)
+  + [H] Show coercivity values (Hcr, MDF) for all samples
+  + [E] Export all statistics to table
+  + [P] Plot FORC data (First Order Reversal Curves)
+  + [G] Generate FORC measurement script
+  + [S] Generate SAM header files (paleomag)
+  + [C] Clear all loaded samples
+  + [Q] Quit
+
+  Choice: l
+
+── Load files ──────────────────────────────────────────────
+  Enter directory path (or press Enter for current dir): /Users/nicolasanderson/Downloads/Furkan
+
+  Found 29 .rmg file(s) under /Users/nicolasanderson/Downloads/Furkan:
+    [  1] JOE_FORC_5.0-200.0mT_exp1.20_min1.0mT_SATURATION.rmg
+    [  2] BIF/BIF1.1.rmg
+    [  3] BIF/BIF1.1_og.rmg
+    [  4] Basalt/Basalt1.1.rmg
+    [  5] Basalt/Basalt1.15.rmg
+    [  6] CryptoC/CryptoC1.coe.rmg
+    [  7] CryptoC/CryptoC1.frc.rmg
+    [  8] FORC Routines/FORC_5.0-200.0mT_exp1.20_min4.0mT_SATURATION.rmg
+    [  9] FORC Routines/FORCz_5.0_to_200.0mT_in_exp1.20_saturation.rmg
+    [ 10] FORC Routines/FORCz_5.0_to_200.0mT_in_exp1.20_saturation_4mT_step.rmg
+    [ 11] FORC Routines/JOE_FORC_5.0-200.0mT_exp1.20_min1.0mT_SATURATION.rmg
+    [ 12] FORC Routines/Rockmag_theworks_FORC_5-200mT_exp1.2_log1.0mTstep_saturated.rmg
+    [ 13] FORC Routines/rockmag_theworks.rmg
+    [ 14] Greg/Greg001.1.frc.rmg
+    [ 15] Greg/Greg001.cor.rmg
+    [ 16] Greg/Greg001.frc.rmg
+    [ 17] Komat/FORCz_5.0_to_200.0mT_in_exp1.20_Steps.rmg
+    [ 18] Komat/FORCz_5.0_to_200.0mT_in_exp1.20_saturation_CORRECT.rmg
+    [ 19] Komat/Komat003.cor.rmg
+    [ 20] Komat/Komat003.frc.rmg
+    [ 21] Komat/Komat004.frc.rmg
+    [ 22] MaChi-ObsidianFireN-/MaChi-ObsidianFireN-clear.rmg
+    [ 23] MaChi-ObsidianFireN-/MaChi-ObsidianFireN-dark.rmg
+    [ 24] MaChi-ObsidianFireN-/old/MaChi-ObsidianFireN-clear.rmg
+    [ 25] MaChi-ObsidianFireN-/old/MaChi-ObsidianFireN-dark.rmg
+    [ 26] ObsFORC/FORCz_5.0_to_500.0mT_in_exp1.30_Steps.rmg
+    [ 27] ObsFORC/ObsFORC1.FRC.rmg
+    [ 28] Obsid-D/Obsid-D1.1.rmg
+    [ 29] Obsid-L/Obsid-L1.1.rmg
+
+  Enter numbers to load (e.g. 1 3 4), or 'all': 27
+  ✓ Loaded: ObsFORC1.FRC  (227 steps, mass=100 g)  [ObsFORC/ObsFORC1.FRC.rmg]
+
+▼═══════════════════════════════════════════════════════════▼
+    [1] Greg001.cor
+    [2] Greg001.frc
+    [3] Greg001.frc
+    [4] ObsFORC1.FRC
+
+▼═══════════════════════════════════════════════════════════▼
+  + [L] Load more files from a directory
+  + [X] Remove samples from loaded list
+  + [R] Run selected routines (batch plotter)
+  + [F] 8-Panel Rock-Mag Dashboard (IRM, ARM, Backfield, etc.)
+  + [I] Inspect one sample (show detailed stats)
+  + [H] Show coercivity values (Hcr, MDF) for all samples
+  + [E] Export all statistics to table
+  + [P] Plot FORC data (First Order Reversal Curves)
+  + [G] Generate FORC measurement script
+  + [S] Generate SAM header files (paleomag)
+  + [C] Clear all loaded samples
+  + [Q] Quit
+
+  Choice: p
+
+── FORC Analysis ───────────────────────────────────────────
+    [1] Greg001.cor
+    [2] Greg001.frc
+    [3] Greg001.frc
+    [4] ObsFORC1.FRC
+
+  Enter sample number(s) to plot (e.g. 1 3 4): 4
+  ✓ ObsFORC1.FRC: 14 FORC curves
+
+  FORC Plot Options:
+  + [1] Complete hysteresis (all curves with reversals)
+  + [2] FORC diagram - hot_r colormap (classic red/orange)
+  + [3] FORC diagram - plasma_r colormap (yellow/pink/purple)
+  + [4] FORC diagram - inferno_r colormap (high contrast)
+  + [5] FORC diagrams - contour plots (hot_r + plasma_r + inferno_r)
+  + [6] All plots (hysteresis + 3 scatter + 3 contour = 7 plots)
+  + [7] FORCinel v3 workflow (export .frc + processed)
+  Choice [6]: 5
+
+  Plotting FORC contour diagrams...
+
+▼══════════════════════════════════════════════════════════▼
+           FORC Data Resolution
+▲══════════════════════════════════════════════════════════▲
+
+Grid resolution (affects data smoothness when cropped):
+  + [1] Standard (100×100) - Fast, good for full range
+  + [2] Fine (200×200) - Better for moderate cropping
+  + [3] Very Fine (300×300) - Best for heavy cropping
+  + [4] Ultra Fine (500×500) - Maximum detail, slower
+
+Note: Higher resolution = smoother contours but slower processing
+
+Choice [2]: 1
+✓ Grid resolution: 100×100 = 10,000 points
+
+▼══════════════════════════════════════════════════════════▼
+           Plot Resolution
+▲══════════════════════════════════════════════════════════▲
+
+Resolution options:
+  + [1] Screen (100 DPI) - Fast, lower quality
+  + [2] Standard (150 DPI) - Good balance
+  + [3] High (300 DPI) - Publication quality
+  + [4] Ultra (600 DPI) - Maximum detail
+
+Choice [3]: 1
+✓ Resolution set to 100 DPI
+
+▼══════════════════════════════════════════════════════════▼
+           Colormap Selection
+▲══════════════════════════════════════════════════════════▲
+
+Available colormaps:
+  + [1] viridis   - Green/blue/purple (good for weak signals)
+  + [2] inferno   - Yellow/orange/purple (high contrast)
+  + [3] rainbow   - Full spectrum (colorful)
+  + [4] spring    - Magenta/yellow (vibrant)
+  + [5] gray      - Grayscale (publication B&W)
+  + [6] hot       - White/red/black (classic)
+
+Choice [2]: 1
+✓ Selected: viridis
+
+  Processing ObsFORC1.FRC...
+
+▼══════════════════════════════════════════════════════════▼
+           FORC Axis Range Settings
+▲══════════════════════════════════════════════════════════▲
+
+Data range:
+  Bc (coercivity):      2.5 to 500.0 mT
+  Bu (interaction):     -250.0 to 247.5 mT
+
+Note: Enter limits in mT (milliTesla)
+
+Options:
+  [1] Auto-scale (use full data range)
+  [2] Set custom Bc and Bu limits
+
+Choice [1]: 1
+✓ Using auto-scale
+
+▼═══════════════════════════════════════════════════════════▼
+    [1] Greg001.cor
+    [2] Greg001.frc
+    [3] Greg001.frc
+    [4] ObsFORC1.FRC
+
+▼═══════════════════════════════════════════════════════════▼
+  + [L] Load more files from a directory
+  + [X] Remove samples from loaded list
+  + [R] Run selected routines (batch plotter)
+  + [F] 8-Panel Rock-Mag Dashboard (IRM, ARM, Backfield, etc.)
+  + [I] Inspect one sample (show detailed stats)
+  + [H] Show coercivity values (Hcr, MDF) for all samples
+  + [E] Export all statistics to table
+  + [P] Plot FORC data (First Order Reversal Curves)
+  + [G] Generate FORC measurement script
+  + [S] Generate SAM header files (paleomag)
+  + [C] Clear all loaded samples
+  + [Q] Quit
+
+  Choice: p
+
+── FORC Analysis ───────────────────────────────────────────
+    [1] Greg001.cor
+    [2] Greg001.frc
+    [3] Greg001.frc
+    [4] ObsFORC1.FRC
+
+  Enter sample number(s) to plot (e.g. 1 3 4): 4
+  ✓ ObsFORC1.FRC: 14 FORC curves
+
+  FORC Plot Options:
+  + [1] Complete hysteresis (all curves with reversals)
+  + [2] FORC diagram - hot_r colormap (classic red/orange)
+  + [3] FORC diagram - plasma_r colormap (yellow/pink/purple)
+  + [4] FORC diagram - inferno_r colormap (high contrast)
+  + [5] FORC diagrams - contour plots (hot_r + plasma_r + inferno_r)
+  + [6] All plots (hysteresis + 3 scatter + 3 contour = 7 plots)
+  + [7] FORCinel v3 workflow (export .frc + processed)
+  Choice [6]: 5
+
+  Plotting FORC contour diagrams...
+
+▼══════════════════════════════════════════════════════════▼
+           FORC Data Resolution
+▲══════════════════════════════════════════════════════════▲
+
+Grid resolution (affects data smoothness when cropped):
+  + [1] Standard (100×100) - Fast, good for full range
+  + [2] Fine (200×200) - Better for moderate cropping
+  + [3] Very Fine (300×300) - Best for heavy cropping
+  + [4] Ultra Fine (500×500) - Maximum detail, slower
+
+Note: Higher resolution = smoother contours but slower processing
+
+Choice [2]: 1
+✓ Grid resolution: 100×100 = 10,000 points
+
+▼══════════════════════════════════════════════════════════▼
+           Plot Resolution
+▲══════════════════════════════════════════════════════════▲
+
+Resolution options:
+  + [1] Screen (100 DPI) - Fast, lower quality
+  + [2] Standard (150 DPI) - Good balance
+  + [3] High (300 DPI) - Publication quality
+  + [4] Ultra (600 DPI) - Maximum detail
+
+Choice [3]: 1
+✓ Resolution set to 100 DPI
+
+▼══════════════════════════════════════════════════════════▼
+           Colormap Selection
+▲══════════════════════════════════════════════════════════▲
+
+Available colormaps:
+  + [1] viridis   - Green/blue/purple (good for weak signals)
+  + [2] inferno   - Yellow/orange/purple (high contrast)
+  + [3] rainbow   - Full spectrum (colorful)
+  + [4] spring    - Magenta/yellow (vibrant)
+  + [5] gray      - Grayscale (publication B&W)
+  + [6] hot       - White/red/black (classic)
+
+Choice [2]: 2
+✓ Selected: inferno
+
+  Processing ObsFORC1.FRC...
+
+▼══════════════════════════════════════════════════════════▼
+           FORC Axis Range Settings
+▲══════════════════════════════════════════════════════════▲
+
+Data range:
+  Bc (coercivity):      2.5 to 500.0 mT
+  Bu (interaction):     -250.0 to 247.5 mT
+
+Note: Enter limits in mT (milliTesla)
+
+Options:
+  [1] Auto-scale (use full data range)
+  [2] Set custom Bc and Bu limits
+
+Choice [1]: 1
+✓ Using auto-scale
+
+▼═══════════════════════════════════════════════════════════▼
+    [1] Greg001.cor
+    [2] Greg001.frc
+    [3] Greg001.frc
+    [4] ObsFORC1.FRC
+
+▼═══════════════════════════════════════════════════════════▼
+  + [L] Load more files from a directory
+  + [X] Remove samples from loaded list
+  + [R] Run selected routines (batch plotter)
+  + [F] 8-Panel Rock-Mag Dashboard (IRM, ARM, Backfield, etc.)
+  + [I] Inspect one sample (show detailed stats)
+  + [H] Show coercivity values (Hcr, MDF) for all samples
+  + [E] Export all statistics to table
+  + [P] Plot FORC data (First Order Reversal Curves)
+  + [G] Generate FORC measurement script
+  + [S] Generate SAM header files (paleomag)
+  + [C] Clear all loaded samples
+  + [Q] Quit
+
+  Choice: p
+
+── FORC Analysis ───────────────────────────────────────────
+    [1] Greg001.cor
+    [2] Greg001.frc
+    [3] Greg001.frc
+    [4] ObsFORC1.FRC
+
+  Enter sample number(s) to plot (e.g. 1 3 4): 4
+  ✓ ObsFORC1.FRC: 14 FORC curves
+
+  FORC Plot Options:
+  + [1] Complete hysteresis (all curves with reversals)
+  + [2] FORC diagram - hot_r colormap (classic red/orange)
+  + [3] FORC diagram - plasma_r colormap (yellow/pink/purple)
+  + [4] FORC diagram - inferno_r colormap (high contrast)
+  + [5] FORC diagrams - contour plots (hot_r + plasma_r + inferno_r)
+  + [6] All plots (hysteresis + 3 scatter + 3 contour = 7 plots)
+  + [7] FORCinel v3 workflow (export .frc + processed)
+  Choice [6]: 5
+
+  Plotting FORC contour diagrams...
+
+▼══════════════════════════════════════════════════════════▼
+           FORC Data Resolution
+▲══════════════════════════════════════════════════════════▲
+
+Grid resolution (affects data smoothness when cropped):
+  + [1] Standard (100×100) - Fast, good for full range
+  + [2] Fine (200×200) - Better for moderate cropping
+  + [3] Very Fine (300×300) - Best for heavy cropping
+  + [4] Ultra Fine (500×500) - Maximum detail, slower
+
+Note: Higher resolution = smoother contours but slower processing
+
+Choice [2]: 1
+✓ Grid resolution: 100×100 = 10,000 points
+
+▼══════════════════════════════════════════════════════════▼
+           Plot Resolution
+▲══════════════════════════════════════════════════════════▲
+
+Resolution options:
+  + [1] Screen (100 DPI) - Fast, lower quality
+  + [2] Standard (150 DPI) - Good balance
+  + [3] High (300 DPI) - Publication quality
+  + [4] Ultra (600 DPI) - Maximum detail
+
+Choice [3]: 1
+✓ Resolution set to 100 DPI
+
+▼══════════════════════════════════════════════════════════▼
+           Colormap Selection
+▲══════════════════════════════════════════════════════════▲
+
+Available colormaps:
+  + [1] viridis   - Green/blue/purple (good for weak signals)
+  + [2] inferno   - Yellow/orange/purple (high contrast)
+  + [3] rainbow   - Full spectrum (colorful)
+  + [4] spring    - Magenta/yellow (vibrant)
+  + [5] gray      - Grayscale (publication B&W)
+  + [6] hot       - White/red/black (classic)
+
+Choice [2]: 2
+✓ Selected: inferno
+
+  Processing ObsFORC1.FRC...
+
+▼══════════════════════════════════════════════════════════▼
+           FORC Axis Range Settings
+▲══════════════════════════════════════════════════════════▲
+
+Data range:
+  Bc (coercivity):      2.5 to 500.0 mT
+  Bu (interaction):     -250.0 to 247.5 mT
+
+Note: Enter limits in mT (milliTesla)
+
+Options:
+  [1] Auto-scale (use full data range)
+  [2] Set custom Bc and Bu limits
+
+Choice [1]: 1
+✓ Using auto-scale
+
+▼═══════════════════════════════════════════════════════════▼
+    [1] Greg001.cor
+    [2] Greg001.frc
+    [3] Greg001.frc
+    [4] ObsFORC1.FRC
+
+▼═══════════════════════════════════════════════════════════▼
+  + [L] Load more files from a directory
+  + [X] Remove samples from loaded list
+  + [R] Run selected routines (batch plotter)
+  + [F] 8-Panel Rock-Mag Dashboard (IRM, ARM, Backfield, etc.)
+  + [I] Inspect one sample (show detailed stats)
+  + [H] Show coercivity values (Hcr, MDF) for all samples
+  + [E] Export all statistics to table
+  + [P] Plot FORC data (First Order Reversal Curves)
+  + [G] Generate FORC measurement script
+  + [S] Generate SAM header files (paleomag)
+  + [C] Clear all loaded samples
+  + [Q] Quit
+
+  Choice: l
+
+── Load files ──────────────────────────────────────────────
+  Enter directory path (or press Enter for current dir): /Users/nicolasanderson/Downloads/Furkan
+
+  Found 30 .rmg file(s) under /Users/nicolasanderson/Downloads/Furkan:
+    [  1] JOE_FORC_5.0-200.0mT_exp1.20_min1.0mT_SATURATION.rmg
+    [  2] BIF/BIF1.1.rmg
+    [  3] BIF/BIF1.1_og.rmg
+    [  4] Basalt/Basalt1.1.rmg
+    [  5] Basalt/Basalt1.15.rmg
+    [  6] CryptoC/CryptoC1.coe.rmg
+    [  7] CryptoC/CryptoC1.frc.rmg
+    [  8] FORC Routines/FORC_5.0-200.0mT_exp1.20_min4.0mT_SATURATION.rmg
+    [  9] FORC Routines/FORCz_5.0_to_200.0mT_in_exp1.20_saturation.rmg
+    [ 10] FORC Routines/FORCz_5.0_to_200.0mT_in_exp1.20_saturation_4mT_step.rmg
+    [ 11] FORC Routines/JOE_FORC_5.0-200.0mT_exp1.20_min1.0mT_SATURATION.rmg
+    [ 12] FORC Routines/Rockmag_theworks_FORC_5-200mT_exp1.2_log1.0mTstep_saturated.rmg
+    [ 13] FORC Routines/rockmag_theworks.rmg
+    [ 14] Greg/Greg001.1.frc.rmg
+    [ 15] Greg/Greg001.cor.rmg
+    [ 16] Greg/Greg001.frc.rmg
+    [ 17] Greg/Greg002.frc.rmg
+    [ 18] Komat/FORCz_5.0_to_200.0mT_in_exp1.20_Steps.rmg
+    [ 19] Komat/FORCz_5.0_to_200.0mT_in_exp1.20_saturation_CORRECT.rmg
+    [ 20] Komat/Komat003.cor.rmg
+    [ 21] Komat/Komat003.frc.rmg
+    [ 22] Komat/Komat004.frc.rmg
+    [ 23] MaChi-ObsidianFireN-/MaChi-ObsidianFireN-clear.rmg
+    [ 24] MaChi-ObsidianFireN-/MaChi-ObsidianFireN-dark.rmg
+    [ 25] MaChi-ObsidianFireN-/old/MaChi-ObsidianFireN-clear.rmg
+    [ 26] MaChi-ObsidianFireN-/old/MaChi-ObsidianFireN-dark.rmg
+    [ 27] ObsFORC/FORCz_5.0_to_500.0mT_in_exp1.30_Steps.rmg
+    [ 28] ObsFORC/ObsFORC1.FRC.rmg
+    [ 29] Obsid-D/Obsid-D1.1.rmg
+    [ 30] Obsid-L/Obsid-L1.1.rmg
+
+  Enter numbers to load (e.g. 1 3 4), or 'all': 17
+  ✓ Loaded: Greg002.frc  (963 steps, mass=100 g)  [Greg/Greg002.frc.rmg]
+
+▼═══════════════════════════════════════════════════════════▼
+    [1] Greg001.cor
+    [2] Greg001.frc
+    [3] Greg001.frc
+    [4] ObsFORC1.FRC
+    [5] Greg002.frc
+
+▼═══════════════════════════════════════════════════════════▼
+  + [L] Load more files from a directory
+  + [X] Remove samples from loaded list
+  + [R] Run selected routines (batch plotter)
+  + [F] 8-Panel Rock-Mag Dashboard (IRM, ARM, Backfield, etc.)
+  + [I] Inspect one sample (show detailed stats)
+  + [H] Show coercivity values (Hcr, MDF) for all samples
+  + [E] Export all statistics to table
+  + [P] Plot FORC data (First Order Reversal Curves)
+  + [G] Generate FORC measurement script
+  + [S] Generate SAM header files (paleomag)
+  + [C] Clear all loaded samples
+  + [Q] Quit
+
+  Choice: p
+
+── FORC Analysis ───────────────────────────────────────────
+    [1] Greg001.cor
+    [2] Greg001.frc
+    [3] Greg001.frc
+    [4] ObsFORC1.FRC
+    [5] Greg002.frc
+
+  Enter sample number(s) to plot (e.g. 1 3 4): 5
+  ✓ Greg002.frc: 30 FORC curves
+
+  FORC Plot Options:
+  + [1] Complete hysteresis (all curves with reversals)
+  + [2] FORC diagram - hot_r colormap (classic red/orange)
+  + [3] FORC diagram - plasma_r colormap (yellow/pink/purple)
+  + [4] FORC diagram - inferno_r colormap (high contrast)
+  + [5] FORC diagrams - contour plots (hot_r + plasma_r + inferno_r)
+  + [6] All plots (hysteresis + 3 scatter + 3 contour = 7 plots)
+  + [7] FORCinel v3 workflow (export .frc + processed)
+  Choice [6]: 6
+
+  Creating all FORC plots...
+
+▼══════════════════════════════════════════════════════════▼
+           FORC Data Resolution
+▲══════════════════════════════════════════════════════════▲
+
+Grid resolution (affects data smoothness when cropped):
+  + [1] Standard (100×100) - Fast, good for full range
+  + [2] Fine (200×200) - Better for moderate cropping
+  + [3] Very Fine (300×300) - Best for heavy cropping
+  + [4] Ultra Fine (500×500) - Maximum detail, slower
+
+Note: Higher resolution = smoother contours but slower processing
+
+Choice [2]: 2
+✓ Grid resolution: 200×200 = 40,000 points
+
+▼══════════════════════════════════════════════════════════▼
+           Plot Resolution
+▲══════════════════════════════════════════════════════════▲
+
+Resolution options:
+  + [1] Screen (100 DPI) - Fast, lower quality
+  + [2] Standard (150 DPI) - Good balance
+  + [3] High (300 DPI) - Publication quality
+  + [4] Ultra (600 DPI) - Maximum detail
+
+Choice [3]: 1
+✓ Resolution set to 100 DPI
+
+  Processing Greg002.frc...
+    - Complete hysteresis
+
+▼══════════════════════════════════════════════════════════▼
+           FORC Axis Range Settings
+▲══════════════════════════════════════════════════════════▲
+
+Data range:
+  Bc (coercivity):      2.5 to 200.0 mT
+  Bu (interaction):     -100.0 to 97.5 mT
+
+Note: Enter limits in mT (milliTesla)
+
+Options:
+  [1] Auto-scale (use full data range)
+  [2] Set custom Bc and Bu limits
+
+Choice [1]: 1
+✓ Using auto-scale
+    - FORC diagram (hot)
+    - FORC diagram (plasma)
+    - FORC diagram (inferno)
+    - FORC diagram (contour hot_r)
+    - FORC diagram (contour plasma_r)
+    - FORC diagram (contour inferno_r)
+
+▼═══════════════════════════════════════════════════════════▼
+    [1] Greg001.cor
+    [2] Greg001.frc
+    [3] Greg001.frc
+    [4] ObsFORC1.FRC
+    [5] Greg002.frc
+
+▼═══════════════════════════════════════════════════════════▼
+  + [L] Load more files from a directory
+  + [X] Remove samples from loaded list
+  + [R] Run selected routines (batch plotter)
+  + [F] 8-Panel Rock-Mag Dashboard (IRM, ARM, Backfield, etc.)
+  + [I] Inspect one sample (show detailed stats)
+  + [H] Show coercivity values (Hcr, MDF) for all samples
+  + [E] Export all statistics to table
+  + [P] Plot FORC data (First Order Reversal Curves)
+  + [G] Generate FORC measurement script
+  + [S] Generate SAM header files (paleomag)
+  + [C] Clear all loaded samples
+  + [Q] Quit
+
+  Choice: l
+
+── Load files ──────────────────────────────────────────────
+  Enter directory path (or press Enter for current dir): /Users/nicolasanderson/Documents/GitHub/2024_Caborca_Tapeats/Rockmag
+
+  Found 1 .rmg file(s) under /Users/nicolasanderson/Documents/GitHub/2024_Caborca_Tapeats/Rockmag:
+    [  1] TPB4.1.cor.rmg
+
+  Enter numbers to load (e.g. 1 3 4), or 'all': 1
+  ✓ Loaded: TPB4.1.cor  (97 steps)  [TPB4.1.cor.rmg]
+
+▼═══════════════════════════════════════════════════════════▼
+    [1] Greg001.cor
+    [2] Greg001.frc
+    [3] Greg001.frc
+    [4] ObsFORC1.FRC
+    [5] Greg002.frc
+    [6] TPB4.1.cor
+
+▼═══════════════════════════════════════════════════════════▼
+  + [L] Load more files from a directory
+  + [X] Remove samples from loaded list
+  + [R] Run selected routines (batch plotter)
+  + [F] 8-Panel Rock-Mag Dashboard (IRM, ARM, Backfield, etc.)
+  + [I] Inspect one sample (show detailed stats)
+  + [H] Show coercivity values (Hcr, MDF) for all samples
+  + [E] Export all statistics to table
+  + [P] Plot FORC data (First Order Reversal Curves)
+  + [G] Generate FORC measurement script
+  + [S] Generate SAM header files (paleomag)
+  + [C] Clear all loaded samples
+  + [Q] Quit
+
+  Choice: f
+
+── Group samples for plotting ──────────────────────────────
+  Samples in the same group will be overlaid on the same axes.
+  Each group gets its own figure set.
+    [1] Greg001.cor
+    [2] Greg001.frc
+    [3] Greg001.frc
+    [4] ObsFORC1.FRC
+    [5] Greg002.frc
+    [6] TPB4.1.cor
+
+  Current groups: 0
+
+  Options:
+  + [N] Create new group
+  + [D] Done (proceed with current groups)
+  + [A] All together (one group with all samples)
+  + [S] All separate (one sample per group)
+  Choice: d
+
+Generating 8-panel dashboard for 1 group(s)…
+  Save group 1 dashboard as PNG? [y/N] y
+    ✓ Saved → group1_multisamples_rockmag.png
+
+▼═══════════════════════════════════════════════════════════▼
+    [1] Greg001.cor
+    [2] Greg001.frc
+    [3] Greg001.frc
+    [4] ObsFORC1.FRC
+    [5] Greg002.frc
+    [6] TPB4.1.cor
+
+▼═══════════════════════════════════════════════════════════▼
+  + [L] Load more files from a directory
+  + [X] Remove samples from loaded list
+  + [R] Run selected routines (batch plotter)
+  + [F] 8-Panel Rock-Mag Dashboard (IRM, ARM, Backfield, etc.)
+  + [I] Inspect one sample (show detailed stats)
+  + [H] Show coercivity values (Hcr, MDF) for all samples
+  + [E] Export all statistics to table
+  + [P] Plot FORC data (First Order Reversal Curves)
+  + [G] Generate FORC measurement script
+  + [S] Generate SAM header files (paleomag)
+  + [C] Clear all loaded samples
+  + [Q] Quit
+
+  Choice: c
+  All samples cleared.
+
+▼═══════════════════════════════════════════════════════════▼
+  (no samples loaded)
+
+▼═══════════════════════════════════════════════════════════▼
+  + [L] Load more files from a directory
+  + [X] Remove samples from loaded list
+  + [R] Run selected routines (batch plotter)
+  + [F] 8-Panel Rock-Mag Dashboard (IRM, ARM, Backfield, etc.)
+  + [I] Inspect one sample (show detailed stats)
+  + [H] Show coercivity values (Hcr, MDF) for all samples
+  + [E] Export all statistics to table
+  + [P] Plot FORC data (First Order Reversal Curves)
+  + [G] Generate FORC measurement script
+  + [S] Generate SAM header files (paleomag)
+  + [C] Clear all loaded samples
+  + [Q] Quit
+
+  Choice: l
+
+── Load files ──────────────────────────────────────────────
+  Enter directory path (or press Enter for current dir): /Users/nicolasanderson/Documents/GitHub/2024_Caborca_Tapeats/Rockmag
+
+  Found 1 .rmg file(s) under /Users/nicolasanderson/Documents/GitHub/2024_Caborca_Tapeats/Rockmag:
+    [  1] TPB4.1.cor.rmg
+
+  Enter numbers to load (e.g. 1 3 4), or 'all': 1
+  ✓ Loaded: TPB4.1.cor  (97 steps)  [TPB4.1.cor.rmg]
+
+▼═══════════════════════════════════════════════════════════▼
+    [1] TPB4.1.cor
+
+▼═══════════════════════════════════════════════════════════▼
+  + [L] Load more files from a directory
+  + [X] Remove samples from loaded list
+  + [R] Run selected routines (batch plotter)
+  + [F] 8-Panel Rock-Mag Dashboard (IRM, ARM, Backfield, etc.)
+  + [I] Inspect one sample (show detailed stats)
+  + [H] Show coercivity values (Hcr, MDF) for all samples
+  + [E] Export all statistics to table
+  + [P] Plot FORC data (First Order Reversal Curves)
+  + [G] Generate FORC measurement script
+  + [S] Generate SAM header files (paleomag)
+  + [C] Clear all loaded samples
+  + [Q] Quit
+
+  Choice: f
+
+── Group samples for plotting ──────────────────────────────
+  Samples in the same group will be overlaid on the same axes.
+  Each group gets its own figure set.
+    [1] TPB4.1.cor
+
+  Current groups: 0
+
+  Options:
+  + [N] Create new group
+  + [D] Done (proceed with current groups)
+  + [A] All together (one group with all samples)
+  + [S] All separate (one sample per group)
+  Choice: s
+
+Generating 8-panel dashboard for 1 group(s)…
+  Save group 1 dashboard as PNG? [y/N] y
+    ✓ Saved → TPB4.1.cor_rockmag.png
+
+▼═══════════════════════════════════════════════════════════▼
+    [1] TPB4.1.cor
+
+▼═══════════════════════════════════════════════════════════▼
+  + [L] Load more files from a directory
+  + [X] Remove samples from loaded list
+  + [R] Run selected routines (batch plotter)
+  + [F] 8-Panel Rock-Mag Dashboard (IRM, ARM, Backfield, etc.)
+  + [I] Inspect one sample (show detailed stats)
+  + [H] Show coercivity values (Hcr, MDF) for all samples
+  + [E] Export all statistics to table
+  + [P] Plot FORC data (First Order Reversal Curves)
+  + [G] Generate FORC measurement script
+  + [S] Generate SAM header files (paleomag)
+  + [C] Clear all loaded samples
+  + [Q] Quit
+
+  Choice: l
+
+── Load files ──────────────────────────────────────────────
+  Enter directory path (or press Enter for current dir): /Volumes/YSB
+
+  Found 418 .rmg file(s) under /Volumes/YSB:
+    [  1] ._FORC_goethite_1T_log30curves.rmg
+    [  2] ._FORC_hematite_1T_log30curves 1.rmg
+    [  3] ._FORC_magnetite_5.0-200.0mT_exp1.20_min1.0mT_SATURATION copy.rmg
+    [  4] ._FORCz_5.0_to_200.0mT_in_exp1.2_2mT_Steps.rmg
+    [  5] ._FORCz_5.0_to_500.0mT_in_exp1.30_Steps.rmg
+    [  6] FORC_goethite_1T_log30curves.rmg
+    [  7] FORC_hematite_1T_log30curves 1.rmg
+    [  8] FORC_magnetite_5.0-200.0mT_exp1.20_min1.0mT_SATURATION copy.rmg
+    [  9] FORCz_5.0_to_200.0mT_in_exp1.2_2mT_Steps.rmg
+    [ 10] FORCz_5.0_to_500.0mT_in_exp1.30_Steps.rmg
+    [ 11] Anderson/Laos/LS/AF_Template.rmg
+    [ 12] Anderson/Laos/LS/LSBPO15.rmg
+    [ 13] Anderson/Laos/LS/LSBSP15.rmg
+    [ 14] Anderson/Laos/LS/LSH18.rmg
+    [ 15] Anderson/Laos/LS/LSPKE19.rmg
+    [ 16] Anderson/Laos/LS/LSPSK18.rmg
+    [ 17] Anderson/Laos/LS/Rockmag_Template.rmg
+    [ 18] Anderson/Laos/NWF-A-/NWF-A-1B.rmg
+    [ 19] Anderson/Laos/NWF-A-/NWF-A-1C.rmg
+    [ 20] Anderson/Laos/NWF-A-/NWF-A-1D.rmg
+    [ 21] Anderson/Laos/NWF-A-/NWF-A-1E.rmg
+    [ 22] Anderson/Laos/NWF-A-/NWF-A-1F.rmg
+    [ 23] Anderson/Laos/NWF-A-/NWF-A-1G.rmg
+    [ 24] Anderson/Laos/NWF-A-/NWF-A-1H.rmg
+    [ 25] Anderson/Laos/NWF-A-/NWF-A-2B.rmg
+    [ 26] Anderson/Laos/NWF-A-/NWF-A-2C.rmg
+    [ 27] Anderson/Laos/NWF-A-/NWF-A-2D.rmg
+    [ 28] Anderson/Laos/NWF-A-/NWF-A-3B.rmg
+    [ 29] Anderson/Laos/NWF-A-/NWF-A-4B.rmg
+    [ 30] Anderson/Laos/NWF-A-/NWF-A-4C.rmg
+    [ 31] Anderson/Laos/NWF-A-/NWF-A-5B.rmg
+    [ 32] Anderson/Laos/NWF-A-/NWF-A-5C.rmg
+    [ 33] Anderson/Laos/NWF-B-/NWF-B-1B.rmg
+    [ 34] Anderson/Laos/NWF-B-/NWF-B-1C.rmg
+    [ 35] Anderson/Laos/NWF-B-/NWF-B-1D.rmg
+    [ 36] Anderson/Laos/NWF-B-/NWF-B-1E.rmg
+    [ 37] Anderson/Laos/NWF-B-/NWF-B-1F.rmg
+    [ 38] Anderson/Laos/NWF-B-/NWF-B-1G.rmg
+    [ 39] Anderson/Laos/NWF-B-/NWF-B-1H.rmg
+    [ 40] Anderson/Laos/NWF-B-/NWF-B-2B.rmg
+    [ 41] Anderson/Laos/NWF-B-/NWF-B-2C.rmg
+    [ 42] Anderson/Laos/NWF-B-/NWF-B-2D.rmg
+    [ 43] Anderson/Laos/NWF-B-/NWF-B-2E.rmg
+    [ 44] Anderson/Laos/NWF-B-/NWF-B-2F.rmg
+    [ 45] Anderson/Laos/NWF-B-/NWF-B-2G.rmg
+    [ 46] Anderson/Laos/NWF-B-/NWF-B-3B.rmg
+    [ 47] Anderson/Laos/NWF-B-/NWF-B-3C.rmg
+    [ 48] Anderson/Laos/NWF-B-/NWF-B-3D.rmg
+    [ 49] Anderson/Laos/NWF-B-/NWF-B-3E.rmg
+    [ 50] Anderson/Laos/NWF-B-/NWF-B-3F.rmg
+    [ 51] Anderson/Laos/NWF-B-/NWF-B-3G.rmg
+    [ 52] Anderson/Laos/NWF-B-/NWF-B-3H.rmg
+    [ 53] Anderson/Laos/NWF-C-/NWF-C-1B.rmg
+    [ 54] Anderson/Laos/NWF-C-/NWF-C-1C.rmg
+    [ 55] Anderson/Laos/NWF-C-/NWF-C-2B.rmg
+    [ 56] Anderson/Laos/NWF-C-/NWF-C-2C.rmg
+    [ 57] Anderson/Laos/NWF-C-/NWF-C-2D.rmg
+    [ 58] Anderson/Laos/NWF-C-/NWF-C-2E.rmg
+    [ 59] Anderson/Laos/NWF-C-/NWF-C-2F.rmg
+    [ 60] Anderson/Laos/NWF-C-/NWF-C-3B.rmg
+    [ 61] Anderson/Laos/NWF-C-/NWF-C-3C.rmg
+    [ 62] Anderson/Laos/NWF-C-/NWF-C-3D.rmg
+    [ 63] Anderson/Laos/NWF-C-/NWF-C-4B.rmg
+    [ 64] Anderson/Laos/NWF-C-/NWF-C-4C.rmg
+    [ 65] Anderson/Laos/NWF-C-/NWF-C-4D.rmg
+    [ 66] Anderson/Laos/NWF-C-/NWF-C-4E.rmg
+    [ 67] Anderson/Laos/NWF-C-/NWF-C-5B.rmg
+    [ 68] Anderson/Laos/NWF-C-/NWF-C-5C.rmg
+    [ 69] Anderson/Laos/NWF-C-/NWF-C-5D.rmg
+    [ 70] Anderson/Laos/NWF-C-/NWF-C-5E.rmg
+    [ 71] Anderson/Laos/NWF-C-/NWF-C-6B.rmg
+    [ 72] Anderson/Laos/NWF-C-/NWF-C-6C.rmg
+    [ 73] Anderson/Laos/NWF-C-/NWF-C-6D.rmg
+    [ 74] Anderson/Laos/NWF-C-/NWF-C-6E.rmg
+    [ 75] Anderson/Laos/NWF-C-/NWF-C-7B.rmg
+    [ 76] Anderson/Laos/NWF-C-/NWF-C-7C.rmg
+    [ 77] Anderson/Laos/NWF-C-/NWF-C-7D.rmg
+    [ 78] Anderson/Laos/NWF-C-/NWF-C-7E.rmg
+    [ 79] Anderson/Laos/NWF-C-/NWF-C-7F.rmg
+    [ 80] Anderson/Laos/NWF-C-/NWF-C-8B.rmg
+    [ 81] Anderson/Laos/NWF-C-/NWF-C-8C.rmg
+    [ 82] Anderson/Laos/NWF-C-/NWF-C-8D.rmg
+    [ 83] Anderson/Laos/NWF-C-/NWF-C-8E.rmg
+    [ 84] Anderson/Laos/NWF-C-/NWF-C-8F.rmg
+    [ 85] Anderson/Laos/NWF-C-/NWF-C-8G.rmg
+    [ 86] Anderson/Laos/PKQ-A-/PKQ-A-0A.rmg
+    [ 87] Anderson/Laos/PKQ-A-/PKQ-A-0B.rmg
+    [ 88] Anderson/Laos/PKQ-A-/PKQ-A-0C.rmg
+    [ 89] Anderson/Laos/PKQ-A-/PKQ-A-0D.rmg
+    [ 90] Anderson/Laos/PKQ-A-/PKQ-A-0E.rmg
+    [ 91] Anderson/Laos/PKQ-A-/PKQ-A-0F.rmg
+    [ 92] Anderson/Laos/PKQ-A-/PKQ-A-0G.rmg
+    [ 93] Anderson/Laos/PKQ-A-/PKQ-A-1A.rmg
+    [ 94] Anderson/Laos/PKQ-A-/PKQ-A-1B.rmg
+    [ 95] Anderson/Laos/PKQ-A-/PKQ-A-1C.rmg
+    [ 96] Anderson/Laos/PKQ-A-/PKQ-A-1D.rmg
+    [ 97] Anderson/Laos/PKQ-A-/PKQ-A-2B.rmg
+    [ 98] Anderson/Laos/PKQ-A-/PKQ-A-2C.rmg
+    [ 99] Anderson/Laos/PKQ-A-/PKQ-A-2D.rmg
+    [100] Anderson/Laos/PKQ-A-/PKQ-A-2E.rmg
+    [101] Anderson/Laos/PKQ-A-/PKQ-A-2F.rmg
+    [102] Anderson/Laos/PKQ-A-/PKQ-A-2G.rmg
+    [103] Anderson/Laos/PKQ-A-/PKQ-A-2H.rmg
+    [104] Anderson/Laos/PKQ-A-/PKQ-A-2I.rmg
+    [105] Anderson/Laos/PKQ-A-/PKQ-A-2J.rmg
+    [106] Anderson/Laos/PKQ-A-/PKQ-A-2K.rmg
+    [107] Anderson/Laos/PKQ-A-/PKQ-A-2L.rmg
+    [108] Anderson/Laos/PKQ-A-/PKQ-A-3B.rmg
+    [109] Anderson/Laos/PKQ-A-/PKQ-A-3C.rmg
+    [110] Anderson/Laos/PKQ-A-/PKQ-A-3D.rmg
+    [111] Anderson/Laos/PKQ-A-/PKQ-A-3E.rmg
+    [112] Anderson/Laos/PKQ-A-/PKQ-A-3F.rmg
+    [113] Anderson/Laos/PKQ-A-/PKQ-A-3G.rmg
+    [114] Anderson/Laos/PKQ-A-/PKQ-A-4B.rmg
+    [115] Anderson/Laos/PKQ-A-/PKQ-A-4C.rmg
+    [116] Anderson/Laos/PKQ-A-/PKQ-A-4D.rmg
+    [117] Anderson/Laos/PKQ-A-/PKQ-A-4E.rmg
+    [118] Anderson/Laos/PKQ-A-/PKQ-A-4F.rmg
+    [119] Anderson/Laos/PKQ-A-/PKQ-A-4G.rmg
+    [120] Anderson/Laos/PKQ-A-/PKQ-A-4H.rmg
+    [121] Anderson/Laos/PKQ-A-/PKQ-A-5B.rmg
+    [122] Anderson/Laos/PKQ-A-/PKQ-A-5C.rmg
+    [123] Anderson/Laos/PKQ-A-/PKQ-A-5D.rmg
+    [124] Anderson/Laos/PKQ-A-/PKQ-A-5E.rmg
+    [125] Anderson/Laos/PKQ-A-/PKQ-A-5F.rmg
+    [126] Anderson/Laos/PKQ-A-/PKQ-A-5G.rmg
+    [127] Anderson/Laos/PKQ-A-/PKQ-A-5H.rmg
+    [128] Anderson/Laos/PKQ-A-/PKQ-A-5I.rmg
+    [129] Anderson/Laos/PKQ-A-/PKQ-A-5J.rmg
+    [130] Anderson/Laos/PKQ-A-/PKQ-A-5K.rmg
+    [131] Anderson/Laos/PKQ-A-/PKQ-A-5L.rmg
+    [132] Anderson/Laos/PKQ-A-/PKQ-A-5M.rmg
+    [133] Anderson/Laos/PKQ-A-/PKQ-A-5N.rmg
+    [134] Anderson/Laos/PKQ-A-/PKQ-A-5O.rmg
+    [135] Anderson/Laos/PKQ-A-/PKQ-A-5P.rmg
+    [136] Anderson/Laos/PKQ-A-/PKQ-A-5Q.rmg
+    [137] Anderson/Laos/PKQ-A-/PKQ-A-6A.rmg
+    [138] Anderson/Laos/PKQ-A-/PKQ-A-6B.rmg
+    [139] Anderson/Laos/PKQ-A-/PKQ-A-6C.rmg
+    [140] Anderson/Laos/PKQ-A-/PKQ-A-6D.rmg
+    [141] Anderson/Laos/PKQ-A-/PKQ-A-6E.rmg
+    [142] Anderson/Laos/PKQ-A-/PKQ-A-6F.rmg
+    [143] Anderson/Laos/PKQ-A-/PKQ-A-6G.rmg
+    [144] Anderson/Laos/PKQ-A-/PKQ-A-6H.rmg
+    [145] Anderson/Laos/PKQ-A-/PKQ-A-6I.rmg
+    [146] Anderson/Laos/PKQ-A-/PKQ-A-6J.rmg
+    [147] Anderson/Laos/PKQ-A-/PKQ-A-6K.rmg
+    [148] Anderson/Laos/PKQ-A-/PKQ-A-6L.rmg
+    [149] Anderson/Laos/PKQ-A-/PKQ-A-7A.rmg
+    [150] Anderson/Laos/PKQ-A-/PKQ-A-7B.rmg
+    [151] Anderson/Laos/PKQ-A-/PKQ-A-7C.rmg
+    [152] Anderson/Laos/PKQ-A-/PKQ-A-7D.rmg
+    [153] Anderson/Laos/PKQ-A-/PKQ-A-7E.rmg
+    [154] Anderson/Laos/PKQ-A-/PKQ-A-7F.rmg
+    [155] Anderson/Laos/PKQ-A-/PKQ-A-7G.rmg
+    [156] Anderson/Laos/PKQ-A-/PKQ-A-7H.rmg
+    [157] Anderson/Laos/PKQ-A-/PKQ-A-7I.rmg
+    [158] Anderson/Laos/PKQ-A-/PKQ-A-7J.rmg
+    [159] Anderson/Laos/PKQ-A-/PKQ-A-7K.rmg
+    [160] Anderson/Laos/PKQ-A-/PKQ-A-8A.rmg
+    [161] Anderson/Laos/PKQ-A-/PKQ-A-8B.rmg
+    [162] Anderson/Laos/PKQ-A-/PKQ-A-8C.rmg
+    [163] Anderson/Laos/PKQ-A-/PKQ-A-8D.rmg
+    [164] Anderson/Laos/PKQ-A-/PKQ-A-8E.rmg
+    [165] Anderson/Laos/PKQ-A-/PKQ-A-8F.rmg
+    [166] Anderson/Laos/PKQ-A-/PKQ-A-8G.rmg
+    [167] Anderson/Laos/PKQ-A-/PKQ-A-8H.rmg
+    [168] Anderson/Laos/PKQ-A-/PKQ-A-8I.rmg
+    [169] Anderson/Laos/PKQ-A-/PKQ-A-8J.rmg
+    [170] Anderson/Laos/PKQ-A-/PKQ-A-8K.rmg
+    [171] Anderson/Laos/PKQ-A-/PKQ-A-8L.rmg
+    [172] Anderson/Laos/PKQ-A-/PKQ-A-8M.rmg
+    [173] Anderson/Laos/PKQ-A-/PKQ-A-9A.rmg
+    [174] Anderson/Laos/PKQ-A-/PKQ-A-9B.rmg
+    [175] Anderson/Laos/PKQ-A-/PKQ-A-9C.rmg
+    [176] Anderson/Laos/PKQ-A-/PKQ-A-9D.rmg
+    [177] Anderson/Laos/PKQ-A-/PKQ-A-9E.rmg
+    [178] Anderson/Laos/PKQ-A-/PKQ-A-9F.rmg
+    [179] Anderson/Laos/PKQ-A-/PKQ-A-9G.rmg
+    [180] Anderson/Laos/PKQ-A-/PKQ-A-9H.rmg
+    [181] Anderson/Laos/PKQ-A-/PKQ-A-9I.rmg
+    [182] Anderson/Laos/PKS-/PKS-J-1A.rmg
+    [183] Anderson/Laos/PKS-/PKS-J-1B.rmg
+    [184] Anderson/Laos/PKS-/PKS-J-1C.rmg
+    [185] Anderson/Laos/PKS-/PKS-J-1D.rmg
+    [186] Anderson/Laos/PKS-/PKS-J-2B.rmg
+    [187] Anderson/Laos/PKS-/PKS-J-2C.rmg
+    [188] Anderson/Laos/PKS-/PKS-J-2D.rmg
+    [189] Anderson/Laos/PKS-/PKS-J-2E.rmg
+    [190] Anderson/Laos/PKS-/PKS-J-3B.rmg
+    [191] Anderson/Laos/PKS-/PKS-J-3C.rmg
+    [192] Anderson/Laos/PKS-/PKS-J-3D.rmg
+    [193] Anderson/Laos/PKS-/PKS-J-3E.rmg
+    [194] Anderson/Laos/PKS-/PKS-K-1A.rmg
+    [195] Anderson/Laos/PKS-/PKS-K-1B.rmg
+    [196] Anderson/Laos/PKS-/PKS-K-1C.rmg
+    [197] Anderson/Laos/PKS-/PKS-K-2A.rmg
+    [198] Anderson/Laos/PKS-/PKS-K-2B.rmg
+    [199] Anderson/Laos/PKS-/PKS-K-2C.rmg
+    [200] Anderson/Laos/PKS-/PKS-K-2D.rmg
+    [201] Anderson/Laos/PKS-/PKS-K-2E.rmg
+    [202] Anderson/Laos/PKS-/PKS-K-2F.rmg
+    [203] Anderson/Laos/PKS-B-/PKS-B-1B.rmg
+    [204] Anderson/Laos/PKS-B-/PKS-B-1C.rmg
+    [205] Anderson/Laos/PKS-B-/PKS-B-1D.rmg
+    [206] Anderson/Laos/PKS-B-/PKS-B-1E.rmg
+    [207] Anderson/Laos/PKS-B-/PKS-B-1F.rmg
+    [208] Anderson/Laos/PKS-B-/PKS-B-1G.rmg
+    [209] Anderson/Laos/PKS-B-/PKS-B-1H.rmg
+    [210] Anderson/Laos/PKS-F-/PKS-F-0A.rmg
+    [211] Anderson/Laos/PKS-F-/PKS-F-0B.rmg
+    [212] Anderson/Laos/PKS-F-/PKS-F-0C.rmg
+    [213] Anderson/Laos/PKS-F-/PKS-F-0D.rmg
+    [214] Anderson/Laos/PKS-F-/PKS-F-0E.rmg
+    [215] Anderson/Laos/PKS-F-/PKS-F-0F.rmg
+    [216] Anderson/Laos/PKS-F-/PKS-F-0G.rmg
+    [217] Anderson/Laos/PKS-F-/PKS-F-0H.rmg
+    [218] Anderson/Laos/PKS-F-/PKS-F-0I.rmg
+    [219] Anderson/Laos/PKS-F-/PKS-F-0J.rmg
+    [220] Anderson/Laos/PKS-F-/PKS-F-0K.rmg
+    [221] Anderson/Laos/PKS-F-/PKS-F-0L.rmg
+    [222] Anderson/Laos/PKS-F-/PKS-F-0M.rmg
+    [223] Anderson/Laos/PKS-F-/PKS-F-1.B.rmg
+    [224] Anderson/Laos/PKS-F-/PKS-F-1.C.rmg
+    [225] Anderson/Laos/PKS-F-/PKS-F-1.D.rmg
+    [226] Anderson/Laos/PKS-F-/PKS-F-1.E.rmg
+    [227] Anderson/Laos/PKS-F-/PKS-F-1.F.rmg
+    [228] Anderson/Laos/PKS-F-/PKS-F-1.G.rmg
+    [229] Anderson/Laos/PKS-F-/PKS-F-1.H.rmg
+    [230] Anderson/Laos/PKS-F-/PKS-F-1.I.rmg
+    [231] Anderson/Laos/PKS-F-/PKS-F-1.J.rmg
+    [232] Anderson/Laos/PKS-F-/PKS-F-1.K.rmg
+    [233] Anderson/Laos/PKS-F-/PKS-F-1.L.rmg
+    [234] Anderson/Laos/PKS-F-/PKS-F-1.M.rmg
+    [235] Anderson/Laos/PKS-F-/PKS-F-1.N.rmg
+    [236] Anderson/Laos/PKS-F-/PKS-F-1.O.rmg
+    [237] Anderson/Laos/PKS-F-/PKS-F-1B.rmg
+    [238] Anderson/Laos/PKS-F-/PKS-F-1C.rmg
+    [239] Anderson/Laos/PKS-F-/PKS-F-1D.rmg
+    [240] Anderson/Laos/PKS-F-/PKS-F-1E.rmg
+    [241] Anderson/Laos/PKS-F-/PKS-F-1F.rmg
+    [242] Anderson/Laos/PKS-F-/PKS-F-1G.rmg
+    [243] Anderson/Laos/PKS-F-/PKS-F-1H.rmg
+    [244] Anderson/Laos/PKS-F-/PKS-F-1I.rmg
+    [245] Anderson/Laos/PKS-F-/PKS-F-1J.rmg
+    [246] Anderson/Laos/PKS-F-/PKS-F-1K.rmg
+    [247] Anderson/Laos/PKS-F-/PKS-F-1L.rmg
+    [248] Anderson/Laos/PKS-F-/PKS-F-2A.rmg
+    [249] Anderson/Laos/PKS-F-/PKS-F-2B.rmg
+    [250] Anderson/Laos/PKS-F-/PKS-F-2C.rmg
+    [251] Anderson/Laos/PKS-F-/PKS-F-2D.rmg
+    [252] Anderson/Laos/PKS-F-/PKS-F-2E.rmg
+    [253] Anderson/Laos/PKS-F-/PKS-F-2F.rmg
+    [254] Anderson/Laos/PKS-F-/PKS-F-2G.rmg
+    [255] Anderson/Laos/PKS-F-/PKS-F-2H.rmg
+    [256] Anderson/Laos/PKS-F-/PKS-F-2I.rmg
+    [257] Anderson/Laos/PKS-F-/PKS-F-2J.rmg
+    [258] Anderson/Laos/PKS-F-/PKS-F-2K.rmg
+    [259] Anderson/Laos/PKS-F-/PKS-F-3B.rmg
+    [260] Anderson/Laos/PKS-F-/PKS-F-3C.rmg
+    [261] Anderson/Laos/PKS-F-/PKS-F-3D.rmg
+    [262] Anderson/Laos/PKS-F-/PKS-F-3E.rmg
+    [263] Anderson/Laos/PKS-F-/PKS-F-3F.rmg
+    [264] Anderson/Laos/PKS-F-/PKS-F-3G.rmg
+    [265] Anderson/Laos/PKS-F-/PKS-F-3H.rmg
+    [266] Anderson/Laos/PKS-F-/PKS-F-3I.rmg
+    [267] Anderson/Laos/PKS-F-/PKS-F-3J.rmg
+    [268] Anderson/Laos/PKS-F-/PKS-F-3K.rmg
+    [269] Anderson/Laos/PKS-F-/PKS-F-3L.rmg
+    [270] Anderson/Laos/PKS-F-/PKS-F-4B.rmg
+    [271] Anderson/Laos/PKS-F-/PKS-F-4C.rmg
+    [272] Anderson/Laos/PKS-F-/PKS-F-4D.rmg
+    [273] Anderson/Laos/PKS-F-/PKS-F-4E.rmg
+    [274] Anderson/Laos/PKS-F-/PKS-F-4F.rmg
+    [275] Anderson/Laos/PKS-F-/PKS-F-4G.rmg
+    [276] Anderson/Laos/PKS-F-/PKS-F-4H.rmg
+    [277] Anderson/Laos/PKS-F-/PKS-F-4I.rmg
+    [278] Anderson/Laos/PKS-F-/PKS-F-4J.rmg
+    [279] Anderson/Laos/PKS-F-/PKS-F-4K.rmg
+    [280] Anderson/Laos/PKS-F-/PKS-F-5A.rmg
+    [281] Anderson/Laos/PKS-F-/PKS-F-5B.rmg
+    [282] Anderson/Laos/PKS-F-/PKS-F-5C.rmg
+    [283] Anderson/Laos/PKS-F-/PKS-F-5D.rmg
+    [284] Anderson/Laos/PKS-F-/PKS-F-5E.rmg
+    [285] Anderson/Laos/PKS-F-/PKS-F-5F.rmg
+    [286] Anderson/Laos/PKS-F-/PKS-F-5G.rmg
+    [287] Anderson/Laos/PKS-F-/PKS-F-5H.rmg
+    [288] Anderson/Laos/PKS-F-/PKS-F-5I.rmg
+    [289] Anderson/Laos/PKS-F-/PKS-F-5J.rmg
+    [290] Anderson/Laos/PKS-F-/PKS-F-5K.rmg
+    [291] Anderson/Laos/PKS-F-/PKS-F-5L.rmg
+    [292] Anderson/Laos/PKS-F-/PKS-F-6B.rmg
+    [293] Anderson/Laos/PKS-F-/PKS-F-6C.rmg
+    [294] Anderson/Laos/PKS-F-/PKS-F-6D.rmg
+    [295] Anderson/Laos/PKS-F-/PKS-F-6E.rmg
+    [296] Anderson/Laos/PKS-F-/PKS-F-6F.rmg
+    [297] Anderson/Laos/PKS-F-/PKS-F-7A.rmg
+    [298] Anderson/Laos/PKS-F-/PKS-F-7B.rmg
+    [299] Anderson/Laos/PKS-F-/PKS-F-7C.rmg
+    [300] Anderson/Laos/PKS-F-/PKS-F-7D.rmg
+    [301] Anderson/Laos/PKS-F-/PKS-F-7E.rmg
+    [302] Anderson/Laos/PKS-F-/PKS-F-7F.rmg
+    [303] Anderson/Laos/PKS-F-/PKS-F-7G.rmg
+    [304] Anderson/Laos/PKS-F-/PKS-F-7H.rmg
+    [305] Anderson/Laos/PKS-F-/PKS-F-7I.rmg
+    [306] Anderson/Laos/PKS-F-/PKS-F-8A.rmg
+    [307] Anderson/Laos/PKS-F-/PKS-F-8B.rmg
+    [308] Anderson/Laos/PKS-F-/PKS-F-8C.rmg
+    [309] Anderson/Laos/PKS-F-/PKS-F-8D.rmg
+    [310] Anderson/Laos/PKS-F-/PKS-F-8E.rmg
+    [311] Anderson/Laos/PKS-F-/PKS-F-8F.rmg
+    [312] Anderson/Laos/PKS-F-/PKS-F-8G.rmg
+    [313] Anderson/Laos/PKS-F-/PKS-F-9A.rmg
+    [314] Anderson/Laos/PKS-F-/PKS-F-9B.rmg
+    [315] Anderson/Laos/PKS-F-/PKS-F-9C.rmg
+    [316] Anderson/Laos/PKS-F-/PKS-F-9D.rmg
+    [317] Anderson/Laos/PKS-F-/PKS-F-9E.rmg
+    [318] Anderson/Laos/PKS-F-/PKS-F-9F.rmg
+    [319] Anderson/Laos/PKS-F-/PKS-F-9G.rmg
+    [320] Anderson/Laos/PKS-F-/PKS-F-9H.rmg
+    [321] Anderson/Laos/PKS-F-/PKS-F-9I.rmg
+    [322] Anderson/Laos/PKS-G-/PKS-G-1B.rmg
+    [323] Anderson/Laos/PKS-G-/PKS-G-1C.rmg
+    [324] Anderson/Laos/PKS-G-/PKS-G-1D.rmg
+    [325] Anderson/Laos/PKS-G-/PKS-G-1E.rmg
+    [326] Anderson/Laos/PKS-G-/PKS-G-1F.rmg
+    [327] Anderson/Laos/PKS-G-/PKS-G-1G.rmg
+    [328] Anderson/Laos/PKS-G-/PKS-G-2A.rmg
+    [329] Anderson/Laos/PKS-G-/PKS-G-2B.rmg
+    [330] Anderson/Laos/PKS-G-/PKS-G-2C.rmg
+    [331] Anderson/Laos/PKS-G-/PKS-G-2D.rmg
+    [332] Anderson/Laos/PKS-G-/PKS-G-2E.rmg
+    [333] Anderson/Laos/PKS-G-/PKS-G-2F.rmg
+    [334] Anderson/Laos/PKS-G-/PKS-G-2G.rmg
+    [335] Anderson/Laos/PKS-G-/PKS-G-3B.rmg
+    [336] Anderson/Laos/PKS-G-/PKS-G-3C.rmg
+    [337] Anderson/Laos/PKS-G-/PKS-G-3D.rmg
+    [338] Anderson/Laos/PKS-G-/PKS-G-3E.rmg
+    [339] Anderson/Laos/PKS-G-/PKS-G-4B.rmg
+    [340] Anderson/Laos/PKS-G-/PKS-G-4C.rmg
+    [341] Anderson/Laos/PKS-G-/PKS-G-4D.rmg
+    [342] Anderson/Laos/PKS-G-/PKS-G-4E.rmg
+    [343] Anderson/Laos/PKS-G-/PKS-G-4F.rmg
+    [344] Anderson/Laos/PKS-G-/PKS-G-5B.rmg
+    [345] Anderson/Laos/PKS-G-/PKS-G-5C.rmg
+    [346] Anderson/Laos/PKS-G-/PKS-G-5D.rmg
+    [347] Anderson/Laos/PKS-G-/PKS-G-6A.rmg
+    [348] Anderson/Laos/PKS-G-/PKS-G-6B.rmg
+    [349] Anderson/Laos/PKS-G-/PKS-G-6C.rmg
+    [350] Anderson/Laos/PKS-G-/PKS-G-7B.rmg
+    [351] Anderson/Laos/PKS-G-/PKS-G-7C.rmg
+    [352] Anderson/Laos/PKS-G-/PKS-G-8B.rmg
+    [353] Anderson/Laos/PKS-G-/PKS-G-8C.rmg
+    [354] Anderson/Laos/PKS-G-/PKS-G-8D.rmg
+    [355] Anderson/Laos/PKS-H-/PKS-H-1B.rmg
+    [356] Anderson/Laos/PKS-H-/PKS-H-1C.rmg
+    [357] Anderson/Laos/PKS-H-/PKS-H-1D.rmg
+    [358] Anderson/Laos/PKS-H-/PKS-H-1E.rmg
+    [359] Anderson/Laos/PKS-H-/PKS-H-1F.rmg
+    [360] Anderson/Laos/PKS-H-/PKS-H-1G.rmg
+    [361] Anderson/Laos/PKS-H-/PKS-H-1H.rmg
+    [362] Anderson/Laos/PKS-H-/PKS-H-1I.rmg
+    [363] Anderson/Laos/PKS-H-/PKS-H-1J.rmg
+    [364] Anderson/Laos/PKS-H-/PKS-H-1K.rmg
+    [365] Anderson/Laos/PKS-H-/PKS-H-1L.rmg
+    [366] Anderson/Laos/PKS-H-/PKS-H-2B.rmg
+    [367] Anderson/Laos/PKS-H-/PKS-H-2C.rmg
+    [368] Anderson/Laos/PKS-H-/PKS-H-2D.rmg
+    [369] Anderson/Laos/PKS-H-/PKS-H-2E.rmg
+    [370] Anderson/Laos/PKS-H-/PKS-H-2F.rmg
+    [371] Anderson/Laos/PKS-H-/PKS-H-2G.rmg
+    [372] Anderson/Laos/PKS-H-/PKS-H-2H.rmg
+    [373] Anderson/Laos/PKS-H-/PKS-H-2I.rmg
+    [374] Anderson/Laos/PKS-H-/PKS-H-2J.rmg
+    [375] Anderson/Laos/PKS-H-/PKS-H-3B.rmg
+    [376] Anderson/Laos/PKS-H-/PKS-H-3C.rmg
+    [377] Anderson/Laos/PKS-H-/PKS-H-3D.rmg
+    [378] Anderson/Laos/PKS-H-/PKS-H-3E.rmg
+    [379] Anderson/Laos/PKS-H-/PKS-H-3F.rmg
+    [380] Anderson/Laos/PKS-I-/PKS-I-1B.rmg
+    [381] Anderson/Laos/PKS-I-/PKS-I-1C.rmg
+    [382] Anderson/Laos/PKS-I-/PKS-I-1D.rmg
+    [383] Anderson/Laos/PKS-I-/PKS-I-1E.rmg
+    [384] Anderson/Laos/PKS-I-/PKS-I-1F.rmg
+    [385] Anderson/Laos/PKS-I-/PKS-I-1G.rmg
+    [386] Anderson/Laos/WBE-A-/WBE-A-1B.rmg
+    [387] Anderson/Laos/WBE-A-/WBE-A-1C.rmg
+    [388] Anderson/Laos/WBE-A-/WBE-A-1D.rmg
+    [389] Anderson/Laos/WBE-A-/WBE-A-1E.rmg
+    [390] Anderson/Laos/WBE-A-/WBE-A-1F.rmg
+    [391] Anderson/Laos/WBE-A-/WBE-A-1G.rmg
+    [392] Anderson/Laos/WBE-A-/WBE-A-1H.rmg
+    [393] Anderson/Laos/WBE-A-/WBE-A-1I.rmg
+    [394] Anderson/Laos/WBE-A-/WBE-A-2B.rmg
+    [395] Anderson/Laos/WBE-A-/WBE-A-2C.rmg
+    [396] Anderson/Laos/WBE-A-/WBE-A-2D.rmg
+    [397] Anderson/RockMag/PKQ-A-/PKQ-A-0H.rmg
+    [398] Anderson/RockMag/PKQ-A-/PKQ-A-2M.rmg
+    [399] Anderson/RockMag/PKQ-A-/PKQ-A-3H.rmg
+    [400] Anderson/RockMag/PKQ-A-/PKQ-A-6M.rmg
+    [401] Anderson/RockMag/PKQ-A-/PKQ-A-9I.rmg
+    [402] Anderson/RockMag/PKS-F-/PKS-F-0N.rmg
+    [403] Anderson/RockMag/PKS-F-/PKS-F-1.P.rmg
+    [404] Anderson/RockMag/PKS-F-/PKS-F-1M.rmg
+    [405] Anderson/RockMag/PKS-F-/PKS-F-2L.rmg
+    [406] Anderson/RockMag/PKS-F-/PKS-F-3M.rmg
+    [407] Anderson/RockMag/PKS-F-/PKS-F-4L.rmg
+    [408] Anderson/RockMag/PKS-F-/PKS-F-5M.rmg
+    [409] Anderson/RockMag/PKS-F-/PKS-F-6G.rmg
+    [410] Anderson/RockMag/PKS-F-/PKS-F-7J.rmg
+    [411] Anderson/RockMag/PKS-F-/PKS-F-8H.rmg
+    [412] Anderson/RockMag/PKS-F-/PKS-F-9J.rmg
+    [413] Komat/FORC_5.0-200.0mT_exp1.20_min1.0mT_SATURATION.rmg
+    [414] Komat/FORC_5.0-200.0mT_exp1.20_min4.0mT_SATURATION.rmg
+    [415] Komat/FORCz_5.0_to_200.0mT_in_exp1.2_2mT_Steps_standard.rmg
+    [416] Komat/Komat003.cor.rmg
+    [417] Komat/Komat003.frc.rmg
+    [418] Komat/Komat004.frc.rmg
+
+  Enter numbers to load (e.g. 1 3 4), or 'all': 1
+  ✗ Error loading ._FORC_goethite_1T_log30curves.rmg: list index out of range
+
+▼═══════════════════════════════════════════════════════════▼
+    [1] TPB4.1.cor
+
+▼═══════════════════════════════════════════════════════════▼
+  + [L] Load more files from a directory
+  + [X] Remove samples from loaded list
+  + [R] Run selected routines (batch plotter)
+  + [F] 8-Panel Rock-Mag Dashboard (IRM, ARM, Backfield, etc.)
+  + [I] Inspect one sample (show detailed stats)
+  + [H] Show coercivity values (Hcr, MDF) for all samples
+  + [E] Export all statistics to table
+  + [P] Plot FORC data (First Order Reversal Curves)
+  + [G] Generate FORC measurement script
+  + [S] Generate SAM header files (paleomag)
+  + [C] Clear all loaded samples
+  + [Q] Quit
+
+  Choice: l
+
+── Load files ──────────────────────────────────────────────
+  Enter directory path (or press Enter for current dir): /Volumes/YSB
+
+  Found 422 .rmg file(s) under /Volumes/YSB:
+    [  1] ._FORC_goethite_1T_log30curves.rmg
+    [  2] ._FORC_hematite_1T_log30curves 1.rmg
+    [  3] ._FORC_magnetite_5.0-200.0mT_exp1.20_min1.0mT_SATURATION copy.rmg
+    [  4] ._FORCz_5.0_to_200.0mT_in_exp1.2_2mT_Steps.rmg
+    [  5] ._FORCz_5.0_to_500.0mT_in_exp1.30_Steps.rmg
+    [  6] FORC_goethite_1T_log30curves.rmg
+    [  7] FORC_hematite_1T_log30curves 1.rmg
+    [  8] FORC_magnetite_5.0-200.0mT_exp1.20_min1.0mT_SATURATION copy.rmg
+    [  9] FORCz_5.0_to_200.0mT_in_exp1.2_2mT_Steps.rmg
+    [ 10] FORCz_5.0_to_500.0mT_in_exp1.30_Steps.rmg
+    [ 11] TPB15.1.cor.rmg
+    [ 12] TPB17.0.cor.rmg
+    [ 13] TPB4.1.cor.rmg
+    [ 14] TPB9.1.cor.rmg
+    [ 15] Anderson/Laos/LS/AF_Template.rmg
+    [ 16] Anderson/Laos/LS/LSBPO15.rmg
+    [ 17] Anderson/Laos/LS/LSBSP15.rmg
+    [ 18] Anderson/Laos/LS/LSH18.rmg
+    [ 19] Anderson/Laos/LS/LSPKE19.rmg
+    [ 20] Anderson/Laos/LS/LSPSK18.rmg
+    [ 21] Anderson/Laos/LS/Rockmag_Template.rmg
+    [ 22] Anderson/Laos/NWF-A-/NWF-A-1B.rmg
+    [ 23] Anderson/Laos/NWF-A-/NWF-A-1C.rmg
+    [ 24] Anderson/Laos/NWF-A-/NWF-A-1D.rmg
+    [ 25] Anderson/Laos/NWF-A-/NWF-A-1E.rmg
+    [ 26] Anderson/Laos/NWF-A-/NWF-A-1F.rmg
+    [ 27] Anderson/Laos/NWF-A-/NWF-A-1G.rmg
+    [ 28] Anderson/Laos/NWF-A-/NWF-A-1H.rmg
+    [ 29] Anderson/Laos/NWF-A-/NWF-A-2B.rmg
+    [ 30] Anderson/Laos/NWF-A-/NWF-A-2C.rmg
+    [ 31] Anderson/Laos/NWF-A-/NWF-A-2D.rmg
+    [ 32] Anderson/Laos/NWF-A-/NWF-A-3B.rmg
+    [ 33] Anderson/Laos/NWF-A-/NWF-A-4B.rmg
+    [ 34] Anderson/Laos/NWF-A-/NWF-A-4C.rmg
+    [ 35] Anderson/Laos/NWF-A-/NWF-A-5B.rmg
+    [ 36] Anderson/Laos/NWF-A-/NWF-A-5C.rmg
+    [ 37] Anderson/Laos/NWF-B-/NWF-B-1B.rmg
+    [ 38] Anderson/Laos/NWF-B-/NWF-B-1C.rmg
+    [ 39] Anderson/Laos/NWF-B-/NWF-B-1D.rmg
+    [ 40] Anderson/Laos/NWF-B-/NWF-B-1E.rmg
+    [ 41] Anderson/Laos/NWF-B-/NWF-B-1F.rmg
+    [ 42] Anderson/Laos/NWF-B-/NWF-B-1G.rmg
+    [ 43] Anderson/Laos/NWF-B-/NWF-B-1H.rmg
+    [ 44] Anderson/Laos/NWF-B-/NWF-B-2B.rmg
+    [ 45] Anderson/Laos/NWF-B-/NWF-B-2C.rmg
+    [ 46] Anderson/Laos/NWF-B-/NWF-B-2D.rmg
+    [ 47] Anderson/Laos/NWF-B-/NWF-B-2E.rmg
+    [ 48] Anderson/Laos/NWF-B-/NWF-B-2F.rmg
+    [ 49] Anderson/Laos/NWF-B-/NWF-B-2G.rmg
+    [ 50] Anderson/Laos/NWF-B-/NWF-B-3B.rmg
+    [ 51] Anderson/Laos/NWF-B-/NWF-B-3C.rmg
+    [ 52] Anderson/Laos/NWF-B-/NWF-B-3D.rmg
+    [ 53] Anderson/Laos/NWF-B-/NWF-B-3E.rmg
+    [ 54] Anderson/Laos/NWF-B-/NWF-B-3F.rmg
+    [ 55] Anderson/Laos/NWF-B-/NWF-B-3G.rmg
+    [ 56] Anderson/Laos/NWF-B-/NWF-B-3H.rmg
+    [ 57] Anderson/Laos/NWF-C-/NWF-C-1B.rmg
+    [ 58] Anderson/Laos/NWF-C-/NWF-C-1C.rmg
+    [ 59] Anderson/Laos/NWF-C-/NWF-C-2B.rmg
+    [ 60] Anderson/Laos/NWF-C-/NWF-C-2C.rmg
+    [ 61] Anderson/Laos/NWF-C-/NWF-C-2D.rmg
+    [ 62] Anderson/Laos/NWF-C-/NWF-C-2E.rmg
+    [ 63] Anderson/Laos/NWF-C-/NWF-C-2F.rmg
+    [ 64] Anderson/Laos/NWF-C-/NWF-C-3B.rmg
+    [ 65] Anderson/Laos/NWF-C-/NWF-C-3C.rmg
+    [ 66] Anderson/Laos/NWF-C-/NWF-C-3D.rmg
+    [ 67] Anderson/Laos/NWF-C-/NWF-C-4B.rmg
+    [ 68] Anderson/Laos/NWF-C-/NWF-C-4C.rmg
+    [ 69] Anderson/Laos/NWF-C-/NWF-C-4D.rmg
+    [ 70] Anderson/Laos/NWF-C-/NWF-C-4E.rmg
+    [ 71] Anderson/Laos/NWF-C-/NWF-C-5B.rmg
+    [ 72] Anderson/Laos/NWF-C-/NWF-C-5C.rmg
+    [ 73] Anderson/Laos/NWF-C-/NWF-C-5D.rmg
+    [ 74] Anderson/Laos/NWF-C-/NWF-C-5E.rmg
+    [ 75] Anderson/Laos/NWF-C-/NWF-C-6B.rmg
+    [ 76] Anderson/Laos/NWF-C-/NWF-C-6C.rmg
+    [ 77] Anderson/Laos/NWF-C-/NWF-C-6D.rmg
+    [ 78] Anderson/Laos/NWF-C-/NWF-C-6E.rmg
+    [ 79] Anderson/Laos/NWF-C-/NWF-C-7B.rmg
+    [ 80] Anderson/Laos/NWF-C-/NWF-C-7C.rmg
+    [ 81] Anderson/Laos/NWF-C-/NWF-C-7D.rmg
+    [ 82] Anderson/Laos/NWF-C-/NWF-C-7E.rmg
+    [ 83] Anderson/Laos/NWF-C-/NWF-C-7F.rmg
+    [ 84] Anderson/Laos/NWF-C-/NWF-C-8B.rmg
+    [ 85] Anderson/Laos/NWF-C-/NWF-C-8C.rmg
+    [ 86] Anderson/Laos/NWF-C-/NWF-C-8D.rmg
+    [ 87] Anderson/Laos/NWF-C-/NWF-C-8E.rmg
+    [ 88] Anderson/Laos/NWF-C-/NWF-C-8F.rmg
+    [ 89] Anderson/Laos/NWF-C-/NWF-C-8G.rmg
+    [ 90] Anderson/Laos/PKQ-A-/PKQ-A-0A.rmg
+    [ 91] Anderson/Laos/PKQ-A-/PKQ-A-0B.rmg
+    [ 92] Anderson/Laos/PKQ-A-/PKQ-A-0C.rmg
+    [ 93] Anderson/Laos/PKQ-A-/PKQ-A-0D.rmg
+    [ 94] Anderson/Laos/PKQ-A-/PKQ-A-0E.rmg
+    [ 95] Anderson/Laos/PKQ-A-/PKQ-A-0F.rmg
+    [ 96] Anderson/Laos/PKQ-A-/PKQ-A-0G.rmg
+    [ 97] Anderson/Laos/PKQ-A-/PKQ-A-1A.rmg
+    [ 98] Anderson/Laos/PKQ-A-/PKQ-A-1B.rmg
+    [ 99] Anderson/Laos/PKQ-A-/PKQ-A-1C.rmg
+    [100] Anderson/Laos/PKQ-A-/PKQ-A-1D.rmg
+    [101] Anderson/Laos/PKQ-A-/PKQ-A-2B.rmg
+    [102] Anderson/Laos/PKQ-A-/PKQ-A-2C.rmg
+    [103] Anderson/Laos/PKQ-A-/PKQ-A-2D.rmg
+    [104] Anderson/Laos/PKQ-A-/PKQ-A-2E.rmg
+    [105] Anderson/Laos/PKQ-A-/PKQ-A-2F.rmg
+    [106] Anderson/Laos/PKQ-A-/PKQ-A-2G.rmg
+    [107] Anderson/Laos/PKQ-A-/PKQ-A-2H.rmg
+    [108] Anderson/Laos/PKQ-A-/PKQ-A-2I.rmg
+    [109] Anderson/Laos/PKQ-A-/PKQ-A-2J.rmg
+    [110] Anderson/Laos/PKQ-A-/PKQ-A-2K.rmg
+    [111] Anderson/Laos/PKQ-A-/PKQ-A-2L.rmg
+    [112] Anderson/Laos/PKQ-A-/PKQ-A-3B.rmg
+    [113] Anderson/Laos/PKQ-A-/PKQ-A-3C.rmg
+    [114] Anderson/Laos/PKQ-A-/PKQ-A-3D.rmg
+    [115] Anderson/Laos/PKQ-A-/PKQ-A-3E.rmg
+    [116] Anderson/Laos/PKQ-A-/PKQ-A-3F.rmg
+    [117] Anderson/Laos/PKQ-A-/PKQ-A-3G.rmg
+    [118] Anderson/Laos/PKQ-A-/PKQ-A-4B.rmg
+    [119] Anderson/Laos/PKQ-A-/PKQ-A-4C.rmg
+    [120] Anderson/Laos/PKQ-A-/PKQ-A-4D.rmg
+    [121] Anderson/Laos/PKQ-A-/PKQ-A-4E.rmg
+    [122] Anderson/Laos/PKQ-A-/PKQ-A-4F.rmg
+    [123] Anderson/Laos/PKQ-A-/PKQ-A-4G.rmg
+    [124] Anderson/Laos/PKQ-A-/PKQ-A-4H.rmg
+    [125] Anderson/Laos/PKQ-A-/PKQ-A-5B.rmg
+    [126] Anderson/Laos/PKQ-A-/PKQ-A-5C.rmg
+    [127] Anderson/Laos/PKQ-A-/PKQ-A-5D.rmg
+    [128] Anderson/Laos/PKQ-A-/PKQ-A-5E.rmg
+    [129] Anderson/Laos/PKQ-A-/PKQ-A-5F.rmg
+    [130] Anderson/Laos/PKQ-A-/PKQ-A-5G.rmg
+    [131] Anderson/Laos/PKQ-A-/PKQ-A-5H.rmg
+    [132] Anderson/Laos/PKQ-A-/PKQ-A-5I.rmg
+    [133] Anderson/Laos/PKQ-A-/PKQ-A-5J.rmg
+    [134] Anderson/Laos/PKQ-A-/PKQ-A-5K.rmg
+    [135] Anderson/Laos/PKQ-A-/PKQ-A-5L.rmg
+    [136] Anderson/Laos/PKQ-A-/PKQ-A-5M.rmg
+    [137] Anderson/Laos/PKQ-A-/PKQ-A-5N.rmg
+    [138] Anderson/Laos/PKQ-A-/PKQ-A-5O.rmg
+    [139] Anderson/Laos/PKQ-A-/PKQ-A-5P.rmg
+    [140] Anderson/Laos/PKQ-A-/PKQ-A-5Q.rmg
+    [141] Anderson/Laos/PKQ-A-/PKQ-A-6A.rmg
+    [142] Anderson/Laos/PKQ-A-/PKQ-A-6B.rmg
+    [143] Anderson/Laos/PKQ-A-/PKQ-A-6C.rmg
+    [144] Anderson/Laos/PKQ-A-/PKQ-A-6D.rmg
+    [145] Anderson/Laos/PKQ-A-/PKQ-A-6E.rmg
+    [146] Anderson/Laos/PKQ-A-/PKQ-A-6F.rmg
+    [147] Anderson/Laos/PKQ-A-/PKQ-A-6G.rmg
+    [148] Anderson/Laos/PKQ-A-/PKQ-A-6H.rmg
+    [149] Anderson/Laos/PKQ-A-/PKQ-A-6I.rmg
+    [150] Anderson/Laos/PKQ-A-/PKQ-A-6J.rmg
+    [151] Anderson/Laos/PKQ-A-/PKQ-A-6K.rmg
+    [152] Anderson/Laos/PKQ-A-/PKQ-A-6L.rmg
+    [153] Anderson/Laos/PKQ-A-/PKQ-A-7A.rmg
+    [154] Anderson/Laos/PKQ-A-/PKQ-A-7B.rmg
+    [155] Anderson/Laos/PKQ-A-/PKQ-A-7C.rmg
+    [156] Anderson/Laos/PKQ-A-/PKQ-A-7D.rmg
+    [157] Anderson/Laos/PKQ-A-/PKQ-A-7E.rmg
+    [158] Anderson/Laos/PKQ-A-/PKQ-A-7F.rmg
+    [159] Anderson/Laos/PKQ-A-/PKQ-A-7G.rmg
+    [160] Anderson/Laos/PKQ-A-/PKQ-A-7H.rmg
+    [161] Anderson/Laos/PKQ-A-/PKQ-A-7I.rmg
+    [162] Anderson/Laos/PKQ-A-/PKQ-A-7J.rmg
+    [163] Anderson/Laos/PKQ-A-/PKQ-A-7K.rmg
+    [164] Anderson/Laos/PKQ-A-/PKQ-A-8A.rmg
+    [165] Anderson/Laos/PKQ-A-/PKQ-A-8B.rmg
+    [166] Anderson/Laos/PKQ-A-/PKQ-A-8C.rmg
+    [167] Anderson/Laos/PKQ-A-/PKQ-A-8D.rmg
+    [168] Anderson/Laos/PKQ-A-/PKQ-A-8E.rmg
+    [169] Anderson/Laos/PKQ-A-/PKQ-A-8F.rmg
+    [170] Anderson/Laos/PKQ-A-/PKQ-A-8G.rmg
+    [171] Anderson/Laos/PKQ-A-/PKQ-A-8H.rmg
+    [172] Anderson/Laos/PKQ-A-/PKQ-A-8I.rmg
+    [173] Anderson/Laos/PKQ-A-/PKQ-A-8J.rmg
+    [174] Anderson/Laos/PKQ-A-/PKQ-A-8K.rmg
+    [175] Anderson/Laos/PKQ-A-/PKQ-A-8L.rmg
+    [176] Anderson/Laos/PKQ-A-/PKQ-A-8M.rmg
+    [177] Anderson/Laos/PKQ-A-/PKQ-A-9A.rmg
+    [178] Anderson/Laos/PKQ-A-/PKQ-A-9B.rmg
+    [179] Anderson/Laos/PKQ-A-/PKQ-A-9C.rmg
+    [180] Anderson/Laos/PKQ-A-/PKQ-A-9D.rmg
+    [181] Anderson/Laos/PKQ-A-/PKQ-A-9E.rmg
+    [182] Anderson/Laos/PKQ-A-/PKQ-A-9F.rmg
+    [183] Anderson/Laos/PKQ-A-/PKQ-A-9G.rmg
+    [184] Anderson/Laos/PKQ-A-/PKQ-A-9H.rmg
+    [185] Anderson/Laos/PKQ-A-/PKQ-A-9I.rmg
+    [186] Anderson/Laos/PKS-/PKS-J-1A.rmg
+    [187] Anderson/Laos/PKS-/PKS-J-1B.rmg
+    [188] Anderson/Laos/PKS-/PKS-J-1C.rmg
+    [189] Anderson/Laos/PKS-/PKS-J-1D.rmg
+    [190] Anderson/Laos/PKS-/PKS-J-2B.rmg
+    [191] Anderson/Laos/PKS-/PKS-J-2C.rmg
+    [192] Anderson/Laos/PKS-/PKS-J-2D.rmg
+    [193] Anderson/Laos/PKS-/PKS-J-2E.rmg
+    [194] Anderson/Laos/PKS-/PKS-J-3B.rmg
+    [195] Anderson/Laos/PKS-/PKS-J-3C.rmg
+    [196] Anderson/Laos/PKS-/PKS-J-3D.rmg
+    [197] Anderson/Laos/PKS-/PKS-J-3E.rmg
+    [198] Anderson/Laos/PKS-/PKS-K-1A.rmg
+    [199] Anderson/Laos/PKS-/PKS-K-1B.rmg
+    [200] Anderson/Laos/PKS-/PKS-K-1C.rmg
+    [201] Anderson/Laos/PKS-/PKS-K-2A.rmg
+    [202] Anderson/Laos/PKS-/PKS-K-2B.rmg
+    [203] Anderson/Laos/PKS-/PKS-K-2C.rmg
+    [204] Anderson/Laos/PKS-/PKS-K-2D.rmg
+    [205] Anderson/Laos/PKS-/PKS-K-2E.rmg
+    [206] Anderson/Laos/PKS-/PKS-K-2F.rmg
+    [207] Anderson/Laos/PKS-B-/PKS-B-1B.rmg
+    [208] Anderson/Laos/PKS-B-/PKS-B-1C.rmg
+    [209] Anderson/Laos/PKS-B-/PKS-B-1D.rmg
+    [210] Anderson/Laos/PKS-B-/PKS-B-1E.rmg
+    [211] Anderson/Laos/PKS-B-/PKS-B-1F.rmg
+    [212] Anderson/Laos/PKS-B-/PKS-B-1G.rmg
+    [213] Anderson/Laos/PKS-B-/PKS-B-1H.rmg
+    [214] Anderson/Laos/PKS-F-/PKS-F-0A.rmg
+    [215] Anderson/Laos/PKS-F-/PKS-F-0B.rmg
+    [216] Anderson/Laos/PKS-F-/PKS-F-0C.rmg
+    [217] Anderson/Laos/PKS-F-/PKS-F-0D.rmg
+    [218] Anderson/Laos/PKS-F-/PKS-F-0E.rmg
+    [219] Anderson/Laos/PKS-F-/PKS-F-0F.rmg
+    [220] Anderson/Laos/PKS-F-/PKS-F-0G.rmg
+    [221] Anderson/Laos/PKS-F-/PKS-F-0H.rmg
+    [222] Anderson/Laos/PKS-F-/PKS-F-0I.rmg
+    [223] Anderson/Laos/PKS-F-/PKS-F-0J.rmg
+    [224] Anderson/Laos/PKS-F-/PKS-F-0K.rmg
+    [225] Anderson/Laos/PKS-F-/PKS-F-0L.rmg
+    [226] Anderson/Laos/PKS-F-/PKS-F-0M.rmg
+    [227] Anderson/Laos/PKS-F-/PKS-F-1.B.rmg
+    [228] Anderson/Laos/PKS-F-/PKS-F-1.C.rmg
+    [229] Anderson/Laos/PKS-F-/PKS-F-1.D.rmg
+    [230] Anderson/Laos/PKS-F-/PKS-F-1.E.rmg
+    [231] Anderson/Laos/PKS-F-/PKS-F-1.F.rmg
+    [232] Anderson/Laos/PKS-F-/PKS-F-1.G.rmg
+    [233] Anderson/Laos/PKS-F-/PKS-F-1.H.rmg
+    [234] Anderson/Laos/PKS-F-/PKS-F-1.I.rmg
+    [235] Anderson/Laos/PKS-F-/PKS-F-1.J.rmg
+    [236] Anderson/Laos/PKS-F-/PKS-F-1.K.rmg
+    [237] Anderson/Laos/PKS-F-/PKS-F-1.L.rmg
+    [238] Anderson/Laos/PKS-F-/PKS-F-1.M.rmg
+    [239] Anderson/Laos/PKS-F-/PKS-F-1.N.rmg
+    [240] Anderson/Laos/PKS-F-/PKS-F-1.O.rmg
+    [241] Anderson/Laos/PKS-F-/PKS-F-1B.rmg
+    [242] Anderson/Laos/PKS-F-/PKS-F-1C.rmg
+    [243] Anderson/Laos/PKS-F-/PKS-F-1D.rmg
+    [244] Anderson/Laos/PKS-F-/PKS-F-1E.rmg
+    [245] Anderson/Laos/PKS-F-/PKS-F-1F.rmg
+    [246] Anderson/Laos/PKS-F-/PKS-F-1G.rmg
+    [247] Anderson/Laos/PKS-F-/PKS-F-1H.rmg
+    [248] Anderson/Laos/PKS-F-/PKS-F-1I.rmg
+    [249] Anderson/Laos/PKS-F-/PKS-F-1J.rmg
+    [250] Anderson/Laos/PKS-F-/PKS-F-1K.rmg
+    [251] Anderson/Laos/PKS-F-/PKS-F-1L.rmg
+    [252] Anderson/Laos/PKS-F-/PKS-F-2A.rmg
+    [253] Anderson/Laos/PKS-F-/PKS-F-2B.rmg
+    [254] Anderson/Laos/PKS-F-/PKS-F-2C.rmg
+    [255] Anderson/Laos/PKS-F-/PKS-F-2D.rmg
+    [256] Anderson/Laos/PKS-F-/PKS-F-2E.rmg
+    [257] Anderson/Laos/PKS-F-/PKS-F-2F.rmg
+    [258] Anderson/Laos/PKS-F-/PKS-F-2G.rmg
+    [259] Anderson/Laos/PKS-F-/PKS-F-2H.rmg
+    [260] Anderson/Laos/PKS-F-/PKS-F-2I.rmg
+    [261] Anderson/Laos/PKS-F-/PKS-F-2J.rmg
+    [262] Anderson/Laos/PKS-F-/PKS-F-2K.rmg
+    [263] Anderson/Laos/PKS-F-/PKS-F-3B.rmg
+    [264] Anderson/Laos/PKS-F-/PKS-F-3C.rmg
+    [265] Anderson/Laos/PKS-F-/PKS-F-3D.rmg
+    [266] Anderson/Laos/PKS-F-/PKS-F-3E.rmg
+    [267] Anderson/Laos/PKS-F-/PKS-F-3F.rmg
+    [268] Anderson/Laos/PKS-F-/PKS-F-3G.rmg
+    [269] Anderson/Laos/PKS-F-/PKS-F-3H.rmg
+    [270] Anderson/Laos/PKS-F-/PKS-F-3I.rmg
+    [271] Anderson/Laos/PKS-F-/PKS-F-3J.rmg
+    [272] Anderson/Laos/PKS-F-/PKS-F-3K.rmg
+    [273] Anderson/Laos/PKS-F-/PKS-F-3L.rmg
+    [274] Anderson/Laos/PKS-F-/PKS-F-4B.rmg
+    [275] Anderson/Laos/PKS-F-/PKS-F-4C.rmg
+    [276] Anderson/Laos/PKS-F-/PKS-F-4D.rmg
+    [277] Anderson/Laos/PKS-F-/PKS-F-4E.rmg
+    [278] Anderson/Laos/PKS-F-/PKS-F-4F.rmg
+    [279] Anderson/Laos/PKS-F-/PKS-F-4G.rmg
+    [280] Anderson/Laos/PKS-F-/PKS-F-4H.rmg
+    [281] Anderson/Laos/PKS-F-/PKS-F-4I.rmg
+    [282] Anderson/Laos/PKS-F-/PKS-F-4J.rmg
+    [283] Anderson/Laos/PKS-F-/PKS-F-4K.rmg
+    [284] Anderson/Laos/PKS-F-/PKS-F-5A.rmg
+    [285] Anderson/Laos/PKS-F-/PKS-F-5B.rmg
+    [286] Anderson/Laos/PKS-F-/PKS-F-5C.rmg
+    [287] Anderson/Laos/PKS-F-/PKS-F-5D.rmg
+    [288] Anderson/Laos/PKS-F-/PKS-F-5E.rmg
+    [289] Anderson/Laos/PKS-F-/PKS-F-5F.rmg
+    [290] Anderson/Laos/PKS-F-/PKS-F-5G.rmg
+    [291] Anderson/Laos/PKS-F-/PKS-F-5H.rmg
+    [292] Anderson/Laos/PKS-F-/PKS-F-5I.rmg
+    [293] Anderson/Laos/PKS-F-/PKS-F-5J.rmg
+    [294] Anderson/Laos/PKS-F-/PKS-F-5K.rmg
+    [295] Anderson/Laos/PKS-F-/PKS-F-5L.rmg
+    [296] Anderson/Laos/PKS-F-/PKS-F-6B.rmg
+    [297] Anderson/Laos/PKS-F-/PKS-F-6C.rmg
+    [298] Anderson/Laos/PKS-F-/PKS-F-6D.rmg
+    [299] Anderson/Laos/PKS-F-/PKS-F-6E.rmg
+    [300] Anderson/Laos/PKS-F-/PKS-F-6F.rmg
+    [301] Anderson/Laos/PKS-F-/PKS-F-7A.rmg
+    [302] Anderson/Laos/PKS-F-/PKS-F-7B.rmg
+    [303] Anderson/Laos/PKS-F-/PKS-F-7C.rmg
+    [304] Anderson/Laos/PKS-F-/PKS-F-7D.rmg
+    [305] Anderson/Laos/PKS-F-/PKS-F-7E.rmg
+    [306] Anderson/Laos/PKS-F-/PKS-F-7F.rmg
+    [307] Anderson/Laos/PKS-F-/PKS-F-7G.rmg
+    [308] Anderson/Laos/PKS-F-/PKS-F-7H.rmg
+    [309] Anderson/Laos/PKS-F-/PKS-F-7I.rmg
+    [310] Anderson/Laos/PKS-F-/PKS-F-8A.rmg
+    [311] Anderson/Laos/PKS-F-/PKS-F-8B.rmg
+    [312] Anderson/Laos/PKS-F-/PKS-F-8C.rmg
+    [313] Anderson/Laos/PKS-F-/PKS-F-8D.rmg
+    [314] Anderson/Laos/PKS-F-/PKS-F-8E.rmg
+    [315] Anderson/Laos/PKS-F-/PKS-F-8F.rmg
+    [316] Anderson/Laos/PKS-F-/PKS-F-8G.rmg
+    [317] Anderson/Laos/PKS-F-/PKS-F-9A.rmg
+    [318] Anderson/Laos/PKS-F-/PKS-F-9B.rmg
+    [319] Anderson/Laos/PKS-F-/PKS-F-9C.rmg
+    [320] Anderson/Laos/PKS-F-/PKS-F-9D.rmg
+    [321] Anderson/Laos/PKS-F-/PKS-F-9E.rmg
+    [322] Anderson/Laos/PKS-F-/PKS-F-9F.rmg
+    [323] Anderson/Laos/PKS-F-/PKS-F-9G.rmg
+    [324] Anderson/Laos/PKS-F-/PKS-F-9H.rmg
+    [325] Anderson/Laos/PKS-F-/PKS-F-9I.rmg
+    [326] Anderson/Laos/PKS-G-/PKS-G-1B.rmg
+    [327] Anderson/Laos/PKS-G-/PKS-G-1C.rmg
+    [328] Anderson/Laos/PKS-G-/PKS-G-1D.rmg
+    [329] Anderson/Laos/PKS-G-/PKS-G-1E.rmg
+    [330] Anderson/Laos/PKS-G-/PKS-G-1F.rmg
+    [331] Anderson/Laos/PKS-G-/PKS-G-1G.rmg
+    [332] Anderson/Laos/PKS-G-/PKS-G-2A.rmg
+    [333] Anderson/Laos/PKS-G-/PKS-G-2B.rmg
+    [334] Anderson/Laos/PKS-G-/PKS-G-2C.rmg
+    [335] Anderson/Laos/PKS-G-/PKS-G-2D.rmg
+    [336] Anderson/Laos/PKS-G-/PKS-G-2E.rmg
+    [337] Anderson/Laos/PKS-G-/PKS-G-2F.rmg
+    [338] Anderson/Laos/PKS-G-/PKS-G-2G.rmg
+    [339] Anderson/Laos/PKS-G-/PKS-G-3B.rmg
+    [340] Anderson/Laos/PKS-G-/PKS-G-3C.rmg
+    [341] Anderson/Laos/PKS-G-/PKS-G-3D.rmg
+    [342] Anderson/Laos/PKS-G-/PKS-G-3E.rmg
+    [343] Anderson/Laos/PKS-G-/PKS-G-4B.rmg
+    [344] Anderson/Laos/PKS-G-/PKS-G-4C.rmg
+    [345] Anderson/Laos/PKS-G-/PKS-G-4D.rmg
+    [346] Anderson/Laos/PKS-G-/PKS-G-4E.rmg
+    [347] Anderson/Laos/PKS-G-/PKS-G-4F.rmg
+    [348] Anderson/Laos/PKS-G-/PKS-G-5B.rmg
+    [349] Anderson/Laos/PKS-G-/PKS-G-5C.rmg
+    [350] Anderson/Laos/PKS-G-/PKS-G-5D.rmg
+    [351] Anderson/Laos/PKS-G-/PKS-G-6A.rmg
+    [352] Anderson/Laos/PKS-G-/PKS-G-6B.rmg
+    [353] Anderson/Laos/PKS-G-/PKS-G-6C.rmg
+    [354] Anderson/Laos/PKS-G-/PKS-G-7B.rmg
+    [355] Anderson/Laos/PKS-G-/PKS-G-7C.rmg
+    [356] Anderson/Laos/PKS-G-/PKS-G-8B.rmg
+    [357] Anderson/Laos/PKS-G-/PKS-G-8C.rmg
+    [358] Anderson/Laos/PKS-G-/PKS-G-8D.rmg
+    [359] Anderson/Laos/PKS-H-/PKS-H-1B.rmg
+    [360] Anderson/Laos/PKS-H-/PKS-H-1C.rmg
+    [361] Anderson/Laos/PKS-H-/PKS-H-1D.rmg
+    [362] Anderson/Laos/PKS-H-/PKS-H-1E.rmg
+    [363] Anderson/Laos/PKS-H-/PKS-H-1F.rmg
+    [364] Anderson/Laos/PKS-H-/PKS-H-1G.rmg
+    [365] Anderson/Laos/PKS-H-/PKS-H-1H.rmg
+    [366] Anderson/Laos/PKS-H-/PKS-H-1I.rmg
+    [367] Anderson/Laos/PKS-H-/PKS-H-1J.rmg
+    [368] Anderson/Laos/PKS-H-/PKS-H-1K.rmg
+    [369] Anderson/Laos/PKS-H-/PKS-H-1L.rmg
+    [370] Anderson/Laos/PKS-H-/PKS-H-2B.rmg
+    [371] Anderson/Laos/PKS-H-/PKS-H-2C.rmg
+    [372] Anderson/Laos/PKS-H-/PKS-H-2D.rmg
+    [373] Anderson/Laos/PKS-H-/PKS-H-2E.rmg
+    [374] Anderson/Laos/PKS-H-/PKS-H-2F.rmg
+    [375] Anderson/Laos/PKS-H-/PKS-H-2G.rmg
+    [376] Anderson/Laos/PKS-H-/PKS-H-2H.rmg
+    [377] Anderson/Laos/PKS-H-/PKS-H-2I.rmg
+    [378] Anderson/Laos/PKS-H-/PKS-H-2J.rmg
+    [379] Anderson/Laos/PKS-H-/PKS-H-3B.rmg
+    [380] Anderson/Laos/PKS-H-/PKS-H-3C.rmg
+    [381] Anderson/Laos/PKS-H-/PKS-H-3D.rmg
+    [382] Anderson/Laos/PKS-H-/PKS-H-3E.rmg
+    [383] Anderson/Laos/PKS-H-/PKS-H-3F.rmg
+    [384] Anderson/Laos/PKS-I-/PKS-I-1B.rmg
+    [385] Anderson/Laos/PKS-I-/PKS-I-1C.rmg
+    [386] Anderson/Laos/PKS-I-/PKS-I-1D.rmg
+    [387] Anderson/Laos/PKS-I-/PKS-I-1E.rmg
+    [388] Anderson/Laos/PKS-I-/PKS-I-1F.rmg
+    [389] Anderson/Laos/PKS-I-/PKS-I-1G.rmg
+    [390] Anderson/Laos/WBE-A-/WBE-A-1B.rmg
+    [391] Anderson/Laos/WBE-A-/WBE-A-1C.rmg
+    [392] Anderson/Laos/WBE-A-/WBE-A-1D.rmg
+    [393] Anderson/Laos/WBE-A-/WBE-A-1E.rmg
+    [394] Anderson/Laos/WBE-A-/WBE-A-1F.rmg
+    [395] Anderson/Laos/WBE-A-/WBE-A-1G.rmg
+    [396] Anderson/Laos/WBE-A-/WBE-A-1H.rmg
+    [397] Anderson/Laos/WBE-A-/WBE-A-1I.rmg
+    [398] Anderson/Laos/WBE-A-/WBE-A-2B.rmg
+    [399] Anderson/Laos/WBE-A-/WBE-A-2C.rmg
+    [400] Anderson/Laos/WBE-A-/WBE-A-2D.rmg
+    [401] Anderson/RockMag/PKQ-A-/PKQ-A-0H.rmg
+    [402] Anderson/RockMag/PKQ-A-/PKQ-A-2M.rmg
+    [403] Anderson/RockMag/PKQ-A-/PKQ-A-3H.rmg
+    [404] Anderson/RockMag/PKQ-A-/PKQ-A-6M.rmg
+    [405] Anderson/RockMag/PKQ-A-/PKQ-A-9I.rmg
+    [406] Anderson/RockMag/PKS-F-/PKS-F-0N.rmg
+    [407] Anderson/RockMag/PKS-F-/PKS-F-1.P.rmg
+    [408] Anderson/RockMag/PKS-F-/PKS-F-1M.rmg
+    [409] Anderson/RockMag/PKS-F-/PKS-F-2L.rmg
+    [410] Anderson/RockMag/PKS-F-/PKS-F-3M.rmg
+    [411] Anderson/RockMag/PKS-F-/PKS-F-4L.rmg
+    [412] Anderson/RockMag/PKS-F-/PKS-F-5M.rmg
+    [413] Anderson/RockMag/PKS-F-/PKS-F-6G.rmg
+    [414] Anderson/RockMag/PKS-F-/PKS-F-7J.rmg
+    [415] Anderson/RockMag/PKS-F-/PKS-F-8H.rmg
+    [416] Anderson/RockMag/PKS-F-/PKS-F-9J.rmg
+    [417] Komat/FORC_5.0-200.0mT_exp1.20_min1.0mT_SATURATION.rmg
+    [418] Komat/FORC_5.0-200.0mT_exp1.20_min4.0mT_SATURATION.rmg
+    [419] Komat/FORCz_5.0_to_200.0mT_in_exp1.2_2mT_Steps_standard.rmg
+    [420] Komat/Komat003.cor.rmg
+    [421] Komat/Komat003.frc.rmg
+    [422] Komat/Komat004.frc.rmg
+
+  Enter numbers to load (e.g. 1 3 4), or 'all': 11 12 13 14
+  ✓ Loaded: TPB 15.1.cor  (97 steps)  [TPB15.1.cor.rmg]
+  ✓ Loaded: TPB 17.0.cor  (194 steps)  [TPB17.0.cor.rmg]
+  ✓ Loaded: TPB 4.1.cor  (97 steps)  [TPB4.1.cor.rmg]
+  ✓ Loaded: TPB 9.1.cor  (97 steps)  [TPB9.1.cor.rmg]
+
+▼═══════════════════════════════════════════════════════════▼
+    [1] TPB4.1.cor
+    [2] TPB 15.1.cor
+    [3] TPB 17.0.cor
+    [4] TPB 4.1.cor
+    [5] TPB 9.1.cor
+
+▼═══════════════════════════════════════════════════════════▼
+  + [L] Load more files from a directory
+  + [X] Remove samples from loaded list
+  + [R] Run selected routines (batch plotter)
+  + [F] 8-Panel Rock-Mag Dashboard (IRM, ARM, Backfield, etc.)
+  + [I] Inspect one sample (show detailed stats)
+  + [H] Show coercivity values (Hcr, MDF) for all samples
+  + [E] Export all statistics to table
+  + [P] Plot FORC data (First Order Reversal Curves)
+  + [G] Generate FORC measurement script
+  + [S] Generate SAM header files (paleomag)
+  + [C] Clear all loaded samples
+  + [Q] Quit
+
+  Choice: f
+
+── Group samples for plotting ──────────────────────────────
+  Samples in the same group will be overlaid on the same axes.
+  Each group gets its own figure set.
+    [1] TPB4.1.cor
+    [2] TPB 15.1.cor
+    [3] TPB 17.0.cor
+    [4] TPB 4.1.cor
+    [5] TPB 9.1.cor
+
+  Current groups: 0
+
+  Options:
+  + [N] Create new group
+  + [D] Done (proceed with current groups)
+  + [A] All together (one group with all samples)
+  + [S] All separate (one sample per group)
+  Choice: s
+
+Generating 8-panel dashboard for 5 group(s)…
+  Save group 1 dashboard as PNG? [y/N] y
+    ✓ Saved → TPB4.1.cor_rockmag.png
+  Save group 2 dashboard as PNG? [y/N] y
+    ✓ Saved → TPB 15.1.cor_rockmag.png
+  Save group 3 dashboard as PNG? [y/N] y
+    ✓ Saved → TPB 17.0.cor_rockmag.png
+  Save group 4 dashboard as PNG? [y/N] y
+    ✓ Saved → TPB 4.1.cor_rockmag.png
+  Save group 5 dashboard as PNG? [y/N] y
+    ✓ Saved → TPB 9.1.cor_rockmag.png
+
+▼═══════════════════════════════════════════════════════════▼
+    [1] TPB4.1.cor
+    [2] TPB 15.1.cor
+    [3] TPB 17.0.cor
+    [4] TPB 4.1.cor
+    [5] TPB 9.1.cor
+
+▼═══════════════════════════════════════════════════════════▼
+  + [L] Load more files from a directory
+  + [X] Remove samples from loaded list
+  + [R] Run selected routines (batch plotter)
+  + [F] 8-Panel Rock-Mag Dashboard (IRM, ARM, Backfield, etc.)
+  + [I] Inspect one sample (show detailed stats)
+  + [H] Show coercivity values (Hcr, MDF) for all samples
+  + [E] Export all statistics to table
+  + [P] Plot FORC data (First Order Reversal Curves)
+  + [G] Generate FORC measurement script
+  + [S] Generate SAM header files (paleomag)
+  + [C] Clear all loaded samples
+  + [Q] Quit
+
+  Choice: f
+
+── Group samples for plotting ──────────────────────────────
+  Samples in the same group will be overlaid on the same axes.
+  Each group gets its own figure set.
+    [1] TPB4.1.cor
+    [2] TPB 15.1.cor
+    [3] TPB 17.0.cor
+    [4] TPB 4.1.cor
+    [5] TPB 9.1.cor
+
+  Current groups: 0
+
+  Options:
+  + [N] Create new group
+  + [D] Done (proceed with current groups)
+  + [A] All together (one group with all samples)
+  + [S] All separate (one sample per group)
+  Choice: n
+  Enter sample numbers for this group (e.g. 1 3 4): 2
+  ✓ Group 1 created: TPB 15.1.cor
+
+  Current groups: 1
+    Group 1: TPB 15.1.cor
+
+  Options:
+  + [N] Create new group
+  + [D] Done (proceed with current groups)
+  + [A] All together (one group with all samples)
+  + [S] All separate (one sample per group)
+  Choice: s
+
+Generating 8-panel dashboard for 5 group(s)…
+  Save group 1 dashboard as PNG? [y/N] y
+    ✓ Saved → TPB4.1.cor_rockmag.png
+  Save group 2 dashboard as PNG? [y/N] y
+    ✓ Saved → TPB 15.1.cor_rockmag.png
+  Save group 3 dashboard as PNG? [y/N] y
+    ✓ Saved → TPB 17.0.cor_rockmag.png
+  Save group 4 dashboard as PNG? [y/N] y
+    ✓ Saved → TPB 4.1.cor_rockmag.png
+  Save group 5 dashboard as PNG? [y/N] y
+    ✓ Saved → TPB 9.1.cor_rockmag.png
+
+▼═══════════════════════════════════════════════════════════▼
+    [1] TPB4.1.cor
+    [2] TPB 15.1.cor
+    [3] TPB 17.0.cor
+    [4] TPB 4.1.cor
+    [5] TPB 9.1.cor
+
+▼═══════════════════════════════════════════════════════════▼
+  + [L] Load more files from a directory
+  + [X] Remove samples from loaded list
+  + [R] Run selected routines (batch plotter)
+  + [F] 8-Panel Rock-Mag Dashboard (IRM, ARM, Backfield, etc.)
+  + [I] Inspect one sample (show detailed stats)
+  + [H] Show coercivity values (Hcr, MDF) for all samples
+  + [E] Export all statistics to table
+  + [P] Plot FORC data (First Order Reversal Curves)
+  + [G] Generate FORC measurement script
+  + [S] Generate SAM header files (paleomag)
+  + [C] Clear all loaded samples
+  + [Q] Quit
+
+  Choice: l
+
+── Load files ──────────────────────────────────────────────
+  Enter directory path (or press Enter for current dir): /Volumes/YSB
+
+  Found 424 .rmg file(s) under /Volumes/YSB:
+    [  1] ._FORC_goethite_1T_log30curves.rmg
+    [  2] ._FORC_hematite_1T_log30curves 1.rmg
+    [  3] ._FORC_magnetite_5.0-200.0mT_exp1.20_min1.0mT_SATURATION copy.rmg
+    [  4] ._FORCz_5.0_to_200.0mT_in_exp1.2_2mT_Steps.rmg
+    [  5] ._FORCz_5.0_to_500.0mT_in_exp1.30_Steps.rmg
+    [  6] ._TPB4.1.cor.rmg
+    [  7] ._TPB9.1.cor.rmg
+    [  8] FORC_goethite_1T_log30curves.rmg
+    [  9] FORC_hematite_1T_log30curves 1.rmg
+    [ 10] FORC_magnetite_5.0-200.0mT_exp1.20_min1.0mT_SATURATION copy.rmg
+    [ 11] FORCz_5.0_to_200.0mT_in_exp1.2_2mT_Steps.rmg
+    [ 12] FORCz_5.0_to_500.0mT_in_exp1.30_Steps.rmg
+    [ 13] TPB15.1.cor.rmg
+    [ 14] TPB17.0.cor.rmg
+    [ 15] TPB4.1.cor.rmg
+    [ 16] TPB9.1.cor.rmg
+    [ 17] Anderson/Laos/LS/AF_Template.rmg
+    [ 18] Anderson/Laos/LS/LSBPO15.rmg
+    [ 19] Anderson/Laos/LS/LSBSP15.rmg
+    [ 20] Anderson/Laos/LS/LSH18.rmg
+    [ 21] Anderson/Laos/LS/LSPKE19.rmg
+    [ 22] Anderson/Laos/LS/LSPSK18.rmg
+    [ 23] Anderson/Laos/LS/Rockmag_Template.rmg
+    [ 24] Anderson/Laos/NWF-A-/NWF-A-1B.rmg
+    [ 25] Anderson/Laos/NWF-A-/NWF-A-1C.rmg
+    [ 26] Anderson/Laos/NWF-A-/NWF-A-1D.rmg
+    [ 27] Anderson/Laos/NWF-A-/NWF-A-1E.rmg
+    [ 28] Anderson/Laos/NWF-A-/NWF-A-1F.rmg
+    [ 29] Anderson/Laos/NWF-A-/NWF-A-1G.rmg
+    [ 30] Anderson/Laos/NWF-A-/NWF-A-1H.rmg
+    [ 31] Anderson/Laos/NWF-A-/NWF-A-2B.rmg
+    [ 32] Anderson/Laos/NWF-A-/NWF-A-2C.rmg
+    [ 33] Anderson/Laos/NWF-A-/NWF-A-2D.rmg
+    [ 34] Anderson/Laos/NWF-A-/NWF-A-3B.rmg
+    [ 35] Anderson/Laos/NWF-A-/NWF-A-4B.rmg
+    [ 36] Anderson/Laos/NWF-A-/NWF-A-4C.rmg
+    [ 37] Anderson/Laos/NWF-A-/NWF-A-5B.rmg
+    [ 38] Anderson/Laos/NWF-A-/NWF-A-5C.rmg
+    [ 39] Anderson/Laos/NWF-B-/NWF-B-1B.rmg
+    [ 40] Anderson/Laos/NWF-B-/NWF-B-1C.rmg
+    [ 41] Anderson/Laos/NWF-B-/NWF-B-1D.rmg
+    [ 42] Anderson/Laos/NWF-B-/NWF-B-1E.rmg
+    [ 43] Anderson/Laos/NWF-B-/NWF-B-1F.rmg
+    [ 44] Anderson/Laos/NWF-B-/NWF-B-1G.rmg
+    [ 45] Anderson/Laos/NWF-B-/NWF-B-1H.rmg
+    [ 46] Anderson/Laos/NWF-B-/NWF-B-2B.rmg
+    [ 47] Anderson/Laos/NWF-B-/NWF-B-2C.rmg
+    [ 48] Anderson/Laos/NWF-B-/NWF-B-2D.rmg
+    [ 49] Anderson/Laos/NWF-B-/NWF-B-2E.rmg
+    [ 50] Anderson/Laos/NWF-B-/NWF-B-2F.rmg
+    [ 51] Anderson/Laos/NWF-B-/NWF-B-2G.rmg
+    [ 52] Anderson/Laos/NWF-B-/NWF-B-3B.rmg
+    [ 53] Anderson/Laos/NWF-B-/NWF-B-3C.rmg
+    [ 54] Anderson/Laos/NWF-B-/NWF-B-3D.rmg
+    [ 55] Anderson/Laos/NWF-B-/NWF-B-3E.rmg
+    [ 56] Anderson/Laos/NWF-B-/NWF-B-3F.rmg
+    [ 57] Anderson/Laos/NWF-B-/NWF-B-3G.rmg
+    [ 58] Anderson/Laos/NWF-B-/NWF-B-3H.rmg
+    [ 59] Anderson/Laos/NWF-C-/NWF-C-1B.rmg
+    [ 60] Anderson/Laos/NWF-C-/NWF-C-1C.rmg
+    [ 61] Anderson/Laos/NWF-C-/NWF-C-2B.rmg
+    [ 62] Anderson/Laos/NWF-C-/NWF-C-2C.rmg
+    [ 63] Anderson/Laos/NWF-C-/NWF-C-2D.rmg
+    [ 64] Anderson/Laos/NWF-C-/NWF-C-2E.rmg
+    [ 65] Anderson/Laos/NWF-C-/NWF-C-2F.rmg
+    [ 66] Anderson/Laos/NWF-C-/NWF-C-3B.rmg
+    [ 67] Anderson/Laos/NWF-C-/NWF-C-3C.rmg
+    [ 68] Anderson/Laos/NWF-C-/NWF-C-3D.rmg
+    [ 69] Anderson/Laos/NWF-C-/NWF-C-4B.rmg
+    [ 70] Anderson/Laos/NWF-C-/NWF-C-4C.rmg
+    [ 71] Anderson/Laos/NWF-C-/NWF-C-4D.rmg
+    [ 72] Anderson/Laos/NWF-C-/NWF-C-4E.rmg
+    [ 73] Anderson/Laos/NWF-C-/NWF-C-5B.rmg
+    [ 74] Anderson/Laos/NWF-C-/NWF-C-5C.rmg
+    [ 75] Anderson/Laos/NWF-C-/NWF-C-5D.rmg
+    [ 76] Anderson/Laos/NWF-C-/NWF-C-5E.rmg
+    [ 77] Anderson/Laos/NWF-C-/NWF-C-6B.rmg
+    [ 78] Anderson/Laos/NWF-C-/NWF-C-6C.rmg
+    [ 79] Anderson/Laos/NWF-C-/NWF-C-6D.rmg
+    [ 80] Anderson/Laos/NWF-C-/NWF-C-6E.rmg
+    [ 81] Anderson/Laos/NWF-C-/NWF-C-7B.rmg
+    [ 82] Anderson/Laos/NWF-C-/NWF-C-7C.rmg
+    [ 83] Anderson/Laos/NWF-C-/NWF-C-7D.rmg
+    [ 84] Anderson/Laos/NWF-C-/NWF-C-7E.rmg
+    [ 85] Anderson/Laos/NWF-C-/NWF-C-7F.rmg
+    [ 86] Anderson/Laos/NWF-C-/NWF-C-8B.rmg
+    [ 87] Anderson/Laos/NWF-C-/NWF-C-8C.rmg
+    [ 88] Anderson/Laos/NWF-C-/NWF-C-8D.rmg
+    [ 89] Anderson/Laos/NWF-C-/NWF-C-8E.rmg
+    [ 90] Anderson/Laos/NWF-C-/NWF-C-8F.rmg
+    [ 91] Anderson/Laos/NWF-C-/NWF-C-8G.rmg
+    [ 92] Anderson/Laos/PKQ-A-/PKQ-A-0A.rmg
+    [ 93] Anderson/Laos/PKQ-A-/PKQ-A-0B.rmg
+    [ 94] Anderson/Laos/PKQ-A-/PKQ-A-0C.rmg
+    [ 95] Anderson/Laos/PKQ-A-/PKQ-A-0D.rmg
+    [ 96] Anderson/Laos/PKQ-A-/PKQ-A-0E.rmg
+    [ 97] Anderson/Laos/PKQ-A-/PKQ-A-0F.rmg
+    [ 98] Anderson/Laos/PKQ-A-/PKQ-A-0G.rmg
+    [ 99] Anderson/Laos/PKQ-A-/PKQ-A-1A.rmg
+    [100] Anderson/Laos/PKQ-A-/PKQ-A-1B.rmg
+    [101] Anderson/Laos/PKQ-A-/PKQ-A-1C.rmg
+    [102] Anderson/Laos/PKQ-A-/PKQ-A-1D.rmg
+    [103] Anderson/Laos/PKQ-A-/PKQ-A-2B.rmg
+    [104] Anderson/Laos/PKQ-A-/PKQ-A-2C.rmg
+    [105] Anderson/Laos/PKQ-A-/PKQ-A-2D.rmg
+    [106] Anderson/Laos/PKQ-A-/PKQ-A-2E.rmg
+    [107] Anderson/Laos/PKQ-A-/PKQ-A-2F.rmg
+    [108] Anderson/Laos/PKQ-A-/PKQ-A-2G.rmg
+    [109] Anderson/Laos/PKQ-A-/PKQ-A-2H.rmg
+    [110] Anderson/Laos/PKQ-A-/PKQ-A-2I.rmg
+    [111] Anderson/Laos/PKQ-A-/PKQ-A-2J.rmg
+    [112] Anderson/Laos/PKQ-A-/PKQ-A-2K.rmg
+    [113] Anderson/Laos/PKQ-A-/PKQ-A-2L.rmg
+    [114] Anderson/Laos/PKQ-A-/PKQ-A-3B.rmg
+    [115] Anderson/Laos/PKQ-A-/PKQ-A-3C.rmg
+    [116] Anderson/Laos/PKQ-A-/PKQ-A-3D.rmg
+    [117] Anderson/Laos/PKQ-A-/PKQ-A-3E.rmg
+    [118] Anderson/Laos/PKQ-A-/PKQ-A-3F.rmg
+    [119] Anderson/Laos/PKQ-A-/PKQ-A-3G.rmg
+    [120] Anderson/Laos/PKQ-A-/PKQ-A-4B.rmg
+    [121] Anderson/Laos/PKQ-A-/PKQ-A-4C.rmg
+    [122] Anderson/Laos/PKQ-A-/PKQ-A-4D.rmg
+    [123] Anderson/Laos/PKQ-A-/PKQ-A-4E.rmg
+    [124] Anderson/Laos/PKQ-A-/PKQ-A-4F.rmg
+    [125] Anderson/Laos/PKQ-A-/PKQ-A-4G.rmg
+    [126] Anderson/Laos/PKQ-A-/PKQ-A-4H.rmg
+    [127] Anderson/Laos/PKQ-A-/PKQ-A-5B.rmg
+    [128] Anderson/Laos/PKQ-A-/PKQ-A-5C.rmg
+    [129] Anderson/Laos/PKQ-A-/PKQ-A-5D.rmg
+    [130] Anderson/Laos/PKQ-A-/PKQ-A-5E.rmg
+    [131] Anderson/Laos/PKQ-A-/PKQ-A-5F.rmg
+    [132] Anderson/Laos/PKQ-A-/PKQ-A-5G.rmg
+    [133] Anderson/Laos/PKQ-A-/PKQ-A-5H.rmg
+    [134] Anderson/Laos/PKQ-A-/PKQ-A-5I.rmg
+    [135] Anderson/Laos/PKQ-A-/PKQ-A-5J.rmg
+    [136] Anderson/Laos/PKQ-A-/PKQ-A-5K.rmg
+    [137] Anderson/Laos/PKQ-A-/PKQ-A-5L.rmg
+    [138] Anderson/Laos/PKQ-A-/PKQ-A-5M.rmg
+    [139] Anderson/Laos/PKQ-A-/PKQ-A-5N.rmg
+    [140] Anderson/Laos/PKQ-A-/PKQ-A-5O.rmg
+    [141] Anderson/Laos/PKQ-A-/PKQ-A-5P.rmg
+    [142] Anderson/Laos/PKQ-A-/PKQ-A-5Q.rmg
+    [143] Anderson/Laos/PKQ-A-/PKQ-A-6A.rmg
+    [144] Anderson/Laos/PKQ-A-/PKQ-A-6B.rmg
+    [145] Anderson/Laos/PKQ-A-/PKQ-A-6C.rmg
+    [146] Anderson/Laos/PKQ-A-/PKQ-A-6D.rmg
+    [147] Anderson/Laos/PKQ-A-/PKQ-A-6E.rmg
+    [148] Anderson/Laos/PKQ-A-/PKQ-A-6F.rmg
+    [149] Anderson/Laos/PKQ-A-/PKQ-A-6G.rmg
+    [150] Anderson/Laos/PKQ-A-/PKQ-A-6H.rmg
+    [151] Anderson/Laos/PKQ-A-/PKQ-A-6I.rmg
+    [152] Anderson/Laos/PKQ-A-/PKQ-A-6J.rmg
+    [153] Anderson/Laos/PKQ-A-/PKQ-A-6K.rmg
+    [154] Anderson/Laos/PKQ-A-/PKQ-A-6L.rmg
+    [155] Anderson/Laos/PKQ-A-/PKQ-A-7A.rmg
+    [156] Anderson/Laos/PKQ-A-/PKQ-A-7B.rmg
+    [157] Anderson/Laos/PKQ-A-/PKQ-A-7C.rmg
+    [158] Anderson/Laos/PKQ-A-/PKQ-A-7D.rmg
+    [159] Anderson/Laos/PKQ-A-/PKQ-A-7E.rmg
+    [160] Anderson/Laos/PKQ-A-/PKQ-A-7F.rmg
+    [161] Anderson/Laos/PKQ-A-/PKQ-A-7G.rmg
+    [162] Anderson/Laos/PKQ-A-/PKQ-A-7H.rmg
+    [163] Anderson/Laos/PKQ-A-/PKQ-A-7I.rmg
+    [164] Anderson/Laos/PKQ-A-/PKQ-A-7J.rmg
+    [165] Anderson/Laos/PKQ-A-/PKQ-A-7K.rmg
+    [166] Anderson/Laos/PKQ-A-/PKQ-A-8A.rmg
+    [167] Anderson/Laos/PKQ-A-/PKQ-A-8B.rmg
+    [168] Anderson/Laos/PKQ-A-/PKQ-A-8C.rmg
+    [169] Anderson/Laos/PKQ-A-/PKQ-A-8D.rmg
+    [170] Anderson/Laos/PKQ-A-/PKQ-A-8E.rmg
+    [171] Anderson/Laos/PKQ-A-/PKQ-A-8F.rmg
+    [172] Anderson/Laos/PKQ-A-/PKQ-A-8G.rmg
+    [173] Anderson/Laos/PKQ-A-/PKQ-A-8H.rmg
+    [174] Anderson/Laos/PKQ-A-/PKQ-A-8I.rmg
+    [175] Anderson/Laos/PKQ-A-/PKQ-A-8J.rmg
+    [176] Anderson/Laos/PKQ-A-/PKQ-A-8K.rmg
+    [177] Anderson/Laos/PKQ-A-/PKQ-A-8L.rmg
+    [178] Anderson/Laos/PKQ-A-/PKQ-A-8M.rmg
+    [179] Anderson/Laos/PKQ-A-/PKQ-A-9A.rmg
+    [180] Anderson/Laos/PKQ-A-/PKQ-A-9B.rmg
+    [181] Anderson/Laos/PKQ-A-/PKQ-A-9C.rmg
+    [182] Anderson/Laos/PKQ-A-/PKQ-A-9D.rmg
+    [183] Anderson/Laos/PKQ-A-/PKQ-A-9E.rmg
+    [184] Anderson/Laos/PKQ-A-/PKQ-A-9F.rmg
+    [185] Anderson/Laos/PKQ-A-/PKQ-A-9G.rmg
+    [186] Anderson/Laos/PKQ-A-/PKQ-A-9H.rmg
+    [187] Anderson/Laos/PKQ-A-/PKQ-A-9I.rmg
+    [188] Anderson/Laos/PKS-/PKS-J-1A.rmg
+    [189] Anderson/Laos/PKS-/PKS-J-1B.rmg
+    [190] Anderson/Laos/PKS-/PKS-J-1C.rmg
+    [191] Anderson/Laos/PKS-/PKS-J-1D.rmg
+    [192] Anderson/Laos/PKS-/PKS-J-2B.rmg
+    [193] Anderson/Laos/PKS-/PKS-J-2C.rmg
+    [194] Anderson/Laos/PKS-/PKS-J-2D.rmg
+    [195] Anderson/Laos/PKS-/PKS-J-2E.rmg
+    [196] Anderson/Laos/PKS-/PKS-J-3B.rmg
+    [197] Anderson/Laos/PKS-/PKS-J-3C.rmg
+    [198] Anderson/Laos/PKS-/PKS-J-3D.rmg
+    [199] Anderson/Laos/PKS-/PKS-J-3E.rmg
+    [200] Anderson/Laos/PKS-/PKS-K-1A.rmg
+    [201] Anderson/Laos/PKS-/PKS-K-1B.rmg
+    [202] Anderson/Laos/PKS-/PKS-K-1C.rmg
+    [203] Anderson/Laos/PKS-/PKS-K-2A.rmg
+    [204] Anderson/Laos/PKS-/PKS-K-2B.rmg
+    [205] Anderson/Laos/PKS-/PKS-K-2C.rmg
+    [206] Anderson/Laos/PKS-/PKS-K-2D.rmg
+    [207] Anderson/Laos/PKS-/PKS-K-2E.rmg
+    [208] Anderson/Laos/PKS-/PKS-K-2F.rmg
+    [209] Anderson/Laos/PKS-B-/PKS-B-1B.rmg
+    [210] Anderson/Laos/PKS-B-/PKS-B-1C.rmg
+    [211] Anderson/Laos/PKS-B-/PKS-B-1D.rmg
+    [212] Anderson/Laos/PKS-B-/PKS-B-1E.rmg
+    [213] Anderson/Laos/PKS-B-/PKS-B-1F.rmg
+    [214] Anderson/Laos/PKS-B-/PKS-B-1G.rmg
+    [215] Anderson/Laos/PKS-B-/PKS-B-1H.rmg
+    [216] Anderson/Laos/PKS-F-/PKS-F-0A.rmg
+    [217] Anderson/Laos/PKS-F-/PKS-F-0B.rmg
+    [218] Anderson/Laos/PKS-F-/PKS-F-0C.rmg
+    [219] Anderson/Laos/PKS-F-/PKS-F-0D.rmg
+    [220] Anderson/Laos/PKS-F-/PKS-F-0E.rmg
+    [221] Anderson/Laos/PKS-F-/PKS-F-0F.rmg
+    [222] Anderson/Laos/PKS-F-/PKS-F-0G.rmg
+    [223] Anderson/Laos/PKS-F-/PKS-F-0H.rmg
+    [224] Anderson/Laos/PKS-F-/PKS-F-0I.rmg
+    [225] Anderson/Laos/PKS-F-/PKS-F-0J.rmg
+    [226] Anderson/Laos/PKS-F-/PKS-F-0K.rmg
+    [227] Anderson/Laos/PKS-F-/PKS-F-0L.rmg
+    [228] Anderson/Laos/PKS-F-/PKS-F-0M.rmg
+    [229] Anderson/Laos/PKS-F-/PKS-F-1.B.rmg
+    [230] Anderson/Laos/PKS-F-/PKS-F-1.C.rmg
+    [231] Anderson/Laos/PKS-F-/PKS-F-1.D.rmg
+    [232] Anderson/Laos/PKS-F-/PKS-F-1.E.rmg
+    [233] Anderson/Laos/PKS-F-/PKS-F-1.F.rmg
+    [234] Anderson/Laos/PKS-F-/PKS-F-1.G.rmg
+    [235] Anderson/Laos/PKS-F-/PKS-F-1.H.rmg
+    [236] Anderson/Laos/PKS-F-/PKS-F-1.I.rmg
+    [237] Anderson/Laos/PKS-F-/PKS-F-1.J.rmg
+    [238] Anderson/Laos/PKS-F-/PKS-F-1.K.rmg
+    [239] Anderson/Laos/PKS-F-/PKS-F-1.L.rmg
+    [240] Anderson/Laos/PKS-F-/PKS-F-1.M.rmg
+    [241] Anderson/Laos/PKS-F-/PKS-F-1.N.rmg
+    [242] Anderson/Laos/PKS-F-/PKS-F-1.O.rmg
+    [243] Anderson/Laos/PKS-F-/PKS-F-1B.rmg
+    [244] Anderson/Laos/PKS-F-/PKS-F-1C.rmg
+    [245] Anderson/Laos/PKS-F-/PKS-F-1D.rmg
+    [246] Anderson/Laos/PKS-F-/PKS-F-1E.rmg
+    [247] Anderson/Laos/PKS-F-/PKS-F-1F.rmg
+    [248] Anderson/Laos/PKS-F-/PKS-F-1G.rmg
+    [249] Anderson/Laos/PKS-F-/PKS-F-1H.rmg
+    [250] Anderson/Laos/PKS-F-/PKS-F-1I.rmg
+    [251] Anderson/Laos/PKS-F-/PKS-F-1J.rmg
+    [252] Anderson/Laos/PKS-F-/PKS-F-1K.rmg
+    [253] Anderson/Laos/PKS-F-/PKS-F-1L.rmg
+    [254] Anderson/Laos/PKS-F-/PKS-F-2A.rmg
+    [255] Anderson/Laos/PKS-F-/PKS-F-2B.rmg
+    [256] Anderson/Laos/PKS-F-/PKS-F-2C.rmg
+    [257] Anderson/Laos/PKS-F-/PKS-F-2D.rmg
+    [258] Anderson/Laos/PKS-F-/PKS-F-2E.rmg
+    [259] Anderson/Laos/PKS-F-/PKS-F-2F.rmg
+    [260] Anderson/Laos/PKS-F-/PKS-F-2G.rmg
+    [261] Anderson/Laos/PKS-F-/PKS-F-2H.rmg
+    [262] Anderson/Laos/PKS-F-/PKS-F-2I.rmg
+    [263] Anderson/Laos/PKS-F-/PKS-F-2J.rmg
+    [264] Anderson/Laos/PKS-F-/PKS-F-2K.rmg
+    [265] Anderson/Laos/PKS-F-/PKS-F-3B.rmg
+    [266] Anderson/Laos/PKS-F-/PKS-F-3C.rmg
+    [267] Anderson/Laos/PKS-F-/PKS-F-3D.rmg
+    [268] Anderson/Laos/PKS-F-/PKS-F-3E.rmg
+    [269] Anderson/Laos/PKS-F-/PKS-F-3F.rmg
+    [270] Anderson/Laos/PKS-F-/PKS-F-3G.rmg
+    [271] Anderson/Laos/PKS-F-/PKS-F-3H.rmg
+    [272] Anderson/Laos/PKS-F-/PKS-F-3I.rmg
+    [273] Anderson/Laos/PKS-F-/PKS-F-3J.rmg
+    [274] Anderson/Laos/PKS-F-/PKS-F-3K.rmg
+    [275] Anderson/Laos/PKS-F-/PKS-F-3L.rmg
+    [276] Anderson/Laos/PKS-F-/PKS-F-4B.rmg
+    [277] Anderson/Laos/PKS-F-/PKS-F-4C.rmg
+    [278] Anderson/Laos/PKS-F-/PKS-F-4D.rmg
+    [279] Anderson/Laos/PKS-F-/PKS-F-4E.rmg
+    [280] Anderson/Laos/PKS-F-/PKS-F-4F.rmg
+    [281] Anderson/Laos/PKS-F-/PKS-F-4G.rmg
+    [282] Anderson/Laos/PKS-F-/PKS-F-4H.rmg
+    [283] Anderson/Laos/PKS-F-/PKS-F-4I.rmg
+    [284] Anderson/Laos/PKS-F-/PKS-F-4J.rmg
+    [285] Anderson/Laos/PKS-F-/PKS-F-4K.rmg
+    [286] Anderson/Laos/PKS-F-/PKS-F-5A.rmg
+    [287] Anderson/Laos/PKS-F-/PKS-F-5B.rmg
+    [288] Anderson/Laos/PKS-F-/PKS-F-5C.rmg
+    [289] Anderson/Laos/PKS-F-/PKS-F-5D.rmg
+    [290] Anderson/Laos/PKS-F-/PKS-F-5E.rmg
+    [291] Anderson/Laos/PKS-F-/PKS-F-5F.rmg
+    [292] Anderson/Laos/PKS-F-/PKS-F-5G.rmg
+    [293] Anderson/Laos/PKS-F-/PKS-F-5H.rmg
+    [294] Anderson/Laos/PKS-F-/PKS-F-5I.rmg
+    [295] Anderson/Laos/PKS-F-/PKS-F-5J.rmg
+    [296] Anderson/Laos/PKS-F-/PKS-F-5K.rmg
+    [297] Anderson/Laos/PKS-F-/PKS-F-5L.rmg
+    [298] Anderson/Laos/PKS-F-/PKS-F-6B.rmg
+    [299] Anderson/Laos/PKS-F-/PKS-F-6C.rmg
+    [300] Anderson/Laos/PKS-F-/PKS-F-6D.rmg
+    [301] Anderson/Laos/PKS-F-/PKS-F-6E.rmg
+    [302] Anderson/Laos/PKS-F-/PKS-F-6F.rmg
+    [303] Anderson/Laos/PKS-F-/PKS-F-7A.rmg
+    [304] Anderson/Laos/PKS-F-/PKS-F-7B.rmg
+    [305] Anderson/Laos/PKS-F-/PKS-F-7C.rmg
+    [306] Anderson/Laos/PKS-F-/PKS-F-7D.rmg
+    [307] Anderson/Laos/PKS-F-/PKS-F-7E.rmg
+    [308] Anderson/Laos/PKS-F-/PKS-F-7F.rmg
+    [309] Anderson/Laos/PKS-F-/PKS-F-7G.rmg
+    [310] Anderson/Laos/PKS-F-/PKS-F-7H.rmg
+    [311] Anderson/Laos/PKS-F-/PKS-F-7I.rmg
+    [312] Anderson/Laos/PKS-F-/PKS-F-8A.rmg
+    [313] Anderson/Laos/PKS-F-/PKS-F-8B.rmg
+    [314] Anderson/Laos/PKS-F-/PKS-F-8C.rmg
+    [315] Anderson/Laos/PKS-F-/PKS-F-8D.rmg
+    [316] Anderson/Laos/PKS-F-/PKS-F-8E.rmg
+    [317] Anderson/Laos/PKS-F-/PKS-F-8F.rmg
+    [318] Anderson/Laos/PKS-F-/PKS-F-8G.rmg
+    [319] Anderson/Laos/PKS-F-/PKS-F-9A.rmg
+    [320] Anderson/Laos/PKS-F-/PKS-F-9B.rmg
+    [321] Anderson/Laos/PKS-F-/PKS-F-9C.rmg
+    [322] Anderson/Laos/PKS-F-/PKS-F-9D.rmg
+    [323] Anderson/Laos/PKS-F-/PKS-F-9E.rmg
+    [324] Anderson/Laos/PKS-F-/PKS-F-9F.rmg
+    [325] Anderson/Laos/PKS-F-/PKS-F-9G.rmg
+    [326] Anderson/Laos/PKS-F-/PKS-F-9H.rmg
+    [327] Anderson/Laos/PKS-F-/PKS-F-9I.rmg
+    [328] Anderson/Laos/PKS-G-/PKS-G-1B.rmg
+    [329] Anderson/Laos/PKS-G-/PKS-G-1C.rmg
+    [330] Anderson/Laos/PKS-G-/PKS-G-1D.rmg
+    [331] Anderson/Laos/PKS-G-/PKS-G-1E.rmg
+    [332] Anderson/Laos/PKS-G-/PKS-G-1F.rmg
+    [333] Anderson/Laos/PKS-G-/PKS-G-1G.rmg
+    [334] Anderson/Laos/PKS-G-/PKS-G-2A.rmg
+    [335] Anderson/Laos/PKS-G-/PKS-G-2B.rmg
+    [336] Anderson/Laos/PKS-G-/PKS-G-2C.rmg
+    [337] Anderson/Laos/PKS-G-/PKS-G-2D.rmg
+    [338] Anderson/Laos/PKS-G-/PKS-G-2E.rmg
+    [339] Anderson/Laos/PKS-G-/PKS-G-2F.rmg
+    [340] Anderson/Laos/PKS-G-/PKS-G-2G.rmg
+    [341] Anderson/Laos/PKS-G-/PKS-G-3B.rmg
+    [342] Anderson/Laos/PKS-G-/PKS-G-3C.rmg
+    [343] Anderson/Laos/PKS-G-/PKS-G-3D.rmg
+    [344] Anderson/Laos/PKS-G-/PKS-G-3E.rmg
+    [345] Anderson/Laos/PKS-G-/PKS-G-4B.rmg
+    [346] Anderson/Laos/PKS-G-/PKS-G-4C.rmg
+    [347] Anderson/Laos/PKS-G-/PKS-G-4D.rmg
+    [348] Anderson/Laos/PKS-G-/PKS-G-4E.rmg
+    [349] Anderson/Laos/PKS-G-/PKS-G-4F.rmg
+    [350] Anderson/Laos/PKS-G-/PKS-G-5B.rmg
+    [351] Anderson/Laos/PKS-G-/PKS-G-5C.rmg
+    [352] Anderson/Laos/PKS-G-/PKS-G-5D.rmg
+    [353] Anderson/Laos/PKS-G-/PKS-G-6A.rmg
+    [354] Anderson/Laos/PKS-G-/PKS-G-6B.rmg
+    [355] Anderson/Laos/PKS-G-/PKS-G-6C.rmg
+    [356] Anderson/Laos/PKS-G-/PKS-G-7B.rmg
+    [357] Anderson/Laos/PKS-G-/PKS-G-7C.rmg
+    [358] Anderson/Laos/PKS-G-/PKS-G-8B.rmg
+    [359] Anderson/Laos/PKS-G-/PKS-G-8C.rmg
+    [360] Anderson/Laos/PKS-G-/PKS-G-8D.rmg
+    [361] Anderson/Laos/PKS-H-/PKS-H-1B.rmg
+    [362] Anderson/Laos/PKS-H-/PKS-H-1C.rmg
+    [363] Anderson/Laos/PKS-H-/PKS-H-1D.rmg
+    [364] Anderson/Laos/PKS-H-/PKS-H-1E.rmg
+    [365] Anderson/Laos/PKS-H-/PKS-H-1F.rmg
+    [366] Anderson/Laos/PKS-H-/PKS-H-1G.rmg
+    [367] Anderson/Laos/PKS-H-/PKS-H-1H.rmg
+    [368] Anderson/Laos/PKS-H-/PKS-H-1I.rmg
+    [369] Anderson/Laos/PKS-H-/PKS-H-1J.rmg
+    [370] Anderson/Laos/PKS-H-/PKS-H-1K.rmg
+    [371] Anderson/Laos/PKS-H-/PKS-H-1L.rmg
+    [372] Anderson/Laos/PKS-H-/PKS-H-2B.rmg
+    [373] Anderson/Laos/PKS-H-/PKS-H-2C.rmg
+    [374] Anderson/Laos/PKS-H-/PKS-H-2D.rmg
+    [375] Anderson/Laos/PKS-H-/PKS-H-2E.rmg
+    [376] Anderson/Laos/PKS-H-/PKS-H-2F.rmg
+    [377] Anderson/Laos/PKS-H-/PKS-H-2G.rmg
+    [378] Anderson/Laos/PKS-H-/PKS-H-2H.rmg
+    [379] Anderson/Laos/PKS-H-/PKS-H-2I.rmg
+    [380] Anderson/Laos/PKS-H-/PKS-H-2J.rmg
+    [381] Anderson/Laos/PKS-H-/PKS-H-3B.rmg
+    [382] Anderson/Laos/PKS-H-/PKS-H-3C.rmg
+    [383] Anderson/Laos/PKS-H-/PKS-H-3D.rmg
+    [384] Anderson/Laos/PKS-H-/PKS-H-3E.rmg
+    [385] Anderson/Laos/PKS-H-/PKS-H-3F.rmg
+    [386] Anderson/Laos/PKS-I-/PKS-I-1B.rmg
+    [387] Anderson/Laos/PKS-I-/PKS-I-1C.rmg
+    [388] Anderson/Laos/PKS-I-/PKS-I-1D.rmg
+    [389] Anderson/Laos/PKS-I-/PKS-I-1E.rmg
+    [390] Anderson/Laos/PKS-I-/PKS-I-1F.rmg
+    [391] Anderson/Laos/PKS-I-/PKS-I-1G.rmg
+    [392] Anderson/Laos/WBE-A-/WBE-A-1B.rmg
+    [393] Anderson/Laos/WBE-A-/WBE-A-1C.rmg
+    [394] Anderson/Laos/WBE-A-/WBE-A-1D.rmg
+    [395] Anderson/Laos/WBE-A-/WBE-A-1E.rmg
+    [396] Anderson/Laos/WBE-A-/WBE-A-1F.rmg
+    [397] Anderson/Laos/WBE-A-/WBE-A-1G.rmg
+    [398] Anderson/Laos/WBE-A-/WBE-A-1H.rmg
+    [399] Anderson/Laos/WBE-A-/WBE-A-1I.rmg
+    [400] Anderson/Laos/WBE-A-/WBE-A-2B.rmg
+    [401] Anderson/Laos/WBE-A-/WBE-A-2C.rmg
+    [402] Anderson/Laos/WBE-A-/WBE-A-2D.rmg
+    [403] Anderson/RockMag/PKQ-A-/PKQ-A-0H.rmg
+    [404] Anderson/RockMag/PKQ-A-/PKQ-A-2M.rmg
+    [405] Anderson/RockMag/PKQ-A-/PKQ-A-3H.rmg
+    [406] Anderson/RockMag/PKQ-A-/PKQ-A-6M.rmg
+    [407] Anderson/RockMag/PKQ-A-/PKQ-A-9I.rmg
+    [408] Anderson/RockMag/PKS-F-/PKS-F-0N.rmg
+    [409] Anderson/RockMag/PKS-F-/PKS-F-1.P.rmg
+    [410] Anderson/RockMag/PKS-F-/PKS-F-1M.rmg
+    [411] Anderson/RockMag/PKS-F-/PKS-F-2L.rmg
+    [412] Anderson/RockMag/PKS-F-/PKS-F-3M.rmg
+    [413] Anderson/RockMag/PKS-F-/PKS-F-4L.rmg
+    [414] Anderson/RockMag/PKS-F-/PKS-F-5M.rmg
+    [415] Anderson/RockMag/PKS-F-/PKS-F-6G.rmg
+    [416] Anderson/RockMag/PKS-F-/PKS-F-7J.rmg
+    [417] Anderson/RockMag/PKS-F-/PKS-F-8H.rmg
+    [418] Anderson/RockMag/PKS-F-/PKS-F-9J.rmg
+    [419] Komat/FORC_5.0-200.0mT_exp1.20_min1.0mT_SATURATION.rmg
+    [420] Komat/FORC_5.0-200.0mT_exp1.20_min4.0mT_SATURATION.rmg
+    [421] Komat/FORCz_5.0_to_200.0mT_in_exp1.2_2mT_Steps_standard.rmg
+    [422] Komat/Komat003.cor.rmg
+    [423] Komat/Komat003.frc.rmg
+    [424] Komat/Komat004.frc.rmg
+
+  Enter numbers to load (e.g. 1 3 4), or 'all': 13 14 15 16
+  ✓ Loaded: TPB15.1.cor  (194 steps)  [TPB15.1.cor.rmg]
+  ✓ Loaded: TPB17.0.cor  (291 steps)  [TPB17.0.cor.rmg]
+  ✓ Loaded: TPB4.1.cor  (194 steps)  [TPB4.1.cor.rmg]
+  ✓ Loaded: TPB9.1.cor  (194 steps)  [TPB9.1.cor.rmg]
+
+▼═══════════════════════════════════════════════════════════▼
+    [1] TPB4.1.cor
+    [2] TPB 15.1.cor
+    [3] TPB 17.0.cor
+    [4] TPB 4.1.cor
+    [5] TPB 9.1.cor
+    [6] TPB15.1.cor
+    [7] TPB17.0.cor
+    [8] TPB4.1.cor
+    [9] TPB9.1.cor
+
+▼═══════════════════════════════════════════════════════════▼
+  + [L] Load more files from a directory
+  + [X] Remove samples from loaded list
+  + [R] Run selected routines (batch plotter)
+  + [F] 8-Panel Rock-Mag Dashboard (IRM, ARM, Backfield, etc.)
+  + [I] Inspect one sample (show detailed stats)
+  + [H] Show coercivity values (Hcr, MDF) for all samples
+  + [E] Export all statistics to table
+  + [P] Plot FORC data (First Order Reversal Curves)
+  + [G] Generate FORC measurement script
+  + [S] Generate SAM header files (paleomag)
+  + [C] Clear all loaded samples
+  + [Q] Quit
+
+  Choice: f
+
+── Group samples for plotting ──────────────────────────────
+  Samples in the same group will be overlaid on the same axes.
+  Each group gets its own figure set.
+    [1] TPB4.1.cor
+    [2] TPB 15.1.cor
+    [3] TPB 17.0.cor
+    [4] TPB 4.1.cor
+    [5] TPB 9.1.cor
+    [6] TPB15.1.cor
+    [7] TPB17.0.cor
+    [8] TPB4.1.cor
+    [9] TPB9.1.cor
+
+  Current groups: 0
+
+  Options:
+  + [N] Create new group
+  + [D] Done (proceed with current groups)
+  + [A] All together (one group with all samples)
+  + [S] All separate (one sample per group)
+  Choice: s
+
+Generating 8-panel dashboard for 9 group(s)…
+  Save group 1 dashboard as PNG? [y/N] y
+    ✓ Saved → TPB4.1.cor_rockmag.png
+  Save group 2 dashboard as PNG? [y/N] y
+    ✓ Saved → TPB 15.1.cor_rockmag.png
+  Save group 3 dashboard as PNG? [y/N] y
+    ✓ Saved → TPB 17.0.cor_rockmag.png
+  Save group 4 dashboard as PNG? [y/N] y
+    ✓ Saved → TPB 4.1.cor_rockmag.png
+  Save group 5 dashboard as PNG? [y/N] y
+    ✓ Saved → TPB 9.1.cor_rockmag.png
+  Save group 6 dashboard as PNG? [y/N] y
+    ✓ Saved → TPB15.1.cor_rockmag.png
+  Save group 7 dashboard as PNG? [y/N] y
+    ✓ Saved → TPB17.0.cor_rockmag.png
+  Save group 8 dashboard as PNG? [y/N] y
+    ✓ Saved → TPB4.1.cor_rockmag.png
+  Save group 9 dashboard as PNG? [y/N] y
+    ✓ Saved → TPB9.1.cor_rockmag.png
+
+▼═══════════════════════════════════════════════════════════▼
+    [1] TPB4.1.cor
+    [2] TPB 15.1.cor
+    [3] TPB 17.0.cor
+    [4] TPB 4.1.cor
+    [5] TPB 9.1.cor
+    [6] TPB15.1.cor
+    [7] TPB17.0.cor
+    [8] TPB4.1.cor
+    [9] TPB9.1.cor
+
+▼═══════════════════════════════════════════════════════════▼
+  + [L] Load more files from a directory
+  + [X] Remove samples from loaded list
+  + [R] Run selected routines (batch plotter)
+  + [F] 8-Panel Rock-Mag Dashboard (IRM, ARM, Backfield, etc.)
+  + [I] Inspect one sample (show detailed stats)
+  + [H] Show coercivity values (Hcr, MDF) for all samples
+  + [E] Export all statistics to table
+  + [P] Plot FORC data (First Order Reversal Curves)
+  + [G] Generate FORC measurement script
+  + [S] Generate SAM header files (paleomag)
+  + [C] Clear all loaded samples
+  + [Q] Quit
+
+  Choice: %                                                                   (base) nicolasanderson@Nicolass-MacBook-Pro-3 pyRockmag % 
+  [Restored Apr 16, 2026 at 4:00:52 PM]
+Last login: Thu Apr 16 16:00:52 on ttys001
+Restored session: Thu Apr 16 16:00:01 PDT 2026
+(base) nicolasanderson@Nicolass-MacBook-Pro-4 pyRockmag % python run_pyrockmag.py
+
+
+===============================================================
+          ░▒▓███████▓▒░░▒▓█▓▒░░▒▓█▓▒░ 
+          ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░ 
+          ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░ 
+          ░▒▓███████▓▒░ ░▒▓██████▓▒░  
+          ░▒▓█▓▒░         ░▒▓█▓▒░     
+          ░▒▓█▓▒░         ░▒▓█▓▒░     
+          ░▒▓█▓▒░         ░▒▓█▓▒░     
+
+     ░▒▓███████▓▒░ ░▒▓██████▓▒░  ░▒▓██████▓▒░░▒▓█▓▒░░▒▓█▓▒░ 
+     ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░ 
+     ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░      ░▒▓█▓▒░░▒▓█▓▒░ 
+     ░▒▓███████▓▒░ ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░      ░▒▓███████▓▒░  
+     ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░      ░▒▓█▓▒░░▒▓█▓▒░ 
+     ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░ 
+     ░▒▓█▓▒░░▒▓█▓▒░░▒▓██████▓▒░ ░▒▓██████▓▒░░▒▓█▓▒░░▒▓█▓▒░ 
+
+     ░▒▓██████████████▓▒░ ░▒▓██████▓▒░ ░▒▓██████▓▒░░▒▓█▓▒░ 
+     ░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░      ░▒▓█▓▒░ 
+     ░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░             
+     ░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░▒▓████████▓▒░▒▓█▓▒▒▓███▓▒░▒▓█▓▒░ 
+     ░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░       
+     ░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░ 
+     ░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░░▒▓██████▓▒░░▒▓█▓▒░ 
+
+                    v1.0 - CIT Format Suite
+        
+[ANALYSIS] Hysteresis • Coercivity • IRM • ARM • Backfield
+[FORC] Diagrams • FORCinel v3.0.8 • Multiple Colormaps
+[PALEOMAG] .SAM Generation • Sun Compass • IGRF • 8.3 Format
+[UTILITIES] Batch Plotting • Lowrie-Fuller • Statistics Export
+===============================================================
+
+
+▼═══════════════════════════════════════════════════════════▼
+  (no samples loaded)
+
+▼═══════════════════════════════════════════════════════════▼
+  + [L] Load more files from a directory
+  + [X] Remove samples from loaded list
+  + [R] Run selected routines (batch plotter)
+  + [F] 8-Panel Rock-Mag Dashboard (IRM, ARM, Backfield, etc.)
+  + [I] Inspect one sample (show detailed stats)
+  + [H] Show coercivity values (Hcr, MDF) for all samples
+  + [E] Export all statistics to table
+  + [P] Plot FORC data (First Order Reversal Curves)
+  + [G] Generate FORC measurement script
+  + [S] Generate SAM header files (paleomag)
+  + [C] Clear all loaded samples
+  + [Q] Quit
+
+  Choice: l
+
+── Load files ──────────────────────────────────────────────
+  Enter directory path (or press Enter for current dir): /Volumes/YSB
+
+  Found 424 .rmg file(s) under /Volumes/YSB:
+    [  1] ._FORC_goethite_1T_log30curves.rmg
+    [  2] ._FORC_hematite_1T_log30curves 1.rmg
+    [  3] ._FORC_magnetite_5.0-200.0mT_exp1.20_min1.0mT_SATURATION copy.rmg
+    [  4] ._FORCz_5.0_to_200.0mT_in_exp1.2_2mT_Steps.rmg
+    [  5] ._FORCz_5.0_to_500.0mT_in_exp1.30_Steps.rmg
+    [  6] ._TPB4.1.cor.rmg
+    [  7] ._TPB9.1.cor.rmg
+    [  8] FORC_goethite_1T_log30curves.rmg
+    [  9] FORC_hematite_1T_log30curves 1.rmg
+    [ 10] FORC_magnetite_5.0-200.0mT_exp1.20_min1.0mT_SATURATION copy.rmg
+    [ 11] FORCz_5.0_to_200.0mT_in_exp1.2_2mT_Steps.rmg
+    [ 12] FORCz_5.0_to_500.0mT_in_exp1.30_Steps.rmg
+    [ 13] TPB15.1.cor.rmg
+    [ 14] TPB17.0.cor.rmg
+    [ 15] TPB4.1.cor.rmg
+    [ 16] TPB9.1.cor.rmg
+    [ 17] Anderson/Laos/LS/AF_Template.rmg
+    [ 18] Anderson/Laos/LS/LSBPO15.rmg
+    [ 19] Anderson/Laos/LS/LSBSP15.rmg
+    [ 20] Anderson/Laos/LS/LSH18.rmg
+    [ 21] Anderson/Laos/LS/LSPKE19.rmg
+    [ 22] Anderson/Laos/LS/LSPSK18.rmg
+    [ 23] Anderson/Laos/LS/Rockmag_Template.rmg
+    [ 24] Anderson/Laos/NWF-A-/NWF-A-1B.rmg
+    [ 25] Anderson/Laos/NWF-A-/NWF-A-1C.rmg
+    [ 26] Anderson/Laos/NWF-A-/NWF-A-1D.rmg
+    [ 27] Anderson/Laos/NWF-A-/NWF-A-1E.rmg
+    [ 28] Anderson/Laos/NWF-A-/NWF-A-1F.rmg
+    [ 29] Anderson/Laos/NWF-A-/NWF-A-1G.rmg
+    [ 30] Anderson/Laos/NWF-A-/NWF-A-1H.rmg
+    [ 31] Anderson/Laos/NWF-A-/NWF-A-2B.rmg
+    [ 32] Anderson/Laos/NWF-A-/NWF-A-2C.rmg
+    [ 33] Anderson/Laos/NWF-A-/NWF-A-2D.rmg
+    [ 34] Anderson/Laos/NWF-A-/NWF-A-3B.rmg
+    [ 35] Anderson/Laos/NWF-A-/NWF-A-4B.rmg
+    [ 36] Anderson/Laos/NWF-A-/NWF-A-4C.rmg
+    [ 37] Anderson/Laos/NWF-A-/NWF-A-5B.rmg
+    [ 38] Anderson/Laos/NWF-A-/NWF-A-5C.rmg
+    [ 39] Anderson/Laos/NWF-B-/NWF-B-1B.rmg
+    [ 40] Anderson/Laos/NWF-B-/NWF-B-1C.rmg
+    [ 41] Anderson/Laos/NWF-B-/NWF-B-1D.rmg
+    [ 42] Anderson/Laos/NWF-B-/NWF-B-1E.rmg
+    [ 43] Anderson/Laos/NWF-B-/NWF-B-1F.rmg
+    [ 44] Anderson/Laos/NWF-B-/NWF-B-1G.rmg
+    [ 45] Anderson/Laos/NWF-B-/NWF-B-1H.rmg
+    [ 46] Anderson/Laos/NWF-B-/NWF-B-2B.rmg
+    [ 47] Anderson/Laos/NWF-B-/NWF-B-2C.rmg
+    [ 48] Anderson/Laos/NWF-B-/NWF-B-2D.rmg
+    [ 49] Anderson/Laos/NWF-B-/NWF-B-2E.rmg
+    [ 50] Anderson/Laos/NWF-B-/NWF-B-2F.rmg
+    [ 51] Anderson/Laos/NWF-B-/NWF-B-2G.rmg
+    [ 52] Anderson/Laos/NWF-B-/NWF-B-3B.rmg
+    [ 53] Anderson/Laos/NWF-B-/NWF-B-3C.rmg
+    [ 54] Anderson/Laos/NWF-B-/NWF-B-3D.rmg
+    [ 55] Anderson/Laos/NWF-B-/NWF-B-3E.rmg
+    [ 56] Anderson/Laos/NWF-B-/NWF-B-3F.rmg
+    [ 57] Anderson/Laos/NWF-B-/NWF-B-3G.rmg
+    [ 58] Anderson/Laos/NWF-B-/NWF-B-3H.rmg
+    [ 59] Anderson/Laos/NWF-C-/NWF-C-1B.rmg
+    [ 60] Anderson/Laos/NWF-C-/NWF-C-1C.rmg
+    [ 61] Anderson/Laos/NWF-C-/NWF-C-2B.rmg
+    [ 62] Anderson/Laos/NWF-C-/NWF-C-2C.rmg
+    [ 63] Anderson/Laos/NWF-C-/NWF-C-2D.rmg
+    [ 64] Anderson/Laos/NWF-C-/NWF-C-2E.rmg
+    [ 65] Anderson/Laos/NWF-C-/NWF-C-2F.rmg
+    [ 66] Anderson/Laos/NWF-C-/NWF-C-3B.rmg
+    [ 67] Anderson/Laos/NWF-C-/NWF-C-3C.rmg
+    [ 68] Anderson/Laos/NWF-C-/NWF-C-3D.rmg
+    [ 69] Anderson/Laos/NWF-C-/NWF-C-4B.rmg
+    [ 70] Anderson/Laos/NWF-C-/NWF-C-4C.rmg
+    [ 71] Anderson/Laos/NWF-C-/NWF-C-4D.rmg
+    [ 72] Anderson/Laos/NWF-C-/NWF-C-4E.rmg
+    [ 73] Anderson/Laos/NWF-C-/NWF-C-5B.rmg
+    [ 74] Anderson/Laos/NWF-C-/NWF-C-5C.rmg
+    [ 75] Anderson/Laos/NWF-C-/NWF-C-5D.rmg
+    [ 76] Anderson/Laos/NWF-C-/NWF-C-5E.rmg
+    [ 77] Anderson/Laos/NWF-C-/NWF-C-6B.rmg
+    [ 78] Anderson/Laos/NWF-C-/NWF-C-6C.rmg
+    [ 79] Anderson/Laos/NWF-C-/NWF-C-6D.rmg
+    [ 80] Anderson/Laos/NWF-C-/NWF-C-6E.rmg
+    [ 81] Anderson/Laos/NWF-C-/NWF-C-7B.rmg
+    [ 82] Anderson/Laos/NWF-C-/NWF-C-7C.rmg
+    [ 83] Anderson/Laos/NWF-C-/NWF-C-7D.rmg
+    [ 84] Anderson/Laos/NWF-C-/NWF-C-7E.rmg
+    [ 85] Anderson/Laos/NWF-C-/NWF-C-7F.rmg
+    [ 86] Anderson/Laos/NWF-C-/NWF-C-8B.rmg
+    [ 87] Anderson/Laos/NWF-C-/NWF-C-8C.rmg
+    [ 88] Anderson/Laos/NWF-C-/NWF-C-8D.rmg
+    [ 89] Anderson/Laos/NWF-C-/NWF-C-8E.rmg
+    [ 90] Anderson/Laos/NWF-C-/NWF-C-8F.rmg
+    [ 91] Anderson/Laos/NWF-C-/NWF-C-8G.rmg
+    [ 92] Anderson/Laos/PKQ-A-/PKQ-A-0A.rmg
+    [ 93] Anderson/Laos/PKQ-A-/PKQ-A-0B.rmg
+    [ 94] Anderson/Laos/PKQ-A-/PKQ-A-0C.rmg
+    [ 95] Anderson/Laos/PKQ-A-/PKQ-A-0D.rmg
+    [ 96] Anderson/Laos/PKQ-A-/PKQ-A-0E.rmg
+    [ 97] Anderson/Laos/PKQ-A-/PKQ-A-0F.rmg
+    [ 98] Anderson/Laos/PKQ-A-/PKQ-A-0G.rmg
+    [ 99] Anderson/Laos/PKQ-A-/PKQ-A-1A.rmg
+    [100] Anderson/Laos/PKQ-A-/PKQ-A-1B.rmg
+    [101] Anderson/Laos/PKQ-A-/PKQ-A-1C.rmg
+    [102] Anderson/Laos/PKQ-A-/PKQ-A-1D.rmg
+    [103] Anderson/Laos/PKQ-A-/PKQ-A-2B.rmg
+    [104] Anderson/Laos/PKQ-A-/PKQ-A-2C.rmg
+    [105] Anderson/Laos/PKQ-A-/PKQ-A-2D.rmg
+    [106] Anderson/Laos/PKQ-A-/PKQ-A-2E.rmg
+    [107] Anderson/Laos/PKQ-A-/PKQ-A-2F.rmg
+    [108] Anderson/Laos/PKQ-A-/PKQ-A-2G.rmg
+    [109] Anderson/Laos/PKQ-A-/PKQ-A-2H.rmg
+    [110] Anderson/Laos/PKQ-A-/PKQ-A-2I.rmg
+    [111] Anderson/Laos/PKQ-A-/PKQ-A-2J.rmg
+    [112] Anderson/Laos/PKQ-A-/PKQ-A-2K.rmg
+    [113] Anderson/Laos/PKQ-A-/PKQ-A-2L.rmg
+    [114] Anderson/Laos/PKQ-A-/PKQ-A-3B.rmg
+    [115] Anderson/Laos/PKQ-A-/PKQ-A-3C.rmg
+    [116] Anderson/Laos/PKQ-A-/PKQ-A-3D.rmg
+    [117] Anderson/Laos/PKQ-A-/PKQ-A-3E.rmg
+    [118] Anderson/Laos/PKQ-A-/PKQ-A-3F.rmg
+    [119] Anderson/Laos/PKQ-A-/PKQ-A-3G.rmg
+    [120] Anderson/Laos/PKQ-A-/PKQ-A-4B.rmg
+    [121] Anderson/Laos/PKQ-A-/PKQ-A-4C.rmg
+    [122] Anderson/Laos/PKQ-A-/PKQ-A-4D.rmg
+    [123] Anderson/Laos/PKQ-A-/PKQ-A-4E.rmg
+    [124] Anderson/Laos/PKQ-A-/PKQ-A-4F.rmg
+    [125] Anderson/Laos/PKQ-A-/PKQ-A-4G.rmg
+    [126] Anderson/Laos/PKQ-A-/PKQ-A-4H.rmg
+    [127] Anderson/Laos/PKQ-A-/PKQ-A-5B.rmg
+    [128] Anderson/Laos/PKQ-A-/PKQ-A-5C.rmg
+    [129] Anderson/Laos/PKQ-A-/PKQ-A-5D.rmg
+    [130] Anderson/Laos/PKQ-A-/PKQ-A-5E.rmg
+    [131] Anderson/Laos/PKQ-A-/PKQ-A-5F.rmg
+    [132] Anderson/Laos/PKQ-A-/PKQ-A-5G.rmg
+    [133] Anderson/Laos/PKQ-A-/PKQ-A-5H.rmg
+    [134] Anderson/Laos/PKQ-A-/PKQ-A-5I.rmg
+    [135] Anderson/Laos/PKQ-A-/PKQ-A-5J.rmg
+    [136] Anderson/Laos/PKQ-A-/PKQ-A-5K.rmg
+    [137] Anderson/Laos/PKQ-A-/PKQ-A-5L.rmg
+    [138] Anderson/Laos/PKQ-A-/PKQ-A-5M.rmg
+    [139] Anderson/Laos/PKQ-A-/PKQ-A-5N.rmg
+    [140] Anderson/Laos/PKQ-A-/PKQ-A-5O.rmg
+    [141] Anderson/Laos/PKQ-A-/PKQ-A-5P.rmg
+    [142] Anderson/Laos/PKQ-A-/PKQ-A-5Q.rmg
+    [143] Anderson/Laos/PKQ-A-/PKQ-A-6A.rmg
+    [144] Anderson/Laos/PKQ-A-/PKQ-A-6B.rmg
+    [145] Anderson/Laos/PKQ-A-/PKQ-A-6C.rmg
+    [146] Anderson/Laos/PKQ-A-/PKQ-A-6D.rmg
+    [147] Anderson/Laos/PKQ-A-/PKQ-A-6E.rmg
+    [148] Anderson/Laos/PKQ-A-/PKQ-A-6F.rmg
+    [149] Anderson/Laos/PKQ-A-/PKQ-A-6G.rmg
+    [150] Anderson/Laos/PKQ-A-/PKQ-A-6H.rmg
+    [151] Anderson/Laos/PKQ-A-/PKQ-A-6I.rmg
+    [152] Anderson/Laos/PKQ-A-/PKQ-A-6J.rmg
+    [153] Anderson/Laos/PKQ-A-/PKQ-A-6K.rmg
+    [154] Anderson/Laos/PKQ-A-/PKQ-A-6L.rmg
+    [155] Anderson/Laos/PKQ-A-/PKQ-A-7A.rmg
+    [156] Anderson/Laos/PKQ-A-/PKQ-A-7B.rmg
+    [157] Anderson/Laos/PKQ-A-/PKQ-A-7C.rmg
+    [158] Anderson/Laos/PKQ-A-/PKQ-A-7D.rmg
+    [159] Anderson/Laos/PKQ-A-/PKQ-A-7E.rmg
+    [160] Anderson/Laos/PKQ-A-/PKQ-A-7F.rmg
+    [161] Anderson/Laos/PKQ-A-/PKQ-A-7G.rmg
+    [162] Anderson/Laos/PKQ-A-/PKQ-A-7H.rmg
+    [163] Anderson/Laos/PKQ-A-/PKQ-A-7I.rmg
+    [164] Anderson/Laos/PKQ-A-/PKQ-A-7J.rmg
+    [165] Anderson/Laos/PKQ-A-/PKQ-A-7K.rmg
+    [166] Anderson/Laos/PKQ-A-/PKQ-A-8A.rmg
+    [167] Anderson/Laos/PKQ-A-/PKQ-A-8B.rmg
+    [168] Anderson/Laos/PKQ-A-/PKQ-A-8C.rmg
+    [169] Anderson/Laos/PKQ-A-/PKQ-A-8D.rmg
+    [170] Anderson/Laos/PKQ-A-/PKQ-A-8E.rmg
+    [171] Anderson/Laos/PKQ-A-/PKQ-A-8F.rmg
+    [172] Anderson/Laos/PKQ-A-/PKQ-A-8G.rmg
+    [173] Anderson/Laos/PKQ-A-/PKQ-A-8H.rmg
+    [174] Anderson/Laos/PKQ-A-/PKQ-A-8I.rmg
+    [175] Anderson/Laos/PKQ-A-/PKQ-A-8J.rmg
+    [176] Anderson/Laos/PKQ-A-/PKQ-A-8K.rmg
+    [177] Anderson/Laos/PKQ-A-/PKQ-A-8L.rmg
+    [178] Anderson/Laos/PKQ-A-/PKQ-A-8M.rmg
+    [179] Anderson/Laos/PKQ-A-/PKQ-A-9A.rmg
+    [180] Anderson/Laos/PKQ-A-/PKQ-A-9B.rmg
+    [181] Anderson/Laos/PKQ-A-/PKQ-A-9C.rmg
+    [182] Anderson/Laos/PKQ-A-/PKQ-A-9D.rmg
+    [183] Anderson/Laos/PKQ-A-/PKQ-A-9E.rmg
+    [184] Anderson/Laos/PKQ-A-/PKQ-A-9F.rmg
+    [185] Anderson/Laos/PKQ-A-/PKQ-A-9G.rmg
+    [186] Anderson/Laos/PKQ-A-/PKQ-A-9H.rmg
+    [187] Anderson/Laos/PKQ-A-/PKQ-A-9I.rmg
+    [188] Anderson/Laos/PKS-/PKS-J-1A.rmg
+    [189] Anderson/Laos/PKS-/PKS-J-1B.rmg
+    [190] Anderson/Laos/PKS-/PKS-J-1C.rmg
+    [191] Anderson/Laos/PKS-/PKS-J-1D.rmg
+    [192] Anderson/Laos/PKS-/PKS-J-2B.rmg
+    [193] Anderson/Laos/PKS-/PKS-J-2C.rmg
+    [194] Anderson/Laos/PKS-/PKS-J-2D.rmg
+    [195] Anderson/Laos/PKS-/PKS-J-2E.rmg
+    [196] Anderson/Laos/PKS-/PKS-J-3B.rmg
+    [197] Anderson/Laos/PKS-/PKS-J-3C.rmg
+    [198] Anderson/Laos/PKS-/PKS-J-3D.rmg
+    [199] Anderson/Laos/PKS-/PKS-J-3E.rmg
+    [200] Anderson/Laos/PKS-/PKS-K-1A.rmg
+    [201] Anderson/Laos/PKS-/PKS-K-1B.rmg
+    [202] Anderson/Laos/PKS-/PKS-K-1C.rmg
+    [203] Anderson/Laos/PKS-/PKS-K-2A.rmg
+    [204] Anderson/Laos/PKS-/PKS-K-2B.rmg
+    [205] Anderson/Laos/PKS-/PKS-K-2C.rmg
+    [206] Anderson/Laos/PKS-/PKS-K-2D.rmg
+    [207] Anderson/Laos/PKS-/PKS-K-2E.rmg
+    [208] Anderson/Laos/PKS-/PKS-K-2F.rmg
+    [209] Anderson/Laos/PKS-B-/PKS-B-1B.rmg
+    [210] Anderson/Laos/PKS-B-/PKS-B-1C.rmg
+    [211] Anderson/Laos/PKS-B-/PKS-B-1D.rmg
+    [212] Anderson/Laos/PKS-B-/PKS-B-1E.rmg
+    [213] Anderson/Laos/PKS-B-/PKS-B-1F.rmg
+    [214] Anderson/Laos/PKS-B-/PKS-B-1G.rmg
+    [215] Anderson/Laos/PKS-B-/PKS-B-1H.rmg
+    [216] Anderson/Laos/PKS-F-/PKS-F-0A.rmg
+    [217] Anderson/Laos/PKS-F-/PKS-F-0B.rmg
+    [218] Anderson/Laos/PKS-F-/PKS-F-0C.rmg
+    [219] Anderson/Laos/PKS-F-/PKS-F-0D.rmg
+    [220] Anderson/Laos/PKS-F-/PKS-F-0E.rmg
+    [221] Anderson/Laos/PKS-F-/PKS-F-0F.rmg
+    [222] Anderson/Laos/PKS-F-/PKS-F-0G.rmg
+    [223] Anderson/Laos/PKS-F-/PKS-F-0H.rmg
+    [224] Anderson/Laos/PKS-F-/PKS-F-0I.rmg
+    [225] Anderson/Laos/PKS-F-/PKS-F-0J.rmg
+    [226] Anderson/Laos/PKS-F-/PKS-F-0K.rmg
+    [227] Anderson/Laos/PKS-F-/PKS-F-0L.rmg
+    [228] Anderson/Laos/PKS-F-/PKS-F-0M.rmg
+    [229] Anderson/Laos/PKS-F-/PKS-F-1.B.rmg
+    [230] Anderson/Laos/PKS-F-/PKS-F-1.C.rmg
+    [231] Anderson/Laos/PKS-F-/PKS-F-1.D.rmg
+    [232] Anderson/Laos/PKS-F-/PKS-F-1.E.rmg
+    [233] Anderson/Laos/PKS-F-/PKS-F-1.F.rmg
+    [234] Anderson/Laos/PKS-F-/PKS-F-1.G.rmg
+    [235] Anderson/Laos/PKS-F-/PKS-F-1.H.rmg
+    [236] Anderson/Laos/PKS-F-/PKS-F-1.I.rmg
+    [237] Anderson/Laos/PKS-F-/PKS-F-1.J.rmg
+    [238] Anderson/Laos/PKS-F-/PKS-F-1.K.rmg
+    [239] Anderson/Laos/PKS-F-/PKS-F-1.L.rmg
+    [240] Anderson/Laos/PKS-F-/PKS-F-1.M.rmg
+    [241] Anderson/Laos/PKS-F-/PKS-F-1.N.rmg
+    [242] Anderson/Laos/PKS-F-/PKS-F-1.O.rmg
+    [243] Anderson/Laos/PKS-F-/PKS-F-1B.rmg
+    [244] Anderson/Laos/PKS-F-/PKS-F-1C.rmg
+    [245] Anderson/Laos/PKS-F-/PKS-F-1D.rmg
+    [246] Anderson/Laos/PKS-F-/PKS-F-1E.rmg
+    [247] Anderson/Laos/PKS-F-/PKS-F-1F.rmg
+    [248] Anderson/Laos/PKS-F-/PKS-F-1G.rmg
+    [249] Anderson/Laos/PKS-F-/PKS-F-1H.rmg
+    [250] Anderson/Laos/PKS-F-/PKS-F-1I.rmg
+    [251] Anderson/Laos/PKS-F-/PKS-F-1J.rmg
+    [252] Anderson/Laos/PKS-F-/PKS-F-1K.rmg
+    [253] Anderson/Laos/PKS-F-/PKS-F-1L.rmg
+    [254] Anderson/Laos/PKS-F-/PKS-F-2A.rmg
+    [255] Anderson/Laos/PKS-F-/PKS-F-2B.rmg
+    [256] Anderson/Laos/PKS-F-/PKS-F-2C.rmg
+    [257] Anderson/Laos/PKS-F-/PKS-F-2D.rmg
+    [258] Anderson/Laos/PKS-F-/PKS-F-2E.rmg
+    [259] Anderson/Laos/PKS-F-/PKS-F-2F.rmg
+    [260] Anderson/Laos/PKS-F-/PKS-F-2G.rmg
+    [261] Anderson/Laos/PKS-F-/PKS-F-2H.rmg
+    [262] Anderson/Laos/PKS-F-/PKS-F-2I.rmg
+    [263] Anderson/Laos/PKS-F-/PKS-F-2J.rmg
+    [264] Anderson/Laos/PKS-F-/PKS-F-2K.rmg
+    [265] Anderson/Laos/PKS-F-/PKS-F-3B.rmg
+    [266] Anderson/Laos/PKS-F-/PKS-F-3C.rmg
+    [267] Anderson/Laos/PKS-F-/PKS-F-3D.rmg
+    [268] Anderson/Laos/PKS-F-/PKS-F-3E.rmg
+    [269] Anderson/Laos/PKS-F-/PKS-F-3F.rmg
+    [270] Anderson/Laos/PKS-F-/PKS-F-3G.rmg
+    [271] Anderson/Laos/PKS-F-/PKS-F-3H.rmg
+    [272] Anderson/Laos/PKS-F-/PKS-F-3I.rmg
+    [273] Anderson/Laos/PKS-F-/PKS-F-3J.rmg
+    [274] Anderson/Laos/PKS-F-/PKS-F-3K.rmg
+    [275] Anderson/Laos/PKS-F-/PKS-F-3L.rmg
+    [276] Anderson/Laos/PKS-F-/PKS-F-4B.rmg
+    [277] Anderson/Laos/PKS-F-/PKS-F-4C.rmg
+    [278] Anderson/Laos/PKS-F-/PKS-F-4D.rmg
+    [279] Anderson/Laos/PKS-F-/PKS-F-4E.rmg
+    [280] Anderson/Laos/PKS-F-/PKS-F-4F.rmg
+    [281] Anderson/Laos/PKS-F-/PKS-F-4G.rmg
+    [282] Anderson/Laos/PKS-F-/PKS-F-4H.rmg
+    [283] Anderson/Laos/PKS-F-/PKS-F-4I.rmg
+    [284] Anderson/Laos/PKS-F-/PKS-F-4J.rmg
+    [285] Anderson/Laos/PKS-F-/PKS-F-4K.rmg
+    [286] Anderson/Laos/PKS-F-/PKS-F-5A.rmg
+    [287] Anderson/Laos/PKS-F-/PKS-F-5B.rmg
+    [288] Anderson/Laos/PKS-F-/PKS-F-5C.rmg
+    [289] Anderson/Laos/PKS-F-/PKS-F-5D.rmg
+    [290] Anderson/Laos/PKS-F-/PKS-F-5E.rmg
+    [291] Anderson/Laos/PKS-F-/PKS-F-5F.rmg
+    [292] Anderson/Laos/PKS-F-/PKS-F-5G.rmg
+    [293] Anderson/Laos/PKS-F-/PKS-F-5H.rmg
+    [294] Anderson/Laos/PKS-F-/PKS-F-5I.rmg
+    [295] Anderson/Laos/PKS-F-/PKS-F-5J.rmg
+    [296] Anderson/Laos/PKS-F-/PKS-F-5K.rmg
+    [297] Anderson/Laos/PKS-F-/PKS-F-5L.rmg
+    [298] Anderson/Laos/PKS-F-/PKS-F-6B.rmg
+    [299] Anderson/Laos/PKS-F-/PKS-F-6C.rmg
+    [300] Anderson/Laos/PKS-F-/PKS-F-6D.rmg
+    [301] Anderson/Laos/PKS-F-/PKS-F-6E.rmg
+    [302] Anderson/Laos/PKS-F-/PKS-F-6F.rmg
+    [303] Anderson/Laos/PKS-F-/PKS-F-7A.rmg
+    [304] Anderson/Laos/PKS-F-/PKS-F-7B.rmg
+    [305] Anderson/Laos/PKS-F-/PKS-F-7C.rmg
+    [306] Anderson/Laos/PKS-F-/PKS-F-7D.rmg
+    [307] Anderson/Laos/PKS-F-/PKS-F-7E.rmg
+    [308] Anderson/Laos/PKS-F-/PKS-F-7F.rmg
+    [309] Anderson/Laos/PKS-F-/PKS-F-7G.rmg
+    [310] Anderson/Laos/PKS-F-/PKS-F-7H.rmg
+    [311] Anderson/Laos/PKS-F-/PKS-F-7I.rmg
+    [312] Anderson/Laos/PKS-F-/PKS-F-8A.rmg
+    [313] Anderson/Laos/PKS-F-/PKS-F-8B.rmg
+    [314] Anderson/Laos/PKS-F-/PKS-F-8C.rmg
+    [315] Anderson/Laos/PKS-F-/PKS-F-8D.rmg
+    [316] Anderson/Laos/PKS-F-/PKS-F-8E.rmg
+    [317] Anderson/Laos/PKS-F-/PKS-F-8F.rmg
+    [318] Anderson/Laos/PKS-F-/PKS-F-8G.rmg
+    [319] Anderson/Laos/PKS-F-/PKS-F-9A.rmg
+    [320] Anderson/Laos/PKS-F-/PKS-F-9B.rmg
+    [321] Anderson/Laos/PKS-F-/PKS-F-9C.rmg
+    [322] Anderson/Laos/PKS-F-/PKS-F-9D.rmg
+    [323] Anderson/Laos/PKS-F-/PKS-F-9E.rmg
+    [324] Anderson/Laos/PKS-F-/PKS-F-9F.rmg
+    [325] Anderson/Laos/PKS-F-/PKS-F-9G.rmg
+    [326] Anderson/Laos/PKS-F-/PKS-F-9H.rmg
+    [327] Anderson/Laos/PKS-F-/PKS-F-9I.rmg
+    [328] Anderson/Laos/PKS-G-/PKS-G-1B.rmg
+    [329] Anderson/Laos/PKS-G-/PKS-G-1C.rmg
+    [330] Anderson/Laos/PKS-G-/PKS-G-1D.rmg
+    [331] Anderson/Laos/PKS-G-/PKS-G-1E.rmg
+    [332] Anderson/Laos/PKS-G-/PKS-G-1F.rmg
+    [333] Anderson/Laos/PKS-G-/PKS-G-1G.rmg
+    [334] Anderson/Laos/PKS-G-/PKS-G-2A.rmg
+    [335] Anderson/Laos/PKS-G-/PKS-G-2B.rmg
+    [336] Anderson/Laos/PKS-G-/PKS-G-2C.rmg
+    [337] Anderson/Laos/PKS-G-/PKS-G-2D.rmg
+    [338] Anderson/Laos/PKS-G-/PKS-G-2E.rmg
+    [339] Anderson/Laos/PKS-G-/PKS-G-2F.rmg
+    [340] Anderson/Laos/PKS-G-/PKS-G-2G.rmg
+    [341] Anderson/Laos/PKS-G-/PKS-G-3B.rmg
+    [342] Anderson/Laos/PKS-G-/PKS-G-3C.rmg
+    [343] Anderson/Laos/PKS-G-/PKS-G-3D.rmg
+    [344] Anderson/Laos/PKS-G-/PKS-G-3E.rmg
+    [345] Anderson/Laos/PKS-G-/PKS-G-4B.rmg
+    [346] Anderson/Laos/PKS-G-/PKS-G-4C.rmg
+    [347] Anderson/Laos/PKS-G-/PKS-G-4D.rmg
+    [348] Anderson/Laos/PKS-G-/PKS-G-4E.rmg
+    [349] Anderson/Laos/PKS-G-/PKS-G-4F.rmg
+    [350] Anderson/Laos/PKS-G-/PKS-G-5B.rmg
+    [351] Anderson/Laos/PKS-G-/PKS-G-5C.rmg
+    [352] Anderson/Laos/PKS-G-/PKS-G-5D.rmg
+    [353] Anderson/Laos/PKS-G-/PKS-G-6A.rmg
+    [354] Anderson/Laos/PKS-G-/PKS-G-6B.rmg
+    [355] Anderson/Laos/PKS-G-/PKS-G-6C.rmg
+    [356] Anderson/Laos/PKS-G-/PKS-G-7B.rmg
+    [357] Anderson/Laos/PKS-G-/PKS-G-7C.rmg
+    [358] Anderson/Laos/PKS-G-/PKS-G-8B.rmg
+    [359] Anderson/Laos/PKS-G-/PKS-G-8C.rmg
+    [360] Anderson/Laos/PKS-G-/PKS-G-8D.rmg
+    [361] Anderson/Laos/PKS-H-/PKS-H-1B.rmg
+    [362] Anderson/Laos/PKS-H-/PKS-H-1C.rmg
+    [363] Anderson/Laos/PKS-H-/PKS-H-1D.rmg
+    [364] Anderson/Laos/PKS-H-/PKS-H-1E.rmg
+    [365] Anderson/Laos/PKS-H-/PKS-H-1F.rmg
+    [366] Anderson/Laos/PKS-H-/PKS-H-1G.rmg
+    [367] Anderson/Laos/PKS-H-/PKS-H-1H.rmg
+    [368] Anderson/Laos/PKS-H-/PKS-H-1I.rmg
+    [369] Anderson/Laos/PKS-H-/PKS-H-1J.rmg
+    [370] Anderson/Laos/PKS-H-/PKS-H-1K.rmg
+    [371] Anderson/Laos/PKS-H-/PKS-H-1L.rmg
+    [372] Anderson/Laos/PKS-H-/PKS-H-2B.rmg
+    [373] Anderson/Laos/PKS-H-/PKS-H-2C.rmg
+    [374] Anderson/Laos/PKS-H-/PKS-H-2D.rmg
+    [375] Anderson/Laos/PKS-H-/PKS-H-2E.rmg
+    [376] Anderson/Laos/PKS-H-/PKS-H-2F.rmg
+    [377] Anderson/Laos/PKS-H-/PKS-H-2G.rmg
+    [378] Anderson/Laos/PKS-H-/PKS-H-2H.rmg
+    [379] Anderson/Laos/PKS-H-/PKS-H-2I.rmg
+    [380] Anderson/Laos/PKS-H-/PKS-H-2J.rmg
+    [381] Anderson/Laos/PKS-H-/PKS-H-3B.rmg
+    [382] Anderson/Laos/PKS-H-/PKS-H-3C.rmg
+    [383] Anderson/Laos/PKS-H-/PKS-H-3D.rmg
+    [384] Anderson/Laos/PKS-H-/PKS-H-3E.rmg
+    [385] Anderson/Laos/PKS-H-/PKS-H-3F.rmg
+    [386] Anderson/Laos/PKS-I-/PKS-I-1B.rmg
+    [387] Anderson/Laos/PKS-I-/PKS-I-1C.rmg
+    [388] Anderson/Laos/PKS-I-/PKS-I-1D.rmg
+    [389] Anderson/Laos/PKS-I-/PKS-I-1E.rmg
+    [390] Anderson/Laos/PKS-I-/PKS-I-1F.rmg
+    [391] Anderson/Laos/PKS-I-/PKS-I-1G.rmg
+    [392] Anderson/Laos/WBE-A-/WBE-A-1B.rmg
+    [393] Anderson/Laos/WBE-A-/WBE-A-1C.rmg
+    [394] Anderson/Laos/WBE-A-/WBE-A-1D.rmg
+    [395] Anderson/Laos/WBE-A-/WBE-A-1E.rmg
+    [396] Anderson/Laos/WBE-A-/WBE-A-1F.rmg
+    [397] Anderson/Laos/WBE-A-/WBE-A-1G.rmg
+    [398] Anderson/Laos/WBE-A-/WBE-A-1H.rmg
+    [399] Anderson/Laos/WBE-A-/WBE-A-1I.rmg
+    [400] Anderson/Laos/WBE-A-/WBE-A-2B.rmg
+    [401] Anderson/Laos/WBE-A-/WBE-A-2C.rmg
+    [402] Anderson/Laos/WBE-A-/WBE-A-2D.rmg
+    [403] Anderson/RockMag/PKQ-A-/PKQ-A-0H.rmg
+    [404] Anderson/RockMag/PKQ-A-/PKQ-A-2M.rmg
+    [405] Anderson/RockMag/PKQ-A-/PKQ-A-3H.rmg
+    [406] Anderson/RockMag/PKQ-A-/PKQ-A-6M.rmg
+    [407] Anderson/RockMag/PKQ-A-/PKQ-A-9I.rmg
+    [408] Anderson/RockMag/PKS-F-/PKS-F-0N.rmg
+    [409] Anderson/RockMag/PKS-F-/PKS-F-1.P.rmg
+    [410] Anderson/RockMag/PKS-F-/PKS-F-1M.rmg
+    [411] Anderson/RockMag/PKS-F-/PKS-F-2L.rmg
+    [412] Anderson/RockMag/PKS-F-/PKS-F-3M.rmg
+    [413] Anderson/RockMag/PKS-F-/PKS-F-4L.rmg
+    [414] Anderson/RockMag/PKS-F-/PKS-F-5M.rmg
+    [415] Anderson/RockMag/PKS-F-/PKS-F-6G.rmg
+    [416] Anderson/RockMag/PKS-F-/PKS-F-7J.rmg
+    [417] Anderson/RockMag/PKS-F-/PKS-F-8H.rmg
+    [418] Anderson/RockMag/PKS-F-/PKS-F-9J.rmg
+    [419] Komat/FORC_5.0-200.0mT_exp1.20_min1.0mT_SATURATION.rmg
+    [420] Komat/FORC_5.0-200.0mT_exp1.20_min4.0mT_SATURATION.rmg
+    [421] Komat/FORCz_5.0_to_200.0mT_in_exp1.2_2mT_Steps_standard.rmg
+    [422] Komat/Komat003.cor.rmg
+    [423] Komat/Komat003.frc.rmg
+    [424] Komat/Komat004.frc.rmg
+
+  Enter numbers to load (e.g. 1 3 4), or 'all': 16
+  ✓ Loaded: TPB9.1.cor  (291 steps)  [TPB9.1.cor.rmg]
+
+▼═══════════════════════════════════════════════════════════▼
+    [1] TPB9.1.cor
+
+▼═══════════════════════════════════════════════════════════▼
+  + [L] Load more files from a directory
+  + [X] Remove samples from loaded list
+  + [R] Run selected routines (batch plotter)
+  + [F] 8-Panel Rock-Mag Dashboard (IRM, ARM, Backfield, etc.)
+  + [I] Inspect one sample (show detailed stats)
+  + [H] Show coercivity values (Hcr, MDF) for all samples
+  + [E] Export all statistics to table
+  + [P] Plot FORC data (First Order Reversal Curves)
+  + [G] Generate FORC measurement script
+  + [S] Generate SAM header files (paleomag)
+  + [C] Clear all loaded samples
+  + [Q] Quit
+
+  Choice: f
+
+── Group samples for plotting ──────────────────────────────
+  Samples in the same group will be overlaid on the same axes.
+  Each group gets its own figure set.
+    [1] TPB9.1.cor
+
+  Current groups: 0
+
+  Options:
+  + [N] Create new group
+  + [D] Done (proceed with current groups)
+  + [A] All together (one group with all samples)
+  + [S] All separate (one sample per group)
+  Choice: d
+
+Generating 8-panel dashboard for 1 group(s)…
+  Save group 1 dashboard as PNG? [y/N] y
+    ✓ Saved → TPB9.1.cor_rockmag.png
+2026-04-17 10:04:38.439 python[3496:239449] The class 'NSSavePanel' overrides the method identifier.  This method is implemented by class 'NSWindow'
+
+▼═══════════════════════════════════════════════════════════▼
+    [1] TPB9.1.cor
+
+▼═══════════════════════════════════════════════════════════▼
+  + [L] Load more files from a directory
+  + [X] Remove samples from loaded list
+  + [R] Run selected routines (batch plotter)
+  + [F] 8-Panel Rock-Mag Dashboard (IRM, ARM, Backfield, etc.)
+  + [I] Inspect one sample (show detailed stats)
+  + [H] Show coercivity values (Hcr, MDF) for all samples
+  + [E] Export all statistics to table
+  + [P] Plot FORC data (First Order Reversal Curves)
+  + [G] Generate FORC measurement script
+  + [S] Generate SAM header files (paleomag)
+  + [C] Clear all loaded samples
+  + [Q] Quit
+
+  Choice: l
+
+── Load files ──────────────────────────────────────────────
+  Enter directory path (or press Enter for current dir): /Users/nicolasanderson/Downloads/wetransfer_tpb4-1-cor-rmg_2026-05-01_0341
+
+  Found 8 .rmg file(s) under /Users/nicolasanderson/Downloads/wetransfer_tpb4-1-cor-rmg_2026-05-01_0341:
+    [  1] TPB15.1.cor.rmg
+    [  2] TPB15.1.frc.rmg
+    [  3] TPB17.0.cor.rmg
+    [  4] TPB17.0.frc.rmg
+    [  5] TPB4.1.cor.rmg
+    [  6] TPB4.1.frc.rmg
+    [  7] TPB9.1.cor.rmg
+    [  8] TPB9.1.frc.rmg
+
+  Enter numbers to load (e.g. 1 3 4), or 'all': all
+  ✓ Loaded: TPB15.1.cor  (305 steps)  [TPB15.1.cor.rmg]
+  ✓ Loaded: TPB15.1.frc  (963 steps)  [TPB15.1.frc.rmg]
+  ✓ Loaded: TPB17.0.cor  (402 steps)  [TPB17.0.cor.rmg]
+  ✓ Loaded: TPB17.0.frc  (1926 steps)  [TPB17.0.frc.rmg]
+  ✓ Loaded: TPB4.1.cor  (305 steps)  [TPB4.1.cor.rmg]
+  ✓ Loaded: TPB4.1.frc  (1926 steps)  [TPB4.1.frc.rmg]
+  ✓ Loaded: TPB9.1.cor  (402 steps)  [TPB9.1.cor.rmg]
+  ✓ Loaded: TPB9.1.frc  (1926 steps)  [TPB9.1.frc.rmg]
+
+▼═══════════════════════════════════════════════════════════▼
+    [1] TPB9.1.cor
+    [2] TPB15.1.cor
+    [3] TPB15.1.frc
+    [4] TPB17.0.cor
+    [5] TPB17.0.frc
+    [6] TPB4.1.cor
+    [7] TPB4.1.frc
+    [8] TPB9.1.cor
+    [9] TPB9.1.frc
+
+▼═══════════════════════════════════════════════════════════▼
+  + [L] Load more files from a directory
+  + [X] Remove samples from loaded list
+  + [R] Run selected routines (batch plotter)
+  + [F] 8-Panel Rock-Mag Dashboard (IRM, ARM, Backfield, etc.)
+  + [I] Inspect one sample (show detailed stats)
+  + [H] Show coercivity values (Hcr, MDF) for all samples
+  + [E] Export all statistics to table
+  + [P] Plot FORC data (First Order Reversal Curves)
+  + [G] Generate FORC measurement script
+  + [S] Generate SAM header files (paleomag)
+  + [C] Clear all loaded samples
+  + [Q] Quit
+
+  Choice: f
+
+── Group samples for plotting ──────────────────────────────
+  Samples in the same group will be overlaid on the same axes.
+  Each group gets its own figure set.
+    [1] TPB9.1.cor
+    [2] TPB15.1.cor
+    [3] TPB15.1.frc
+    [4] TPB17.0.cor
+    [5] TPB17.0.frc
+    [6] TPB4.1.cor
+    [7] TPB4.1.frc
+    [8] TPB9.1.cor
+    [9] TPB9.1.frc
+
+  Current groups: 0
+
+  Options:
+  + [N] Create new group
+  + [D] Done (proceed with current groups)
+  + [A] All together (one group with all samples)
+  + [S] All separate (one sample per group)
+  Choice: s
+
+Generating 8-panel dashboard for 9 group(s)…
+  Save group 1 dashboard as PNG? [y/N] y
+    ✓ Saved → TPB9.1.cor_rockmag.png
+  Save group 2 dashboard as PNG? [y/N] y
+    ✓ Saved → TPB15.1.cor_rockmag.png
+  Save group 3 dashboard as PNG? [y/N] y
+    ✓ Saved → TPB15.1.frc_rockmag.png
+  Save group 4 dashboard as PNG? [y/N] y
+    ✓ Saved → TPB17.0.cor_rockmag.png
+  Save group 5 dashboard as PNG? [y/N] y
+    ✓ Saved → TPB17.0.frc_rockmag.png
+  Save group 6 dashboard as PNG? [y/N] y
+    ✓ Saved → TPB4.1.cor_rockmag.png
+  Save group 7 dashboard as PNG? [y/N] y
+    ✓ Saved → TPB4.1.frc_rockmag.png
+  Save group 8 dashboard as PNG? [y/N] y
+    ✓ Saved → TPB9.1.cor_rockmag.png
+  Save group 9 dashboard as PNG? [y/N] y
+    ✓ Saved → TPB9.1.frc_rockmag.png
+
+▼═══════════════════════════════════════════════════════════▼
+    [1] TPB9.1.cor
+    [2] TPB15.1.cor
+    [3] TPB15.1.frc
+    [4] TPB17.0.cor
+    [5] TPB17.0.frc
+    [6] TPB4.1.cor
+    [7] TPB4.1.frc
+    [8] TPB9.1.cor
+    [9] TPB9.1.frc
+
+▼═══════════════════════════════════════════════════════════▼
+  + [L] Load more files from a directory
+  + [X] Remove samples from loaded list
+  + [R] Run selected routines (batch plotter)
+  + [F] 8-Panel Rock-Mag Dashboard (IRM, ARM, Backfield, etc.)
+  + [I] Inspect one sample (show detailed stats)
+  + [H] Show coercivity values (Hcr, MDF) for all samples
+  + [E] Export all statistics to table
+  + [P] Plot FORC data (First Order Reversal Curves)
+  + [G] Generate FORC measurement script
+  + [S] Generate SAM header files (paleomag)
+  + [C] Clear all loaded samples
+  + [Q] Quit
+
+  Choice: p
+
+── FORC Analysis ───────────────────────────────────────────
+    [1] TPB9.1.cor
+    [2] TPB15.1.cor
+    [3] TPB15.1.frc
+    [4] TPB17.0.cor
+    [5] TPB17.0.frc
+    [6] TPB4.1.cor
+    [7] TPB4.1.frc
+    [8] TPB9.1.cor
+    [9] TPB9.1.frc
+
+  Enter sample number(s) to plot (e.g. 1 3 4): 3 5 7 9
+  ✓ TPB15.1.frc: 30 FORC curves
+  ✓ TPB17.0.frc: 60 FORC curves
+  ✓ TPB4.1.frc: 60 FORC curves
+  ✓ TPB9.1.frc: 60 FORC curves
+
+  FORC Plot Options:
+  + [1] Complete hysteresis (all curves with reversals)
+  + [2] FORC diagram - hot_r colormap (classic red/orange)
+  + [3] FORC diagram - plasma_r colormap (yellow/pink/purple)
+  + [4] FORC diagram - inferno_r colormap (high contrast)
+  + [5] FORC diagrams - contour plots (hot_r + plasma_r + inferno_r)
+  + [6] All plots (hysteresis + 3 scatter + 3 contour = 7 plots)
+  + [7] FORCinel v3 workflow (export .frc + processed)
+  Choice [6]: 6
+
+  Creating all FORC plots...
+
+▼══════════════════════════════════════════════════════════▼
+           FORC Data Resolution
+▲══════════════════════════════════════════════════════════▲
+
+Grid resolution (affects data smoothness when cropped):
+  + [1] Standard (100×100) - Fast, good for full range
+  + [2] Fine (200×200) - Better for moderate cropping
+  + [3] Very Fine (300×300) - Best for heavy cropping
+  + [4] Ultra Fine (500×500) - Maximum detail, slower
+
+Note: Higher resolution = smoother contours but slower processing
+
+Choice [2]: 1
+✓ Grid resolution: 100×100 = 10,000 points
+
+▼══════════════════════════════════════════════════════════▼
+           Plot Resolution
+▲══════════════════════════════════════════════════════════▲
+
+Resolution options:
+  + [1] Screen (100 DPI) - Fast, lower quality
+  + [2] Standard (150 DPI) - Good balance
+  + [3] High (300 DPI) - Publication quality
+  + [4] Ultra (600 DPI) - Maximum detail
+
+Choice [3]: 1
+✓ Resolution set to 100 DPI
+
+  Processing TPB15.1.frc...
+    - Complete hysteresis
+
+▼══════════════════════════════════════════════════════════▼
+           FORC Axis Range Settings
+▲══════════════════════════════════════════════════════════▲
+
+Data range:
+  Bc (coercivity):      12.5 to 1000.0 mT
+  Bu (interaction):     -500.0 to 487.5 mT
+
+Note: Enter limits in mT (milliTesla)
+
+Options:
+  [1] Auto-scale (use full data range)
+  [2] Set custom Bc and Bu limits
+
+Choice [1]: 1
+✓ Using auto-scale
+    - FORC diagram (hot)
+    - FORC diagram (plasma)
+    - FORC diagram (inferno)
+    - FORC diagram (contour hot_r)
+    - FORC diagram (contour plasma_r)
+    - FORC diagram (contour inferno_r)
+
+  Processing TPB17.0.frc...
+    - Complete hysteresis
+
+▼══════════════════════════════════════════════════════════▼
+           FORC Axis Range Settings
+▲══════════════════════════════════════════════════════════▲
+
+Data range:
+  Bc (coercivity):      12.5 to 1000.0 mT
+  Bu (interaction):     -500.0 to 487.5 mT
+
+Note: Enter limits in mT (milliTesla)
+
+Options:
+  [1] Auto-scale (use full data range)
+  [2] Set custom Bc and Bu limits
+
+Choice [1]: 1
+✓ Using auto-scale
+    - FORC diagram (hot)
+    - FORC diagram (plasma)
+    - FORC diagram (inferno)
+    - FORC diagram (contour hot_r)
+    - FORC diagram (contour plasma_r)
+    - FORC diagram (contour inferno_r)
+
+  Processing TPB4.1.frc...
+    - Complete hysteresis
+
+▼══════════════════════════════════════════════════════════▼
+           FORC Axis Range Settings
+▲══════════════════════════════════════════════════════════▲
+
+Data range:
+  Bc (coercivity):      2.5 to 200.0 mT
+  Bu (interaction):     -100.0 to 97.5 mT
+
+Note: Enter limits in mT (milliTesla)
+
+Options:
+  [1] Auto-scale (use full data range)
+  [2] Set custom Bc and Bu limits
+
+Choice [1]: 1
+✓ Using auto-scale
+    - FORC diagram (hot)
+    - FORC diagram (plasma)
+    - FORC diagram (inferno)
+    - FORC diagram (contour hot_r)
+    - FORC diagram (contour plasma_r)
+    - FORC diagram (contour inferno_r)
+/Users/nicolasanderson/Documents/GitHub/pyRockmag/run_pyrockmag.py:886: RuntimeWarning: More than 20 figures have been opened. Figures created through the pyplot interface (`matplotlib.pyplot.figure`) are retained until explicitly closed and may consume too much memory. (To control this warning, see the rcParam `figure.max_open_warning`). Consider using `matplotlib.pyplot.close()`.
+
+  Processing TPB9.1.frc...
+    - Complete hysteresis
+
+▼══════════════════════════════════════════════════════════▼
+           FORC Axis Range Settings
+▲══════════════════════════════════════════════════════════▲
+
+Data range:
+  Bc (coercivity):      12.5 to 1000.0 mT
+  Bu (interaction):     -500.0 to 487.5 mT
+
+Note: Enter limits in mT (milliTesla)
+
+Options:
+  [1] Auto-scale (use full data range)
+  [2] Set custom Bc and Bu limits
+
+Choice [1]: 1
+✓ Using auto-scale
+    - FORC diagram (hot)
+    - FORC diagram (plasma)
+    - FORC diagram (inferno)
+    - FORC diagram (contour hot_r)
+    - FORC diagram (contour plasma_r)
+    - FORC diagram (contour inferno_r)
+
+▼═══════════════════════════════════════════════════════════▼
+    [1] TPB9.1.cor
+    [2] TPB15.1.cor
+    [3] TPB15.1.frc
+    [4] TPB17.0.cor
+    [5] TPB17.0.frc
+    [6] TPB4.1.cor
+    [7] TPB4.1.frc
+    [8] TPB9.1.cor
+    [9] TPB9.1.frc
+
+▼═══════════════════════════════════════════════════════════▼
+  + [L] Load more files from a directory
+  + [X] Remove samples from loaded list
+  + [R] Run selected routines (batch plotter)
+  + [F] 8-Panel Rock-Mag Dashboard (IRM, ARM, Backfield, etc.)
+  + [I] Inspect one sample (show detailed stats)
+  + [H] Show coercivity values (Hcr, MDF) for all samples
+  + [E] Export all statistics to table
+  + [P] Plot FORC data (First Order Reversal Curves)
+  + [G] Generate FORC measurement script
+  + [S] Generate SAM header files (paleomag)
+  + [C] Clear all loaded samples
+  + [Q] Quit
+
+  Choice: 
+  [Restored May 2, 2026 at 3:57:24 PM]
+## cd /Users/nicolasanderson/Documents/Github/pyRockmag ##
+Last login: Sat May  2 15:57:22 on ttys000
+(base) nicolasanderson@Nicolass-MacBook-Pro-4 ~ % 
+  [Restored May 6, 2026 at 2:01:27 PM]
+Last login: Wed May  6 14:01:27 on ttys000
+Restored session: Wed May  6 14:00:30 PDT 2026
+(base) nicolasanderson@Nicolass-MacBook-Pro-5 ~ % 
+  [Restored May 19, 2026 at 9:31:03 AM]
+Last login: Tue May 19 09:31:02 on ttys001
+Restored session: Tue May 19 07:05:41 PDT 2026
+%                                                                       (base)(base) (base) nicolasanderson@Nicolass-MacBook-Pro-5 ~ % 
