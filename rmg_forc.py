@@ -1335,7 +1335,7 @@ def forc_compute_rockmag_stats(data):
         data.forc_SIRMperkg   – SIRM / mass (Am²/kg), NaN if mass unknown
         data.forc_delta       – Bu baseline offset (mT)
         data.forc_BcrTrue     – true remanence coercivity Bcr (mT)
-        data.forc_modal_Bcr   – modal remanence coercivity from FORC DCD spectrum (mT)
+        data.forc_modal_Bcr   – modal remanence coercivity from the remanence coercivity spectrum (mT)
         data._forc_rem_data   – cached reversal-remanence dict for plotting
 
     Parameters
