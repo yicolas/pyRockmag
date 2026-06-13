@@ -136,6 +136,46 @@ def rmg_stats(data_list):
         s['NRMdirectional'] = np.nan
         s['MDFofNRM'] = np.nan
 
+        # ── FORC-derived stats ────────────────────────────────────────────────
+        # Read pre-computed values if present (set by forc_compute_rockmag_stats
+        # or process_forc_forcinel_workflow); otherwise try to compute them now.
+        forc_keys = ('forc_SIRM', 'forc_SIRMperkg', 'forc_BcrTrue',
+                     'forc_modal_Bcr', 'forc_delta')
+        if any(hasattr(data, k) for k in forc_keys):
+            s['forc_SIRM']      = getattr(data, 'forc_SIRM',      np.nan)
+            s['forc_SIRMperkg'] = getattr(data, 'forc_SIRMperkg', np.nan)
+            s['forc_Bcr']       = getattr(data, 'forc_BcrTrue',   np.nan)
+            s['forc_modal_Bcr'] = getattr(data, 'forc_modal_Bcr', np.nan)
+            s['forc_delta']     = getattr(data, 'forc_delta',      np.nan)
+        else:
+            # Lazy computation: detect FORC file and compute stats
+            try:
+                from rmg_forc import (rmg_extract_forc_data,
+                                      forc_compute_rockmag_stats)
+                forc_check = rmg_extract_forc_data(data)
+                if forc_check.exists:
+                    forc_s = forc_compute_rockmag_stats(data)
+                    s['forc_SIRM']      = forc_s.get('forc_SIRM',      np.nan)
+                    s['forc_SIRMperkg'] = forc_s.get('forc_SIRMperkg', np.nan)
+                    s['forc_Bcr']       = forc_s.get('forc_Bcr',       np.nan)
+                    s['forc_modal_Bcr'] = forc_s.get('forc_modal_Bcr', np.nan)
+                    s['forc_delta']     = forc_s.get('forc_delta',      np.nan)
+                else:
+                    for k in ('forc_SIRM', 'forc_SIRMperkg', 'forc_Bcr',
+                              'forc_modal_Bcr', 'forc_delta'):
+                        s[k] = np.nan
+            except Exception:
+                for k in ('forc_SIRM', 'forc_SIRMperkg', 'forc_Bcr',
+                          'forc_modal_Bcr', 'forc_delta'):
+                    s[k] = np.nan
+
+        # Add FORC units
+        s['units']['forc_SIRM']      = 'Am²'
+        s['units']['forc_SIRMperkg'] = 'Am²/kg'
+        s['units']['forc_Bcr']       = 'mT'
+        s['units']['forc_modal_Bcr'] = 'mT'
+        s['units']['forc_delta']     = 'mT'
+
         results.append(s)
 
     return results

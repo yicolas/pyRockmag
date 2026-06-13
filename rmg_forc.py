@@ -571,18 +571,36 @@ def process_forc_forcinel_workflow(data, smoothing_factor: int = 3, grid_size: i
     
     # Mask unphysical region (Ha < Hr)
     valid_mask = Ha_grid >= Hr_grid
-    
+
+    # ── Bu baseline registration ──────────────────────────────────────────────
+    # Compute per-file delta from descending/ascending branch coercivity asymmetry
+    # and store on the data object so rmg_stats can read it later.
+    forc_complete = rmg_extract_forc_data_complete(data)
+    baseline      = forc_measure_bu_baseline(forc_complete)
+    delta         = baseline['delta']    # T
+    BcrTrue       = baseline['BcrTrue']  # T
+
+    # Apply Bu-axis correction: BuCorrected = Hu - delta
+    Hu_corrected = Hu - delta
+
+    # Store on data object for stats access
+    data.forc_delta   = float(delta * 1000)   # mT
+    data.forc_BcrTrue = float(BcrTrue * 1000) if np.isfinite(BcrTrue) else np.nan
+
     return {
-        'forc_data': forc,
-        'Hr_grid': Hr_grid,
-        'Ha_grid': Ha_grid,
-        'M_grid': M_grid,
-        'M_smooth': M_smooth,
-        'Hc': Hc,
-        'Hu': Hu,
-        'rho': rho,
-        'valid_mask': valid_mask,
-        'smoothing_factor': smoothing_factor
+        'forc_data':         forc,
+        'Hr_grid':           Hr_grid,
+        'Ha_grid':           Ha_grid,
+        'M_grid':            M_grid,
+        'M_smooth':          M_smooth,
+        'Hc':                Hc,
+        'Hu':                Hu,
+        'Hu_corrected':      Hu_corrected,
+        'rho':               rho,
+        'valid_mask':        valid_mask,
+        'smoothing_factor':  smoothing_factor,
+        'delta':             delta,        # T
+        'BcrTrue':           BcrTrue,      # T
     }
 
 
@@ -824,11 +842,11 @@ def plot_forc_diagram_standard(result, ax=None, show_points=True,
                                bc_lim=None, bu_lim=None):
     """
     Plot FORC diagram in standard format matching published figures.
-    
+
     Shows scatter plot of (Bc, Bu) points with FORC distribution values.
     Bc = coercivity = (Ha - Hr) / 2
-    Bu = interaction field = (Ha + Hr) / 2
-    
+    Bu = interaction field = (Ha + Hr) / 2  [Bu-axis corrected if baseline present]
+
     Parameters
     ----------
     result : dict from process_forc_forcinel_workflow
@@ -847,78 +865,81 @@ def plot_forc_diagram_standard(result, ax=None, show_points=True,
     """
     if ax is None:
         fig, ax = plt.subplots(figsize=(8, 9))
-    
+
     # Use Bc/Bu notation (standard in FORC literature)
-    Bc = result['Hc']  # Already calculated as (Ha - Hr)/2, in Tesla
-    Bu = result['Hu']  # Already calculated as (Ha + Hr)/2, in Tesla
-    rho = result['rho']
+    Bc  = result['Hc']                                  # (Ha - Hr)/2, Tesla
+    # Use Bu-corrected axis when available (baseline registration)
+    Bu  = result.get('Hu_corrected', result['Hu'])      # Tesla
+    rho  = result['rho']
     mask = result['valid_mask']
-    
-    # Convert to mT FIRST (before any plotting)
+
+    # Convert to mT
     Bc_mT = Bc * 1000
     Bu_mT = Bu * 1000
-    
-    # Handle NaN values in rho (common in sparse upper Bu region)
+
     # Replace NaN with zero for visualization
     rho_clean = np.where(np.isnan(rho), 0, rho)
-    
+
     # Flatten for scatter plot
-    Bc_flat = Bc_mT[mask].flatten()
-    Bu_flat = Bu_mT[mask].flatten()
+    Bc_flat  = Bc_mT[mask].flatten()
+    Bu_flat  = Bu_mT[mask].flatten()
     rho_flat = rho_clean[mask].flatten()
-    
-    # Remove remaining NaN (if any)
-    finite = np.isfinite(rho_flat)
-    Bc_flat = Bc_flat[finite]
-    Bu_flat = Bu_flat[finite]
-    rho_flat = rho_flat[finite]
-    
-    # Determine color scale
-    if vmin is None or vmax is None:
-        # Use tighter percentiles for better color contrast
-        vmin_auto = np.percentile(rho_flat, 5)
-        vmax_auto = np.percentile(rho_flat, 95)
+
+    finite    = np.isfinite(rho_flat)
+    Bc_flat   = Bc_flat[finite]
+    Bu_flat   = Bu_flat[finite]
+    rho_flat  = rho_flat[finite]
+
+    # Color scale
+    if len(rho_flat) > 0:
         if vmin is None:
-            vmin = vmin_auto
+            vmin = np.percentile(rho_flat, 5)
         if vmax is None:
-            vmax = vmax_auto
-    
-    if show_points:
-        # Scatter plot - BRIGHT MODE for vibrant colors
-        scatter = ax.scatter(Bc_flat, Bu_flat, c=rho_flat, 
-                            cmap=colormap, s=3, alpha=0.9,
-                            vmin=vmin, vmax=vmax)
+            vmax = np.percentile(rho_flat, 95)
     else:
-        # Contour plot (use cleaned rho without NaN)
-        rho_clipped = np.clip(rho_clean, vmin, vmax)
+        vmin = vmin if vmin is not None else 0
+        vmax = vmax if vmax is not None else 1
+
+    if show_points:
+        scatter = ax.scatter(Bc_flat, Bu_flat, c=rho_flat,
+                             cmap=colormap, s=3, alpha=0.9,
+                             vmin=vmin, vmax=vmax)
+    else:
+        rho_clipped        = np.clip(rho_clean, vmin, vmax)
         rho_clipped_masked = np.ma.masked_where(~mask, rho_clipped)
-        levels = np.linspace(vmin, vmax, 20)
-        
-        scatter = ax.contourf(Bc_mT, Bu_mT, rho_clipped_masked, 
-                             levels=levels, cmap=colormap,
-                             vmin=vmin, vmax=vmax, extend='neither')
-        ax.contour(Bc_mT, Bu_mT, rho_clipped_masked, 
-                  levels=levels, colors='k', linewidths=0.3, alpha=0.2)
-    
-    # Formatting
+        levels             = np.linspace(vmin, vmax, 20)
+        scatter = ax.contourf(Bc_mT, Bu_mT, rho_clipped_masked,
+                              levels=levels, cmap=colormap,
+                              vmin=vmin, vmax=vmax, extend='neither')
+        ax.contour(Bc_mT, Bu_mT, rho_clipped_masked,
+                   levels=levels, colors='k', linewidths=0.3, alpha=0.2)
+
     ax.set_xlabel('$B_c$ (mT)', fontsize=12)
     ax.set_ylabel('$B_u$ (mT)', fontsize=12)
     ax.set_aspect('equal')
     ax.grid(True, alpha=0.3, linestyle='-', linewidth=0.5)
     ax.axhline(0, color='k', linewidth=0.8, linestyle='--', alpha=0.5)
     ax.axvline(0, color='k', linewidth=0.8, alpha=0.3)
-    
-    # Apply user-specified axis limits (in mT)
+
     if bc_lim is not None:
         ax.set_xlim(bc_lim)
     if bu_lim is not None:
         ax.set_ylim(bu_lim)
-    
-    # Colorbar
+
+    # Caption: baseline registration info
+    delta = result.get('delta', None)
+    if delta is not None:
+        delta_mT = float(delta * 1000)
+        caption  = f'Bu-corrected (Δ={delta_mT:+.2f} mT)'
+        ax.text(0.02, 0.02, caption,
+                transform=ax.transAxes, fontsize=8,
+                verticalalignment='bottom',
+                color='gray')
+
     cbar = plt.colorbar(scatter, ax=ax, label='Am²/T²')
     cbar.formatter.set_powerlimits((-3, 3))
     cbar.update_ticks()
-    
+
     return ax
 
 
@@ -1098,3 +1119,293 @@ def plot_forc_hysteresis_complete(forc_data, ax=None):
             verticalalignment='top', bbox=props)
     
     return ax
+
+
+# =============================================================================
+#  FORC-derived remanence extraction and Bu baseline registration
+# =============================================================================
+
+def forc_extract_reversal_remanence(forc_complete):
+    """
+    Extract descending (DCD) and ascending (IRM-approx) remanence branches.
+
+    Descending branch: magnetization at each reversal point (Mr vs |Hr|).
+    Ascending branch:  for each reversal at -H, the interpolated M at Ha = +H.
+    Both branches are resampled onto a common log-spaced field axis.
+
+    Parameters
+    ----------
+    forc_complete : FORCData
+        Output from rmg_extract_forc_data_complete.
+
+    Returns
+    -------
+    dict or None  (None if fewer than 3 curves or no reversal moment stored).
+    Keys:
+        'H_common'    ndarray  log-spaced field axis (T)
+        'M_desc_r'    ndarray  resampled descending branch (Am²)
+        'M_asc_r'     ndarray  resampled ascending branch (Am²)
+        'M_desc_norm' ndarray  descending / |SIRM|
+        'M_asc_norm'  ndarray  ascending  / |SIRM|
+        'SIRM'        float    SIRM estimate (Am²)
+        'H_desc'      ndarray  raw descending field points (T)
+        'M_desc'      ndarray  raw descending magnetizations (Am²)
+        'H_asc'       ndarray  raw ascending field points (T)
+        'M_asc'       ndarray  raw ascending magnetizations (Am²)
+    """
+    if not forc_complete.exists or len(forc_complete.curves) < 3:
+        return None
+
+    H_desc_raw, M_desc_raw = [], []
+    H_asc_raw,  M_asc_raw  = [], []
+
+    for curve in forc_complete.curves:
+        Hr = curve['Hr']               # negative value (T)
+        Mr = curve.get('Mr', np.nan)
+        Ha = curve['Ha']               # positive sweep fields (T)
+        M  = curve['M']
+        H  = -Hr                       # positive field magnitude
+
+        if H <= 0:
+            continue
+
+        H_desc_raw.append(H)
+        M_desc_raw.append(Mr)
+
+        # Ascending branch point: M at Ha = H (same field magnitude as reversal)
+        if len(Ha) >= 2 and float(Ha[-1]) >= H:
+            M_at_H = float(np.interp(H, Ha, M))
+            H_asc_raw.append(H)
+            M_asc_raw.append(M_at_H)
+
+    if len(H_desc_raw) < 2:
+        return None
+
+    H_desc = np.array(H_desc_raw, dtype=float)
+    M_desc = np.array(M_desc_raw, dtype=float)
+    idx = np.argsort(H_desc)
+    H_desc, M_desc = H_desc[idx], M_desc[idx]
+
+    H_asc = np.array(H_asc_raw,  dtype=float)
+    M_asc = np.array(M_asc_raw,  dtype=float)
+    if len(H_asc) >= 2:
+        idx_a = np.argsort(H_asc)
+        H_asc, M_asc = H_asc[idx_a], M_asc[idx_a]
+
+    # Common log-spaced axis
+    pos_d = H_desc[H_desc > 0]
+    H_lo  = float(pos_d.min()) if len(pos_d) > 0 else 1e-5
+    H_hi  = float(H_desc.max())
+    if len(H_asc) >= 2:
+        pos_a = H_asc[H_asc > 0]
+        if len(pos_a) > 0:
+            H_lo = max(H_lo, float(pos_a.min()))
+        H_hi = min(H_hi, float(H_asc.max()))
+    if H_hi <= H_lo:
+        H_hi = float(H_desc.max())
+
+    n_pts   = max(50, len(H_desc))
+    H_common = np.logspace(np.log10(H_lo), np.log10(H_hi), n_pts)
+
+    # Interpolate in log-field space
+    pos_mask_d = H_desc > 0
+    M_desc_r = np.interp(
+        np.log10(H_common),
+        np.log10(H_desc[pos_mask_d]),
+        M_desc[pos_mask_d]
+    )
+
+    if len(H_asc) >= 2:
+        pos_mask_a = H_asc > 0
+        M_asc_r = np.interp(
+            np.log10(H_common),
+            np.log10(H_asc[pos_mask_a]),
+            M_asc[pos_mask_a]
+        )
+    else:
+        M_asc_r = np.zeros_like(M_desc_r)
+
+    # SIRM: M at smallest reversal (before any backfield)
+    SIRM = float(M_desc_r[0]) if np.isfinite(M_desc_r[0]) else np.nan
+
+    norm = abs(SIRM) if (np.isfinite(SIRM) and SIRM != 0) else 1.0
+    M_desc_norm = M_desc_r / norm
+    M_asc_norm  = M_asc_r  / norm
+
+    return {
+        'H_common':    H_common,
+        'M_desc_r':    M_desc_r,
+        'M_asc_r':     M_asc_r,
+        'M_desc_norm': M_desc_norm,
+        'M_asc_norm':  M_asc_norm,
+        'SIRM':        SIRM,
+        'H_desc':      H_desc,
+        'M_desc':      M_desc,
+        'H_asc':       H_asc,
+        'M_asc':       M_asc,
+    }
+
+
+def forc_measure_bu_baseline(forc_complete):
+    """
+    Measure per-file Bu baseline offset (delta) from FORC reversal-branch
+    coercivity asymmetry.
+
+    Resamples descending and ascending branches onto a common log-spaced field
+    axis, finds the zero-crossing of each branch, then computes:
+        delta   = (Bcr_desc - Bcr_asc) / 2    [Bu offset, T]
+        BcrTrue = (Bcr_desc + Bcr_asc) / 2    [true Bcr, T]
+
+    Parameters
+    ----------
+    forc_complete : FORCData
+        Output from rmg_extract_forc_data_complete.
+
+    Returns
+    -------
+    dict with keys:
+        'delta'   float  Bu baseline offset (T); 0 if indeterminate
+        'BcrTrue' float  true remanence coercivity (T); NaN if indeterminate
+        'rem'     dict   reversal-remanence dict (or None)
+    """
+    rem = forc_extract_reversal_remanence(forc_complete)
+    if rem is None:
+        return {'delta': 0.0, 'BcrTrue': np.nan, 'rem': None}
+
+    H  = rem['H_common']
+    Md = rem['M_desc_r']
+    Ma = rem['M_asc_r']
+
+    def _zero_crossing(H_arr, M_arr):
+        signs = np.sign(M_arr)
+        idx   = np.where(np.diff(signs) != 0)[0]
+        if len(idx) == 0:
+            return np.nan
+        i  = idx[0]
+        dM = M_arr[i + 1] - M_arr[i]
+        if dM == 0:
+            return float(H_arr[i])
+        return float(H_arr[i] - M_arr[i] * (H_arr[i + 1] - H_arr[i]) / dM)
+
+    Bcr_desc = _zero_crossing(H, Md)
+    Bcr_asc  = _zero_crossing(H, Ma)
+
+    if np.isnan(Bcr_desc) and np.isnan(Bcr_asc):
+        delta, BcrTrue = 0.0, np.nan
+    elif np.isnan(Bcr_asc):
+        delta, BcrTrue = 0.0, Bcr_desc
+    elif np.isnan(Bcr_desc):
+        delta, BcrTrue = 0.0, Bcr_asc
+    else:
+        delta   = (Bcr_desc - Bcr_asc) / 2.0
+        BcrTrue = (Bcr_desc + Bcr_asc) / 2.0
+
+    return {'delta': float(delta), 'BcrTrue': float(BcrTrue), 'rem': rem}
+
+
+def forc_compute_rockmag_stats(data):
+    """
+    Compute FORC-derived rock-mag statistics and store them on the RmgData object.
+
+    Sets the following attributes on *data*:
+        data.forc_SIRM        – SIRM estimate (Am²)
+        data.forc_SIRMperkg   – SIRM / mass (Am²/kg), NaN if mass unknown
+        data.forc_delta       – Bu baseline offset (mT)
+        data.forc_BcrTrue     – true remanence coercivity Bcr (mT)
+        data.forc_modal_Bcr   – modal Bc from FORC Bc distribution (mT)
+        data._forc_rem_data   – cached reversal-remanence dict for plotting
+
+    Parameters
+    ----------
+    data : RmgData
+
+    Returns
+    -------
+    dict  (subset of rmg_stats format), or {} if no FORC data present.
+    """
+    from scipy.ndimage import uniform_filter
+    from scipy.interpolate import griddata
+
+    forc_complete = rmg_extract_forc_data_complete(data)
+    if not forc_complete.exists:
+        return {}
+
+    baseline = forc_measure_bu_baseline(forc_complete)
+    delta    = baseline['delta']      # T
+    BcrTrue  = baseline['BcrTrue']    # T
+    rem      = baseline['rem']
+
+    # ── SIRM ─────────────────────────────────────────────────────────────────
+    SIRM = float(rem['SIRM']) if rem is not None and np.isfinite(rem['SIRM']) else np.nan
+    if np.isfinite(SIRM) and SIRM < 0:
+        SIRM = -SIRM   # physical SIRM is positive
+
+    mass      = float(getattr(data, 'mass', np.nan))
+    SIRMperkg = float(SIRM / mass) if (np.isfinite(SIRM) and
+                                        np.isfinite(mass) and
+                                        mass > 0) else np.nan
+
+    # ── Modal Bc from FORC distribution ──────────────────────────────────────
+    modal_Bc = np.nan
+    try:
+        forc_plain = rmg_extract_forc_data(data)
+        if forc_plain.exists and len(forc_plain.curves) >= 3:
+            Hr_all, Ha_all, M_all = [], [], []
+            for curve in forc_plain.curves:
+                n = len(curve['Ha'])
+                Hr_all.extend([curve['Hr']] * n)
+                Ha_all.extend(list(curve['Ha']))
+                M_all.extend(list(curve['M']))
+
+            Hr_all = np.array(Hr_all, dtype=float)
+            Ha_all = np.array(Ha_all, dtype=float)
+            M_all  = np.array(M_all,  dtype=float)
+
+            g     = 60
+            Hr_1d = np.linspace(Hr_all.min(), Hr_all.max(), g)
+            Ha_1d = np.linspace(Ha_all.min(), Ha_all.max(), g)
+            Hr_gr, Ha_gr = np.meshgrid(Hr_1d, Ha_1d, indexing='ij')
+
+            M_gr = griddata(
+                (Hr_all, Ha_all), M_all, (Hr_gr, Ha_gr),
+                method='linear', fill_value=np.nan
+            )
+            M_sm = uniform_filter(
+                np.where(np.isnan(M_gr), 0.0, M_gr), size=3, mode='nearest'
+            )
+            dHr   = Hr_1d[1] - Hr_1d[0]
+            dHa   = Ha_1d[1] - Ha_1d[0]
+            rho   = -0.5 * np.gradient(
+                np.gradient(M_sm, dHr, axis=0), dHa, axis=1
+            )
+            Hc_gr  = (Ha_gr - Hr_gr) / 2.0
+            valid  = Ha_gr >= Hr_gr
+            rho_v  = rho[valid]
+            Hc_v   = Hc_gr[valid]
+            fin    = np.isfinite(rho_v) & np.isfinite(Hc_v) & (rho_v > 0)
+            if fin.any():
+                Hc_bins = np.unique(np.round(Hc_v[fin], 8))
+                marginal = np.array([
+                    float(rho_v[fin][np.abs(Hc_v[fin] - hc) < 1e-9].sum())
+                    for hc in Hc_bins
+                ])
+                if marginal.max() > 0:
+                    modal_Bc = float(Hc_bins[np.argmax(marginal)] * 1000)  # mT
+    except Exception:
+        pass
+
+    # ── Store on data object ─────────────────────────────────────────────────
+    data.forc_SIRM      = float(SIRM) if np.isfinite(SIRM) else np.nan
+    data.forc_SIRMperkg = float(SIRMperkg)
+    data.forc_delta     = float(delta * 1000)   # mT
+    data.forc_BcrTrue   = float(BcrTrue * 1000) if np.isfinite(BcrTrue) else np.nan
+    data.forc_modal_Bcr = float(modal_Bc)
+    data._forc_rem_data = rem
+
+    return {
+        'forc_SIRM':      data.forc_SIRM,
+        'forc_SIRMperkg': data.forc_SIRMperkg,
+        'forc_Bcr':       data.forc_BcrTrue,
+        'forc_modal_Bcr': data.forc_modal_Bcr,
+        'forc_delta':     data.forc_delta,
+    }

@@ -505,6 +505,10 @@ def rmg_stat_box(data_list, af_levels=None, ax: Axes = None):
 
         def _fmt(key, label, unit=''):
             v = s.get(key, np.nan)
+            try:
+                v = float(v)
+            except (TypeError, ValueError):
+                v = np.nan
             if np.isfinite(v):
                 lines.append(f'{label} = {v:.4g} {unit}'.strip())
 
@@ -518,6 +522,28 @@ def rmg_stat_box(data_list, af_levels=None, ax: Axes = None):
         _fmt('ARMsusceptibilityToIRM', 'k_ARM/IRM',    s['units']['ARMsusceptibilityToIRM'])
         _fmt('ARMtoIRMat100uT',      '(ARM/IRM)_0.1mT')
         _fmt('MDFofARM',             'MDF_ARM',        s['units']['MDF'])
+
+        # FORC-derived stats (only shown when available)
+        forc_keys = [
+            ('forc_SIRM',      'SIRM (FORC)',    'Am²'),
+            ('forc_SIRMperkg', 'SIRM/kg (FORC)', 'Am²/kg'),
+            ('forc_Bcr',       'Bcr (FORC)',      'mT'),
+            ('forc_modal_Bcr', 'modal Bc (FORC)', 'mT'),
+        ]
+        forc_lines = []
+        for key, label, unit in forc_keys:
+            v = s.get(key, np.nan)
+            try:
+                v = float(v)
+            except (TypeError, ValueError):
+                v = np.nan
+            if np.isfinite(v):
+                forc_lines.append(f'{label} = {v:.4g} {unit}'.strip())
+        if forc_lines:
+            lines.append('')
+            lines.append('── FORC ──')
+            lines.extend(forc_lines)
+
         lines.append('')
 
     ax.text(0.05, 0.95, '\n'.join(lines),
@@ -526,6 +552,7 @@ def rmg_stat_box(data_list, af_levels=None, ax: Axes = None):
             fontsize=7,
             family='monospace')
     ax.axis('off')
+
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -760,3 +787,321 @@ def rmg_lowrie_fuller_derivative_plot(data_list, multi_af=False, ax=None):
         ax.axis('off')
 
     return fig, ax
+
+
+# =============================================================================
+#  FORC-derived remanence panels
+# =============================================================================
+
+def rmg_forc_dcd_plot(rem_data, Bcr_mT=None, samplename='', ax: Axes = None):
+    """
+    DC backfield demagnetization (DCD) panel derived from FORC reversal branches.
+
+    Log x-axis (mT), normalized remanence y-axis, y=0 reference line, and a
+    vertical dashed annotation at Bcr.
+
+    Parameters
+    ----------
+    rem_data   : dict – output of forc_extract_reversal_remanence
+    Bcr_mT     : float, optional – Bcr (mT) for vertical annotation
+    samplename : str
+    ax         : matplotlib Axes
+    """
+    if ax is None:
+        ax = plt.gca()
+
+    if rem_data is None:
+        ax.text(0.5, 0.5, 'No FORC data', ha='center', va='center',
+                transform=ax.transAxes)
+        ax.axis('off')
+        return ax
+
+    H_mT  = rem_data['H_common'] * 1000   # T → mT
+    M_norm = rem_data['M_desc_norm']
+
+    ax.plot(H_mT, M_norm, 'k.-', linewidth=1.2, markersize=3)
+    ax.axhline(0, color='k', linewidth=0.8, alpha=0.7)
+    ax.set_xscale('log')
+    ax.set_xlabel('$|B|$ (mT)')
+    ax.set_ylabel('$M / M_{SIRM}$')
+    suffix = f': {samplename}' if samplename else ''
+    ax.set_title(f'DCD (FORC){suffix}')
+
+    if Bcr_mT is not None and np.isfinite(Bcr_mT) and Bcr_mT > 0:
+        ax.axvline(Bcr_mT, color='royalblue', linewidth=1.2,
+                   linestyle='--', alpha=0.8,
+                   label=f'$B_{{cr}}$ = {Bcr_mT:.1f} mT')
+        ax.legend(fontsize='small', loc='lower left')
+
+    from matplotlib.ticker import LogFormatter, LogLocator
+    ax.xaxis.set_major_locator(LogLocator(base=10))
+    ax.xaxis.set_major_formatter(LogFormatter(minor_thresholds=(2, 0.5)))
+    ax.tick_params(axis='x', rotation=45)
+
+    return ax
+
+
+def rmg_forc_spectrum_plot(rem_data, modal_Bcr_mT=None, samplename='',
+                           ax: Axes = None):
+    """
+    Remanence coercivity spectrum: -dM/d(log B) derived from FORC DCD branch.
+
+    Log x-axis (mT), derivative spectrum y-axis, vertical dotted annotation at
+    the modal coercivity.
+
+    Parameters
+    ----------
+    rem_data      : dict – output of forc_extract_reversal_remanence
+    modal_Bcr_mT  : float, optional – modal Bcr (mT) for annotation
+    samplename    : str
+    ax            : matplotlib Axes
+    """
+    if ax is None:
+        ax = plt.gca()
+
+    if rem_data is None:
+        ax.text(0.5, 0.5, 'No FORC data', ha='center', va='center',
+                transform=ax.transAxes)
+        ax.axis('off')
+        return ax
+
+    H_mT   = rem_data['H_common'] * 1000   # T → mT
+    M_norm = rem_data['M_desc_norm']
+
+    # Derivative in log-field space: -dM / d(log10 H)
+    log_H  = np.log10(H_mT)
+    deriv  = -np.gradient(M_norm, log_H)
+
+    # Smooth lightly (3-point uniform filter)
+    from scipy.ndimage import uniform_filter1d
+    deriv_smooth = uniform_filter1d(deriv, size=3, mode='nearest')
+
+    ax.plot(H_mT, deriv_smooth, 'g-', linewidth=1.2)
+    ax.set_xscale('log')
+    ax.set_xlabel('$|B|$ (mT)')
+    ax.set_ylabel('$-dM / d(\\log B)$')
+    suffix = f': {samplename}' if samplename else ''
+    ax.set_title(f'Coercivity Spectrum (FORC){suffix}')
+    ax.set_ylim(bottom=0)
+
+    if modal_Bcr_mT is not None and np.isfinite(modal_Bcr_mT) and modal_Bcr_mT > 0:
+        ax.axvline(modal_Bcr_mT, color='darkgreen', linewidth=1.2,
+                   linestyle=':', alpha=0.85,
+                   label=f'modal $B_{{c}}$ = {modal_Bcr_mT:.1f} mT')
+        ax.legend(fontsize='small', loc='upper right')
+
+    from matplotlib.ticker import LogFormatter, LogLocator
+    ax.xaxis.set_major_locator(LogLocator(base=10))
+    ax.xaxis.set_major_formatter(LogFormatter(minor_thresholds=(2, 0.5)))
+    ax.tick_params(axis='x', rotation=45)
+
+    return ax
+
+
+def rmg_forc_irm_plot(rem_data, samplename='', ax: Axes = None):
+    """
+    IRM acquisition (approx) panel derived from FORC reversal branches.
+
+    Linear x-axis (mT), normalized remanence y-axis, y=0 reference line.
+
+    Parameters
+    ----------
+    rem_data   : dict – output of forc_extract_reversal_remanence
+    samplename : str
+    ax         : matplotlib Axes
+    """
+    if ax is None:
+        ax = plt.gca()
+
+    if rem_data is None:
+        ax.text(0.5, 0.5, 'No FORC data', ha='center', va='center',
+                transform=ax.transAxes)
+        ax.axis('off')
+        return ax
+
+    H_mT   = rem_data['H_common'] * 1000   # T → mT
+    M_norm = rem_data['M_asc_norm']
+
+    ax.plot(H_mT, M_norm, 'r.-', linewidth=1.2, markersize=3)
+    ax.axhline(0, color='k', linewidth=0.8, alpha=0.7)
+    ax.set_xlabel('$B$ (mT)')
+    ax.set_ylabel('$M / M_{SIRM}$')
+    suffix = f': {samplename}' if samplename else ''
+    ax.set_title(f'IRM approx (FORC){suffix}')
+
+    return ax
+
+
+# =============================================================================
+#  FORC-specific full rockmag analysis dashboard
+# =============================================================================
+
+def rmg_forc_rockmag_analysis(data_list, smoothing_factor=3, grid_size=100,
+                               colormap='hot_r'):
+    """
+    FORC-specific rockmag analysis dashboard.
+
+    Layout (4 rows × 3 columns):
+      Col 0: regular rock-mag panels (IRM, dIRM, ARM, Backfield)
+      Col 1: FORC column (FORC diagram → DCD → Coercivity Spectrum → IRM approx)
+      Col 2: Stats box (spanning all rows)
+
+    The FORC diagram uses the Bu-corrected axis; the three new panels below it
+    are derived from the FORC reversal branches.
+
+    Parameters
+    ----------
+    data_list        : list of RmgData (or single RmgData)
+    smoothing_factor : int  – FORC smoothing factor (default 3)
+    grid_size        : int  – FORC grid resolution (default 100)
+    colormap         : str  – colormap for FORC diagram
+
+    Returns
+    -------
+    matplotlib Figure
+    """
+    from rmg_forc import (
+        process_forc_forcinel_workflow,
+        plot_forc_diagram_standard,
+        forc_extract_reversal_remanence,
+        rmg_extract_forc_data_complete,
+        forc_compute_rockmag_stats,
+    )
+
+    if not isinstance(data_list, list):
+        data_list = [data_list]
+
+    # Use first FORC-capable sample as primary
+    forc_data = data_list[0]
+
+    sample_title = forc_data.samplename if len(data_list) == 1 else 'Multiple samples'
+
+    fig = plt.figure(figsize=(18, 14))
+    fig.suptitle(f'FORC Rock-Mag Analysis – {sample_title}', fontsize=14, y=0.995)
+
+    # Build 4-row × 3-col layout; col 2 spans rows 0-3 for stats
+    gs = fig.add_gridspec(4, 3, hspace=0.55, wspace=0.35)
+
+    ax_irm   = fig.add_subplot(gs[0, 0])
+    ax_dirm  = fig.add_subplot(gs[1, 0])
+    ax_arm   = fig.add_subplot(gs[2, 0])
+    ax_bf    = fig.add_subplot(gs[3, 0])
+
+    ax_forc  = fig.add_subplot(gs[0, 1])
+    ax_dcd   = fig.add_subplot(gs[1, 1])
+    ax_spec  = fig.add_subplot(gs[2, 1])
+    ax_irmap = fig.add_subplot(gs[3, 1])
+
+    ax_stats = fig.add_subplot(gs[:, 2])   # stats spans all 4 rows
+
+    # ── Left column: existing rockmag panels ─────────────────────────────────
+    rmg_sirm_plot(data_list,            ax=ax_irm)
+    rmg_sirm_derivative_plot(data_list, ax=ax_dirm)
+    rmg_arm_plot(data_list,             ax=ax_arm)
+    rmg_backfield_plot(data_list,       ax=ax_bf)
+
+    # ── Middle column: FORC panels ────────────────────────────────────────────
+    # Compute FORC stats (stores delta, BcrTrue etc. on data object)
+    forc_stats = forc_compute_rockmag_stats(forc_data)
+
+    rem_data  = getattr(forc_data, '_forc_rem_data', None)
+    delta_mT  = getattr(forc_data, 'forc_delta',     np.nan)
+    BcrTrue   = getattr(forc_data, 'forc_BcrTrue',   np.nan)
+    modal_Bcr = getattr(forc_data, 'forc_modal_Bcr', np.nan)
+
+    # FORC diagram with Bu correction
+    try:
+        result = process_forc_forcinel_workflow(
+            forc_data,
+            smoothing_factor=smoothing_factor,
+            grid_size=grid_size
+        )
+        plot_forc_diagram_standard(result, ax=ax_forc,
+                                   show_points=True, colormap=colormap)
+        ax_forc.set_title(f'FORC Diagram: {forc_data.samplename}', fontsize=9)
+    except Exception as exc:
+        ax_forc.text(0.5, 0.5, f'FORC error:\n{exc}',
+                     ha='center', va='center', transform=ax_forc.transAxes,
+                     fontsize=7)
+        ax_forc.axis('off')
+
+    # DCD panel
+    rmg_forc_dcd_plot(
+        rem_data,
+        Bcr_mT=BcrTrue if np.isfinite(BcrTrue) else None,
+        samplename=forc_data.samplename,
+        ax=ax_dcd
+    )
+
+    # Coercivity spectrum
+    rmg_forc_spectrum_plot(
+        rem_data,
+        modal_Bcr_mT=modal_Bcr if np.isfinite(modal_Bcr) else None,
+        samplename=forc_data.samplename,
+        ax=ax_spec
+    )
+
+    # IRM approx
+    rmg_forc_irm_plot(rem_data, samplename=forc_data.samplename, ax=ax_irmap)
+
+    # ── Stats column ──────────────────────────────────────────────────────────
+    _rmg_forc_stat_box(data_list, forc_stats, ax=ax_stats)
+
+    return fig
+
+
+def _rmg_forc_stat_box(data_list, forc_stats, ax: Axes = None):
+    """Internal helper: render the stats text box for the FORC dashboard."""
+    if ax is None:
+        ax = plt.gca()
+
+    stats_list = rmg_stats(data_list)
+
+    lines = []
+    for s in stats_list:
+        lines.append(f"Sample: {s['sample']}")
+        lines.append('')
+
+        def _fmt(key, label, unit=''):
+            v = s.get(key, np.nan)
+            try:
+                v = float(v)
+            except (TypeError, ValueError):
+                v = np.nan
+            if np.isfinite(v):
+                lines.append(f'{label} = {v:.4g} {unit}'.strip())
+
+        # Standard rock-mag stats (blank when not measured)
+        _fmt('susceptibility', 'χ',       s['units']['susceptibility'])
+        _fmt('sIRM',           'sIRM',    s['units']['sIRM'])
+        _fmt('sIRMperkg',      'sIRM/kg', s['units']['sIRMperkg'])
+        _fmt('Hcr',            'H_cr',    s['units']['Hcr'])
+        _fmt('MDFofIRM',       'MDF_IRM', s['units']['MDF'])
+        _fmt('MDFofARM',       'MDF_ARM', s['units']['MDF'])
+        lines.append('')
+
+        # FORC-derived stats
+        if forc_stats:
+            lines.append('── FORC-derived ──')
+            for key, label, unit in [
+                ('forc_SIRM',      'SIRM',          'Am²'),
+                ('forc_SIRMperkg', 'SIRM/kg',       'Am²/kg'),
+                ('forc_Bcr',       'Bcr (true)',     'mT'),
+                ('forc_modal_Bcr', 'modal Bc',       'mT'),
+                ('forc_delta',     'Δ Bu',           'mT'),
+            ]:
+                v = forc_stats.get(key, np.nan)
+                try:
+                    v = float(v)
+                except (TypeError, ValueError):
+                    v = np.nan
+                if np.isfinite(v):
+                    lines.append(f'{label} = {v:.4g} {unit}'.strip())
+            lines.append('')
+
+    ax.text(0.05, 0.97, '\n'.join(lines),
+            transform=ax.transAxes,
+            verticalalignment='top',
+            fontsize=7,
+            family='monospace')
+    ax.axis('off')
