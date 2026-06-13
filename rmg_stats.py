@@ -139,7 +139,7 @@ def rmg_stats(data_list):
         # ── FORC-derived stats ────────────────────────────────────────────────
         # Read pre-computed values if present (set by forc_compute_rockmag_stats
         # or process_forc_forcinel_workflow); otherwise try to compute them now.
-        forc_keys = ('forc_SIRM', 'forc_SIRMperkg', 'forc_BcrTrue',
+        forc_keys = ('forc_SIRM', 'forc_SIRMperkg', 'forc_Bcr', 'forc_BcrTrue',
                      'forc_modal_Bcr', 'forc_delta')
         if any(hasattr(data, k) for k in forc_keys):
             s['forc_SIRM']      = getattr(data, 'forc_SIRM',      np.nan)

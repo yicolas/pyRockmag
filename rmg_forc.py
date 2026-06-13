@@ -1341,9 +1341,9 @@ def forc_compute_rockmag_stats(data):
         SIRM = -SIRM   # physical SIRM is positive
 
     mass      = float(getattr(data, 'mass', np.nan))
-    SIRMperkg = float(SIRM / mass) if (np.isfinite(SIRM) and
-                                        np.isfinite(mass) and
-                                        mass > 0) else np.nan
+    SIRMperkg = (float(SIRM / mass) if (np.isfinite(SIRM) and
+                                         np.isfinite(mass) and
+                                         mass > 0) else float('nan'))
 
     # ── Modal Bc from FORC distribution ──────────────────────────────────────
     modal_Bc = np.nan
