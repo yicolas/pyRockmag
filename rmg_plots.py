@@ -885,7 +885,7 @@ def rmg_forc_spectrum_plot(rem_data, modal_Bcr_mT=None, samplename='',
 
     ax.text(
         0.02, 0.02,
-        'Tracks bulk remanence; not the FORC central-ridge modal $B_c$.',
+        'Tracks bulk remanence; not the FORC central-ridge modal $B_{c}$.',
         transform=ax.transAxes,
         fontsize=7,
         color='gray',
