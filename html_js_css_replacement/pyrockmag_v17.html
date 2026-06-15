@@ -52,7 +52,7 @@ body{display:grid;grid-template-rows:auto 1fr auto;height:100vh}
 #drop-zone{border:2px dashed var(--bdr2);padding:16px 10px;border-radius:var(--r);text-align:center;color:var(--tx3);cursor:pointer;margin-bottom:8px;font-size:11px;transition:all .2s}
 #drop-zone:hover,#drop-zone.over{border-color:var(--ac);color:var(--ac);background:var(--ac3)}
 
-.sample-item{display:flex;align-items:center;gap:8px;padding:6px 8px;background:var(--bg2);border-left:3px solid transparent;border-radius:var(--r);margin-bottom:4px;cursor:pointer;font-size:11px;transition:all .15s}
+.op-disabled{opacity:.3;cursor:default;pointer-events:none}.clean-btn{display:block;width:calc(100% - 4px);margin:1px 2px 9px;padding:5px 8px;font-size:11px;font-family:inherit;color:#2f9e6e;background:transparent;border:1px dashed #2f9e6e;border-radius:6px;cursor:pointer}.clean-btn:hover{background:rgba(47,158,110,.12)}.sample-item{display:flex;align-items:center;gap:8px;padding:6px 8px;background:var(--bg2);border-left:3px solid transparent;border-radius:var(--r);margin-bottom:4px;cursor:pointer;font-size:11px;transition:all .15s}
 .sample-item:hover{background:var(--bg3)}
 .sample-item.sel{border-left-color:var(--ac);background:var(--bg3)}
 .sample-item .chk{width:12px;height:12px;accent-color:var(--ac);cursor:pointer}
@@ -4364,6 +4364,42 @@ function processForcForcinelWorkflow(data, opts){
     }
   }
 
+  // ─── Bu=0 registration (robust): integrate rho across the central-ridge Bc
+  //     band into a Bu profile and center on its smoothed peak. Integrating the
+  //     ridge over Bc makes isolated spikes negligible next to the coherent
+  //     central ridge, so the registration no longer chases a single spike cell. ─
+  let _buPeak = 0;
+  {
+    const _buWin = 0.020, _bcLo = 0.004, _bcHi = 0.055, _NB = 41; // 1 mT bins, ±20 mT
+    // Tight |Bu| window: lock onto the dominant peak near Bu=0, not a far
+    // spike/interaction blob that can exceed the central ridge in raw data.
+    const _prof = new Float64Array(_NB);
+    for (let i = 0; i < gridSize; i++)
+      for (let j = 0; j < gridSize; j++){
+        if (!validMask[i][j]) continue;
+        const _bc = Hc[i][j], _bu = Hu[i][j], _r = rho[i][j];
+        if (_bc < _bcLo || _bc > _bcHi) continue;
+        if (_bu < -_buWin || _bu > _buWin) continue;
+        if (!(_r > 0) || !isFinite(_r)) continue;
+        const _b = Math.round((_bu + _buWin) / (2 * _buWin) * (_NB - 1));
+        if (_b >= 0 && _b < _NB) _prof[_b] += _r;
+      }
+    let _best = -Infinity, _bb = -1;
+    for (let b = 0; b < _NB; b++){
+      let s = _prof[b], w = 1;
+      if (b > 0){ s += _prof[b - 1]; w++; }
+      if (b < _NB - 1){ s += _prof[b + 1]; w++; }
+      s /= w;
+      if (s > _best){ _best = s; _bb = b; }
+    }
+    if (_bb >= 0 && _best > 0) _buPeak = -_buWin + (2 * _buWin) * _bb / (_NB - 1);
+  }
+  if (isFinite(_buPeak) && _buPeak !== 0){
+    for (let i = 0; i < gridSize; i++)
+      for (let j = 0; j < gridSize; j++) Hu[i][j] -= _buPeak;
+  }
+
+
   return {
     forcData: forc,
     HrGrid, HaGrid,
@@ -4442,31 +4478,65 @@ const OP_BLURBS = {
   'FORC_GEN':   'generate a FORC measurement protocol or convert .rmg → .frc'
 };
 
+function opsForKind(kind){
+  const FORC=['FORC_CURVES','FORC_DIAG','FORC_HYST','FORC_DCD','FORC_COERSPEC','FORC_IRMACQ','FORC_GEN','SAM_GEN','STATS'];
+  const ROCK=['IRM','DIRM','ARM','LF','LF_ARM','FULLER','BACKFIELD','COERCIVITY','DASH','STATS','COER','SAM_GEN'];
+  const IRMK=['IRM','DIRM','BACKFIELD','COERCIVITY','STATS','COER','SAM_GEN'];
+  const ARMK=['ARM','STATS','COER','SAM_GEN'];
+  const map={FORC:FORC, rockmag:ROCK, IRM:IRMK, ARM:ARMK};
+  const arr=map[kind];
+  return arr ? new Set(arr) : null;
+}
 function renderOps(){
   const list = document.getElementById('op-list');
   list.innerHTML = '';
-  for(const g of OPS){
-    const h = document.createElement('div');
-    h.className = 'shdr';
-    h.textContent = g.sec;
-    list.appendChild(h);
-    for(const op of g.items){
-      const el = document.createElement('div');
-      el.className = 'op' + (op.key === S.activeOp ? ' active' : '');
-      const blurb = OP_BLURBS[op.key] || '';
-      el.innerHTML = `
+  const sel = S.samples.find(s => s.selected);
+  const kind = sel ? rmgKind(sel._d) : null;
+  const ok = kind ? opsForKind(kind) : null;
+  if(ok && !ok.has(S.activeOp)){
+    for(const g of OPS){ for(const op of g.items){ if(ok.has(op.key)){ S.activeOp=op.key; break; } } if(ok.has(S.activeOp)) break; }
+  }
+  const mkOp = (op, disabled) => {
+    const el = document.createElement('div');
+    el.className = 'op' + (op.key === S.activeOp ? ' active' : '') + (disabled ? ' op-disabled' : '');
+    const blurb = OP_BLURBS[op.key] || '';
+    el.innerHTML = `
         <div class="op-row"><span class="op-key">${op.key}</span><span class="op-lbl">${op.label}</span></div>
         ${blurb ? `<div class="op-blurb">${blurb}</div>` : ''}
       `;
+    if(!disabled){
       el.onclick = () => {
-        // Tool operations open modals instead of running analysis
         if(op.key === 'SAM_GEN'){ showSamModal(); return; }
         if(op.key === 'FORC_GEN'){ showForcModal(); return; }
         S.activeOp = op.key;
         renderOps();
         if(S.samples.length > 0) runAnalysis();
       };
-      list.appendChild(el);
+    }
+    return el;
+  };
+  if(ok){
+    const h = document.createElement('div');
+    h.className = 'shdr';
+    h.textContent = 'available \u00b7 ' + kind;
+    list.appendChild(h);
+    for(const g of OPS) for(const op of g.items) if(ok.has(op.key)) list.appendChild(mkOp(op, false));
+    for(const g of OPS){
+      const rest = g.items.filter(op => !ok.has(op.key));
+      if(!rest.length) continue;
+      const hh = document.createElement('div');
+      hh.className = 'shdr';
+      hh.textContent = g.sec;
+      list.appendChild(hh);
+      for(const op of rest) list.appendChild(mkOp(op, true));
+    }
+  } else {
+    for(const g of OPS){
+      const h = document.createElement('div');
+      h.className = 'shdr';
+      h.textContent = g.sec;
+      list.appendChild(h);
+      for(const op of g.items) list.appendChild(mkOp(op, false));
     }
   }
 }
@@ -4604,6 +4674,80 @@ function samplesToggleSortDir(){
   renderSamples();
 }
 
+function _median(a){ const b=a.slice().sort((x,y)=>x-y); const n=b.length; if(!n) return NaN; return n%2 ? b[(n-1)/2] : (b[n/2-1]+b[n/2])/2; }
+function cleanForcData(d){
+  const c = Object.assign({}, d);
+  c.mvector = [d.mvector[0].slice(), d.mvector[1].slice(), d.mvector[2].slice()];
+  c.samplename = (d.samplename || 'sample').replace(/ \(cleaned\)$/,'') + ' (cleaned)';
+  const steps = findForcSteps(c);
+  if(!steps.length){ c._nCleaned = 0; return c; }
+  // group into curves (mirror rmgExtractForcData), tracking the step index per sweep point
+  let cur=null, skip=true; const curves=[];
+  for(const i of steps){
+    const f=c.levels[i]; if(f==null||Number.isNaN(f)) continue;
+    const m=c.mvector[2][i]; if(m==null||Number.isNaN(m)) continue;
+    if(skip && f>0){ skip=false; continue; }
+    if(f<0){ if(cur&&cur.pts.length) curves.push(cur); cur={pts:[]}; }
+    else if(cur){ cur.pts.push({ha:f, idx:i}); }
+  }
+  if(cur&&cur.pts.length) curves.push(cur);
+  // robust SIRM = median over curves of the top-field moment
+  const satM = curves.map(cv=>{ let b=cv.pts[0]; for(const p of cv.pts) if(p.ha>b.ha) b=p; return Math.abs(c.mvector[2][b.idx]); }).filter(isFinite);
+  const SIRM = _median(satM) || 0;
+  // Hampel despike ACROSS curves at each fixed Ha (along the Hr direction),
+  // where the signal is smooth so only true spikes are outliers.
+  let nClean=0;
+  const groups=new Map();
+  for(let ci=0;ci<curves.length;ci++) for(const p of curves[ci].pts){
+    const key=p.ha.toFixed(3); if(!groups.has(key)) groups.set(key,[]);
+    groups.get(key).push({ci, idx:p.idx});
+  }
+  // 2D median-filter despike: replace points that deviate from the median of their
+  // local 2D neighbourhood (cross-curve same Ha + within-curve adjacent Ha). A single
+  // bad measurement pops out of the local median; a sharp coherent ridge does not.
+  const sweeps = curves.map(cv => cv.pts.slice().sort((a,b)=>a.ha-b.ha));
+  const haMap = new Map();
+  for(let ci=0; ci<sweeps.length; ci++) for(let j=0;j<sweeps[ci].length;j++){
+    const key=sweeps[ci][j].ha.toFixed(3); if(!haMap.has(key)) haMap.set(key,[]);
+    haMap.get(key).push({ci,j});
+  }
+  for(const arr of haMap.values()) arr.sort((a,b)=>a.ci-b.ci);
+  const M = (ci,j)=> c.mvector[2][sweeps[ci][j].idx];
+  const med2D = (ci,j)=>{
+    const v=[M(ci,j)];
+    if(j>0) v.push(M(ci,j-1));
+    if(j<sweeps[ci].length-1) v.push(M(ci,j+1));
+    const grp=haMap.get(sweeps[ci][j].ha.toFixed(3));
+    const gi=grp.findIndex(e=>e.ci===ci);
+    if(gi>0) v.push(M(grp[gi-1].ci,grp[gi-1].j));
+    if(gi<grp.length-1) v.push(M(grp[gi+1].ci,grp[gi+1].j));
+    return _median(v);
+  };
+  // noise floor from along-sweep second differences (real measurement noise)
+  const nz=[];
+  for(let ci=0;ci<sweeps.length;ci++) for(let j=1;j<sweeps[ci].length-1;j++) nz.push(Math.abs(M(ci,j)-(M(ci,j-1)+M(ci,j+1))/2));
+  const noise=(_median(nz.filter(v=>v>0))||0)*1.4826;
+  const THR=Math.max(10*noise, 0.04*SIRM*0);   // pure noise-based; SIRM term disabled
+  const repl=[];
+  for(let ci=0;ci<sweeps.length;ci++) for(let j=0;j<sweeps[ci].length;j++){
+    const m=M(ci,j), md=med2D(ci,j);
+    const impossible = SIRM>0 && Math.abs(m)>1.3*SIRM;
+    if((noise>0 && Math.abs(m-md)>THR) || impossible) repl.push({idx:sweeps[ci][j].idx, val:md});
+  }
+  for(const r of repl){ c.mvector[2][r.idx]=r.val; nClean++; }
+  c._nCleaned=nClean;
+  return c;
+}
+function cleanForcSample(id){
+  const sel = S.samples.find(s => s.id === id);
+  if(!sel) return;
+  const cleaned = cleanForcData(sel._d);
+  const ix = S.samples.indexOf(sel);
+  S.samples.forEach(s => s.selected = false);
+  S.samples.splice(ix + 1, 0, { _d: cleaned, selected: true, id: nextId++, cleaned: true });
+  renderSamples(); renderOps(); runAnalysis();
+  log((cleaned._nCleaned || 0) + ' spike(s) interpolated -> ' + cleaned.samplename, 'ok');
+}
 function renderSamples(){
   const el = document.getElementById('sample-list');
   const count = document.getElementById('n-samples');
@@ -4626,7 +4770,7 @@ function renderSamples(){
       <span class="x">×</span>
     `;
     const chk = div.querySelector('.chk');
-    chk.onchange = () => { s.selected = chk.checked; div.classList.toggle('sel', s.selected); if(S.samples.some(x=>x.selected)) runAnalysis(); };
+    chk.onchange = () => { s.selected = chk.checked; div.classList.toggle('sel', s.selected); renderOps(); if(S.samples.some(x=>x.selected)) runAnalysis(); };
     div.querySelector('.x').onclick = e => {
       e.stopPropagation();
       S.samples = S.samples.filter(x => x.id !== s.id);
@@ -4634,6 +4778,13 @@ function renderSamples(){
       if(S.samples.length > 0) runAnalysis(); else hideAll();
     };
     el.appendChild(div);
+    if(s.selected && rmgKind(d) === 'FORC' && !s.cleaned){
+      const cb = document.createElement('button');
+      cb.className = 'clean-btn';
+      cb.textContent = '⟲ clean data (interpolate spikes)';
+      cb.onclick = (e) => { e.stopPropagation(); cleanForcSample(s.id); };
+      el.appendChild(cb);
+    }
   }
 }
 function getSelected(){ return S.samples.filter(s => s.selected); }
