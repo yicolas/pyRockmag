@@ -2623,6 +2623,7 @@ function tForcDiag(samples){
   // Hc ranges from 0 to (HaMax - HrMin)/2; Hu ranges from HrMin/2 to HaMax/2.
   // Use symmetric Hu around 0 for nicer visualisation (clamp to data range).
   let HcMin = Infinity, HcMax = -Infinity, HuMin = Infinity, HuMax = -Infinity;
+  let apexBu = 0, apexMinBc = Infinity;   // Bu of the min-Bc vertex = left apex (registration ref)
   for (let i = 0; i < gs; i++){
     for (let j = 0; j < gs; j++){
       if (!result.validMask[i][j]) continue;
@@ -2631,6 +2632,7 @@ function tForcDiag(samples){
       if (hc > HcMax) HcMax = hc;
       if (hu < HuMin) HuMin = hu;
       if (hu > HuMax) HuMax = hu;
+      if (hc < apexMinBc){ apexMinBc = hc; apexBu = hu; }
     }
   }
 
@@ -2642,9 +2644,13 @@ function tForcDiag(samples){
   // Output grid same resolution as input
   const Hc_1d = new Float64Array(gs);
   const Hu_1d = new Float64Array(gs);
+  // Anchor the Hu grid so one node lands exactly on the apex Bu — guarantees the
+  // left apex renders precisely at display Bu=0 with no grid-quantisation residual.
+  const huStep = (HuMax - HuMin) / (gs - 1);
+  const nApex = Math.round((apexBu - HuMin) / huStep);
   for (let k = 0; k < gs; k++){
     Hc_1d[k] = HcMin + (HcMax - HcMin) * k / (gs - 1);
-    Hu_1d[k] = HuMin + (HuMax - HuMin) * k / (gs - 1);
+    Hu_1d[k] = apexBu + (k - nApex) * huStep;
   }
 
   // Resample rho onto (Hc, Hu) via inverse transform
@@ -2699,7 +2705,7 @@ function tForcDiag(samples){
 
   // Convert Hc/Hu to mT for display
   const x_mT = Array.from(Hc_1d).map(v => v * 1000);
-  const y_mT = Array.from(Hu_1d).map(v => v * 1000);
+  const y_mT = Array.from(Hu_1d).map(v => (v - apexBu) * 1000);   // left apex → Bu=0
 
   // User-selected colormap from the FORC controls dropdown. Falls back to inferno_r.
   const colorscale = FORC_COLORMAPS[ForcDiagState.colormap] || FORC_COLORMAPS['inferno_r'];
@@ -4364,20 +4370,9 @@ function processForcForcinelWorkflow(data, opts){
     }
   }
 
-  // ─── Bu=0 registration: put the LEFT APEX of the (Bc,Bu) data triangle — the
-  //     minimum-Bc vertex — at Bu=0. This is a pure geometric reference (the
-  //     corner where Ha is smallest and Hr largest), independent of rho, so it
-  //     is completely unaffected by spikes, noise, or peak shape. ─
-  let _apexBu = 0, _minBc = Infinity;
-  for (let i = 0; i < gridSize; i++)
-    for (let j = 0; j < gridSize; j++){
-      if (!validMask[i][j]) continue;
-      if (Hc[i][j] < _minBc){ _minBc = Hc[i][j]; _apexBu = Hu[i][j]; }
-    }
-  if (isFinite(_apexBu) && _apexBu !== 0){
-    for (let i = 0; i < gridSize; i++)
-      for (let j = 0; j < gridSize; j++) Hu[i][j] -= _apexBu;
-  }
+  // ─── Bu=0 registration is applied at DISPLAY time in tForcDiag: the contour
+  //     resamples rho against the UNSHIFTED Hr/Ha grid, so shifting Hu here is
+  //     bypassed. Hu is kept in raw coordinates for a consistent rho lookup. ─
 
 
 

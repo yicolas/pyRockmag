@@ -2623,6 +2623,7 @@ function tForcDiag(samples){
   // Hc ranges from 0 to (HaMax - HrMin)/2; Hu ranges from HrMin/2 to HaMax/2.
   // Use symmetric Hu around 0 for nicer visualisation (clamp to data range).
   let HcMin = Infinity, HcMax = -Infinity, HuMin = Infinity, HuMax = -Infinity;
+  let apexBu = 0, apexMinBc = Infinity;   // Bu of the min-Bc vertex = left apex (registration ref)
   for (let i = 0; i < gs; i++){
     for (let j = 0; j < gs; j++){
       if (!result.validMask[i][j]) continue;
@@ -2631,6 +2632,7 @@ function tForcDiag(samples){
       if (hc > HcMax) HcMax = hc;
       if (hu < HuMin) HuMin = hu;
       if (hu > HuMax) HuMax = hu;
+      if (hc < apexMinBc){ apexMinBc = hc; apexBu = hu; }
     }
   }
 
@@ -2642,9 +2644,13 @@ function tForcDiag(samples){
   // Output grid same resolution as input
   const Hc_1d = new Float64Array(gs);
   const Hu_1d = new Float64Array(gs);
+  // Anchor the Hu grid so one node lands exactly on the apex Bu — guarantees the
+  // left apex renders precisely at display Bu=0 with no grid-quantisation residual.
+  const huStep = (HuMax - HuMin) / (gs - 1);
+  const nApex = Math.round((apexBu - HuMin) / huStep);
   for (let k = 0; k < gs; k++){
     Hc_1d[k] = HcMin + (HcMax - HcMin) * k / (gs - 1);
-    Hu_1d[k] = HuMin + (HuMax - HuMin) * k / (gs - 1);
+    Hu_1d[k] = apexBu + (k - nApex) * huStep;
   }
 
   // Resample rho onto (Hc, Hu) via inverse transform
@@ -2699,7 +2705,7 @@ function tForcDiag(samples){
 
   // Convert Hc/Hu to mT for display
   const x_mT = Array.from(Hc_1d).map(v => v * 1000);
-  const y_mT = Array.from(Hu_1d).map(v => v * 1000);
+  const y_mT = Array.from(Hu_1d).map(v => (v - apexBu) * 1000);   // left apex → Bu=0
 
   // User-selected colormap from the FORC controls dropdown. Falls back to inferno_r.
   const colorscale = FORC_COLORMAPS[ForcDiagState.colormap] || FORC_COLORMAPS['inferno_r'];
@@ -4364,40 +4370,10 @@ function processForcForcinelWorkflow(data, opts){
     }
   }
 
-  // ─── Bu=0 registration (robust): integrate rho across the central-ridge Bc
-  //     band into a Bu profile and center on its smoothed peak. Integrating the
-  //     ridge over Bc makes isolated spikes negligible next to the coherent
-  //     central ridge, so the registration no longer chases a single spike cell. ─
-  let _buPeak = 0;
-  {
-    const _buWin = 0.020, _bcLo = 0.004, _bcHi = 0.055, _NB = 41; // 1 mT bins, ±20 mT
-    // Tight |Bu| window: lock onto the dominant peak near Bu=0, not a far
-    // spike/interaction blob that can exceed the central ridge in raw data.
-    const _prof = new Float64Array(_NB);
-    for (let i = 0; i < gridSize; i++)
-      for (let j = 0; j < gridSize; j++){
-        if (!validMask[i][j]) continue;
-        const _bc = Hc[i][j], _bu = Hu[i][j], _r = rho[i][j];
-        if (_bc < _bcLo || _bc > _bcHi) continue;
-        if (_bu < -_buWin || _bu > _buWin) continue;
-        if (!(_r > 0) || !isFinite(_r)) continue;
-        const _b = Math.round((_bu + _buWin) / (2 * _buWin) * (_NB - 1));
-        if (_b >= 0 && _b < _NB) _prof[_b] += _r;
-      }
-    let _best = -Infinity, _bb = -1;
-    for (let b = 0; b < _NB; b++){
-      let s = _prof[b], w = 1;
-      if (b > 0){ s += _prof[b - 1]; w++; }
-      if (b < _NB - 1){ s += _prof[b + 1]; w++; }
-      s /= w;
-      if (s > _best){ _best = s; _bb = b; }
-    }
-    if (_bb >= 0 && _best > 0) _buPeak = -_buWin + (2 * _buWin) * _bb / (_NB - 1);
-  }
-  if (isFinite(_buPeak) && _buPeak !== 0){
-    for (let i = 0; i < gridSize; i++)
-      for (let j = 0; j < gridSize; j++) Hu[i][j] -= _buPeak;
-  }
+  // ─── Bu=0 registration is applied at DISPLAY time in tForcDiag: the contour
+  //     resamples rho against the UNSHIFTED Hr/Ha grid, so shifting Hu here is
+  //     bypassed. Hu is kept in raw coordinates for a consistent rho lookup. ─
+
 
 
   return {
@@ -4677,7 +4653,7 @@ function samplesToggleSortDir(){
 function _median(a){ const b=a.slice().sort((x,y)=>x-y); const n=b.length; if(!n) return NaN; return n%2 ? b[(n-1)/2] : (b[n/2-1]+b[n/2])/2; }
 function cleanForcData(d){
   const c = Object.assign({}, d);
-  c.mvector = [d.mvector[0].slice(), d.mvector[1].slice(), d.mvector[2].slice()];
+  c.mvector = [(d.mvector[0]||[]).slice(), (d.mvector[1]||[]).slice(), (d.mvector[2]||[]).slice()];
   c.samplename = (d.samplename || 'sample').replace(/ \(cleaned\)$/,'') + ' (cleaned)';
   const steps = findForcSteps(c);
   if(!steps.length){ c._nCleaned = 0; return c; }
@@ -4741,7 +4717,9 @@ function cleanForcData(d){
 function cleanForcSample(id){
   const sel = S.samples.find(s => s.id === id);
   if(!sel) return;
-  const cleaned = cleanForcData(sel._d);
+  let cleaned;
+  try { cleaned = cleanForcData(sel._d); }
+  catch(err){ log('clean failed: ' + (err && err.message ? err.message : err), 'err'); return; }
   const ix = S.samples.indexOf(sel);
   S.samples.forEach(s => s.selected = false);
   S.samples.splice(ix + 1, 0, { _d: cleaned, selected: true, id: nextId++, cleaned: true });
@@ -4778,7 +4756,7 @@ function renderSamples(){
       if(S.samples.length > 0) runAnalysis(); else hideAll();
     };
     el.appendChild(div);
-    if(s.selected && rmgKind(d) === 'FORC' && !s.cleaned){
+    if(s.selected && !s.cleaned && (function(){ try { return rmgExtractForcData(d).exists; } catch(_e){ return rmgKind(d)==='FORC'; } })()){
       const cb = document.createElement('button');
       cb.className = 'clean-btn';
       cb.textContent = '⟲ clean data (interpolate spikes)';
