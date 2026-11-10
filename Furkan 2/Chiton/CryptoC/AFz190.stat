@@ -1,0 +1,4 @@
+Sample     Sig/Drift     Sig/Holder     Sig/Ind     Sig/Noise     CSD     HorizErrAng     Up/Down
+CryptoC1.coe     07893     99999     071.3     055.7     001.0     000.0     0.000
+CryptoC1.coe     99999     99999     064.3     054.4     001.0     000.0     0.000
+CryptoC1.coe     99999     99999     070.2     057.8     000.9     000.0     0.000

@@ -1,0 +1,1811 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>FITQUEST v02 — pyRockmag fitting arcade</title>
+<script src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.27.0/plotly.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0e0f;--bg2:#111518;--bg3:#171c1e;--bg4:#1e2426;
+  --bdr:#2a3235;--bdr2:#3a4548;
+  --ac:#00e676;--ac2:#00c853;--ac3:rgba(0,230,118,.1);--acd:#1b5e20;
+  --amb:#ffd54f;--red:#ef5350;
+  --tx:#e0e8e6;--tx2:#8fa8a4;--tx3:#4a6360;
+  --mono:'IBM Plex Mono',monospace;
+  --lt:#3a9d5d;--mt:#2a6f97;--ht:#c1121f;
+  --r:4px;
+}
+html.light{
+  --bg:#f5f2ed;--bg2:#ebe5d8;--bg3:#e0dac8;--bg4:#d5cdb8;
+  --bdr:#c8bfb2;--bdr2:#a89f92;
+  --ac:#2d7a3d;--ac2:#1b5e20;--ac3:rgba(45,122,61,.08);--acd:#0f3d13;
+  --amb:#b45309;--red:#b91c1c;
+  --tx:#1a1208;--tx2:#4a3820;--tx3:#6b5838;
+}
+html,body{height:100%;background:var(--bg);color:var(--tx);font-family:var(--mono);font-size:12px;overflow:hidden}
+body{display:grid;grid-template-rows:auto 1fr auto;height:100vh}
+
+/* ── header ── */
+.hdr{display:flex;align-items:center;gap:12px;padding:7px 14px;border-bottom:1px solid var(--bdr);background:var(--bg2);font-size:12px}
+.hdr .logo{color:var(--ac);font-weight:700;letter-spacing:.12em}
+.hdr .sub{color:var(--tx3);font-size:10px}
+.hdr .sp{flex:1}
+.stat-pill{display:flex;align-items:center;gap:6px;background:var(--bg3);border:1px solid var(--bdr);border-radius:12px;padding:3px 10px;font-size:11px}
+.stat-pill b{color:var(--ac)}
+.stat-pill .lbl{color:var(--tx3);font-size:9px;text-transform:uppercase;letter-spacing:.08em}
+#streak-pill.hot b{color:var(--amb)}
+.btn{background:transparent;border:1px solid var(--bdr);color:var(--tx2);padding:4px 10px;border-radius:var(--r);cursor:pointer;font-family:var(--mono);font-size:11px;transition:all .15s}
+.btn:hover{border-color:var(--ac);color:var(--ac)}
+.btn.pri{background:var(--ac3);border-color:var(--acd);color:var(--ac)}
+.btn.sm{padding:3px 8px;font-size:10px}
+
+/* ── main grid ── */
+.main{display:grid;grid-template-columns:230px 1fr 252px;overflow:hidden;border-bottom:1px solid var(--bdr)}
+.col{background:var(--bg);overflow:hidden;display:flex;flex-direction:column;border-right:1px solid var(--bdr)}
+.col:last-child{border-right:none;border-left:1px solid var(--bdr)}
+.col-hdr{padding:7px 10px;font-size:10px;color:var(--tx3);text-transform:uppercase;letter-spacing:.1em;border-bottom:1px solid var(--bdr);display:flex;align-items:center;gap:6px;flex:none}
+.col-body{flex:1;overflow-y:auto;padding:8px}
+
+/* ── queue (left) ── */
+#drop-zone{border:2px dashed var(--bdr2);padding:14px 8px;border-radius:var(--r);text-align:center;color:var(--tx3);cursor:pointer;margin-bottom:8px;font-size:10.5px;transition:all .2s}
+#drop-zone:hover,#drop-zone.over{border-color:var(--ac);color:var(--ac);background:var(--ac3)}
+#progress-wrap{margin-bottom:8px}
+#progress-bar{height:6px;background:var(--bg3);border-radius:3px;overflow:hidden;border:1px solid var(--bdr)}
+#progress-fill{height:100%;background:var(--ac);width:0%;transition:width .4s}
+#progress-txt{font-size:9px;color:var(--tx3);margin-top:3px;text-align:right}
+.spec-item{display:flex;align-items:center;gap:6px;padding:5px 7px;background:var(--bg2);border-left:3px solid transparent;border-radius:var(--r);margin-bottom:3px;cursor:pointer;font-size:11px;transition:all .12s}
+.spec-item:hover{background:var(--bg3)}
+.spec-item.sel{border-left-color:var(--ac);background:var(--bg3)}
+.spec-item.nodata{opacity:.35;cursor:default}
+.spec-item .name{flex:1;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.spec-item .meta{color:var(--tx3);font-size:9px;flex:none}
+.grade-badge{flex:none;min-width:18px;text-align:center;font-size:9px;font-weight:700;border-radius:3px;padding:1px 3px}
+.g-S{background:#ffd54f22;color:#ffd54f}.g-A{background:#00e67622;color:var(--ac)}
+.g-B{background:#4fc3f722;color:#4fc3f7}.g-C{background:#ffb74d22;color:#ffb74d}
+.g-D,.g-F{background:#ef535022;color:var(--red)}
+.site-hdr{font-size:9px;color:var(--tx3);text-transform:uppercase;letter-spacing:.1em;margin:8px 0 4px;border-bottom:1px dashed var(--bdr);padding-bottom:2px}
+
+/* ── plots (center) ── */
+#plots{display:grid;grid-template-columns:58% 1fr;grid-template-rows:1fr 1fr;overflow:hidden;background:var(--bg)}
+#zij-div{grid-row:1/3;border-right:1px solid var(--bdr)}
+#eq-div{border-bottom:1px solid var(--bdr)}
+.plot-cell{position:relative;overflow:hidden;min-width:0;min-height:0}
+.plot-cell .ptitle{position:absolute;top:4px;left:8px;z-index:5;font-size:9px;color:var(--tx3);text-transform:uppercase;letter-spacing:.1em;pointer-events:none}
+
+/* ── fit console (right) ── */
+.slot{border:1px solid var(--bdr);border-radius:var(--r);margin-bottom:8px;background:var(--bg2);overflow:hidden;transition:border-color .15s}
+.slot.armed{border-color:var(--slotc);box-shadow:0 0 0 1px var(--slotc)}
+.slot-hdr{display:flex;align-items:center;gap:6px;padding:5px 8px;cursor:pointer;user-select:none}
+.slot-hdr:hover{background:var(--bg3)}
+.slot-dot{width:10px;height:10px;border-radius:50%;background:var(--slotc);flex:none}
+.slot-name{font-weight:700;letter-spacing:.08em;flex:1}
+.slot-armtag{font-size:8px;color:var(--slotc);letter-spacing:.1em;display:none}
+.slot.armed .slot-armtag{display:inline}
+.slot-x{color:var(--tx3);cursor:pointer;padding:0 4px;font-size:13px}
+.slot-x:hover{color:var(--red)}
+.slot-body{padding:0 8px 7px;display:none}
+.slot.hasfit .slot-body,.slot.armed .slot-body{display:block}
+.bnd-row{display:flex;gap:5px;margin-bottom:5px}
+.bnd-row input{flex:1;min-width:0;background:var(--bg3);border:1px solid var(--bdr);color:var(--tx);padding:3px 5px;border-radius:3px;font-family:var(--mono);font-size:10px}
+.bnd-row input:focus{outline:none;border-color:var(--slotc)}
+.fit-stats{font-size:10px;line-height:1.55;color:var(--tx2)}
+.fit-stats b{color:var(--tx)}
+.fit-stats .crit-ok{color:var(--ac)}
+.fit-stats .crit-bad{color:var(--red)}
+.fit-warn{font-size:9px;color:var(--amb);margin-top:3px;line-height:1.4}
+.slot-grade{float:right;font-size:14px;font-weight:700}
+
+#spec-summary{border-top:1px solid var(--bdr);padding:8px;flex:none}
+#save-btn{width:100%;padding:8px;font-size:12px;font-weight:700;letter-spacing:.08em;margin-top:6px}
+#save-btn:disabled{opacity:.3;cursor:default}
+.coord-row{display:flex;gap:4px;margin-bottom:8px}
+.coord-btn{flex:1;text-align:center;padding:3px 0;font-size:9px;border:1px solid var(--bdr);border-radius:3px;cursor:pointer;color:var(--tx3);letter-spacing:.05em}
+.coord-btn.on{border-color:var(--ac);color:var(--ac);background:var(--ac3)}
+select{background:var(--bg3);border:1px solid var(--bdr);color:var(--tx2);font-family:var(--mono);font-size:10px;padding:3px;border-radius:3px;width:100%}
+
+/* ── step strip (bottom) ── */
+#step-strip{display:flex;gap:4px;padding:7px 10px;background:var(--bg2);overflow-x:auto;min-height:46px;align-items:center}
+.chip{flex:none;padding:4px 7px;border:1px solid var(--bdr);border-radius:var(--r);cursor:pointer;font-size:10px;background:var(--bg3);color:var(--tx2);user-select:none;position:relative;transition:all .1s;text-align:center;line-height:1.3}
+.chip:hover{border-color:var(--ac)}
+.chip .j{display:block;font-size:8px;color:var(--tx3)}
+.chip.skipped{opacity:.45;text-decoration:line-through;border-color:var(--red);color:var(--red)}
+.chip.inLT{border-color:var(--lt);box-shadow:inset 0 -3px 0 var(--lt)}
+.chip.inMT{border-color:var(--mt);box-shadow:inset 0 -3px 0 var(--mt)}
+.chip.inHT{border-color:var(--ht);box-shadow:inset 0 -3px 0 var(--ht)}
+.chip.pend{outline:2px solid var(--amb)}
+.chip.warnstep::after{content:'⚠';position:absolute;top:-6px;right:-3px;font-size:8px;color:var(--amb)}
+
+/* ── popups ── */
+#score-pop{position:fixed;top:40%;left:50%;transform:translate(-50%,-50%) scale(.8);background:var(--bg2);border:1px solid var(--ac);border-radius:8px;padding:18px 30px;text-align:center;z-index:200;opacity:0;pointer-events:none;transition:all .25s}
+#score-pop.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
+#score-pop .big{font-size:30px;font-weight:700;color:var(--ac)}
+#score-pop .tag{font-size:11px;color:var(--tx2);letter-spacing:.15em;margin-top:4px}
+#score-pop.chrm{border-color:var(--amb)}
+#score-pop.chrm .big{color:var(--amb)}
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:100;display:none;align-items:center;justify-content:center}
+.ov.vis{display:flex}
+.modal{background:var(--bg2);border:1px solid var(--bdr2);border-radius:8px;max-width:620px;max-height:84vh;overflow-y:auto;padding:18px;font-size:11px;line-height:1.6}
+.modal h3{color:var(--ac);font-size:12px;letter-spacing:.1em;margin-bottom:8px}
+.modal h4{color:var(--tx);font-size:11px;margin:12px 0 4px}
+.modal code{background:var(--bg3);padding:1px 4px;border-radius:3px;font-size:10px}
+.modal td{padding:1px 10px 1px 0;color:var(--tx2)}
+kbd{background:var(--bg4);border:1px solid var(--bdr2);border-radius:3px;padding:0 4px;font-size:9px}
+#toast{position:fixed;bottom:60px;left:50%;transform:translateX(-50%);background:var(--bg4);border:1px solid var(--bdr2);color:var(--tx);padding:6px 14px;border-radius:var(--r);font-size:11px;z-index:300;opacity:0;transition:opacity .3s;pointer-events:none}
+#toast.vis{opacity:1}
+::-webkit-scrollbar{width:8px;height:8px}
+::-webkit-scrollbar-thumb{background:var(--bdr2);border-radius:4px}
+::-webkit-scrollbar-track{background:var(--bg2)}
+</style>
+</head>
+<body>
+
+<!-- ═══ HEADER ═══ -->
+<div class="hdr">
+  <span class="logo">⬡ FITQUEST</span>
+  <span class="sub">v02 · component fitting arcade · CIT format · Laos manuscript fits preloaded</span>
+  <span class="sp"></span>
+  <div class="stat-pill"><span class="lbl">score</span><b id="hud-score">0</b></div>
+  <div class="stat-pill" id="streak-pill"><span class="lbl">streak</span><b id="hud-streak">0</b></div>
+  <div class="stat-pill"><span class="lbl">best</span><b id="hud-best">0</b></div>
+  <button class="btn sm" id="redo-btn" title="Export all fits as a demag_gui-compatible .redo">⭳ .redo</button>
+  <button class="btn sm" id="help-btn">? help</button>
+  <button class="btn sm" id="theme-btn">◐</button>
+</div>
+
+<!-- ═══ MAIN ═══ -->
+<div class="main">
+  <!-- queue -->
+  <div class="col">
+    <div class="col-hdr">⬡ specimen queue</div>
+    <div class="col-body">
+      <div id="drop-zone">drop .sam + specimen files<br>(+ optional .redo)<br><span style="font-size:9px">or click to browse</span><br><span style="font-size:9px;color:var(--ac)">Laos manuscript redo built in —<br>fits appear when you drop the data</span></div>
+      <input type="file" id="file-input" multiple style="display:none">
+      <div id="progress-wrap" style="display:none">
+        <div id="progress-bar"><div id="progress-fill"></div></div>
+        <div id="progress-txt"></div>
+      </div>
+      <div id="spec-list"></div>
+    </div>
+  </div>
+
+  <!-- plots -->
+  <div id="plots">
+    <div class="plot-cell" id="zij-div"><span class="ptitle">zijderveld · <span id="zij-sub"></span></span><div id="zij" style="width:100%;height:100%"></div></div>
+    <div class="plot-cell" id="eq-div"><span class="ptitle">equal area</span><div id="eq" style="width:100%;height:100%"></div></div>
+    <div class="plot-cell" id="dec-div"><span class="ptitle">intensity decay</span><div id="dec" style="width:100%;height:100%"></div></div>
+  </div>
+
+  <!-- fit console -->
+  <div class="col">
+    <div class="col-hdr">⬡ fit console <span class="sp" style="flex:1"></span><span id="spec-title" style="color:var(--ac);text-transform:none;letter-spacing:0"></span></div>
+    <div class="col-body" id="console-body">
+      <div class="coord-row" id="coord-row">
+        <div class="coord-btn" data-cs="spec">core</div>
+        <div class="coord-btn on" data-cs="geo">geo</div>
+        <div class="coord-btn" data-cs="tc">tilt</div>
+      </div>
+      <select id="zij-conv" style="margin-bottom:8px">
+        <option value="NE">zij: x=N · E / Up</option>
+        <option value="EN">zij: x=E · N / Up</option>
+        <option value="ROT">zij: rotated to NRM dec</option>
+      </select>
+      <div id="slots"></div>
+      <div style="font-size:9px;color:var(--tx3);line-height:1.5;margin-top:4px">
+        click slot → click 2 points (or type bounds) · right-click any point = skip/unskip · tip: fit HT first, then split what precedes it
+      </div>
+    </div>
+    <div id="spec-summary">
+      <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--tx2)">
+        <span id="sum-fits">0 fits</span><span id="sum-chrm"></span>
+      </div>
+      <button class="btn pri" id="save-btn" disabled>SAVE FITS ▸ NEXT</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ STEP STRIP ═══ -->
+<div id="step-strip"><span style="color:var(--tx3);font-size:10px">load files to begin…</span></div>
+
+<!-- popups -->
+<div id="score-pop"><div class="big"></div><div class="tag"></div></div>
+<div id="toast"></div>
+<div class="ov" id="help-ov"><div class="modal">
+  <h3>⬡ FITQUEST — how to play</h3>
+  <h4>Controls</h4>
+  <table>
+    <tr><td><kbd>click slot</kbd></td><td>arm LT / MT / HT, then click two points (any plot or the step strip) to bracket the segment — or type bounds in the boxes (°C, <code>nrm</code>, <code>ln2</code>, or e.g. <code>100G</code> for AF)</td></tr>
+    <tr><td><kbd>right-click</kbd></td><td>skip / unskip a point everywhere (the point skipper — excluded from all fits)</td></tr>
+    <tr><td><kbd>1 2 3</kbd></td><td>arm LT / MT / HT</td></tr>
+    <tr><td><kbd>← →</kbd></td><td>previous / next specimen</td></tr>
+    <tr><td><kbd>s</kbd></td><td>save fits &amp; advance</td></tr>
+  </table>
+  <h4>House rules (how you're graded)</h4>
+  <p>Free lines only (DE-BFL) — never anchored to the origin. MAD is per segment against its own points. Only the terminal (last-unblocking) component is judged on origin-trending: <b>dang</b> is shown for the fit that ends on the last surviving step. Usable ChRM: <b>MAD ≤ 10° and dang ≤ 15°</b>. A beautiful MAD on the wrong segment is worth nothing — watch dang. Fit the terminal segment first, then split what precedes it. Don't assume three components; one good fit beats three forced ones.</p>
+  <h4>Scoring</h4>
+  <p><code>per fit: 100 − 6·MAD − 2·max(0, dang−5) + 2·(n−3) [cap +10]</code><br>
+  +15 bonus for a usable terminal ChRM. Grades: S ≥ 95 · A ≥ 85 · B ≥ 70 · C ≥ 50 · D ≥ 30 · F. Streak counts consecutive specimens saved with a usable ChRM. Skipping &gt; 25% of a segment's points caps its grade at C — beyond that the line is wrong, not the points.</p>
+  <h4>Preloaded Laos fits</h4>
+  <p>The manuscript redo (<code>Magnetometer_Data_corrected/demag_gui.redo</code> — the one whose bounds produced the Aug 2026 <code>specimens.txt</code> and the manuscript's site means) is built in. Drop any Laos site's files and its <code>lt</code>/<code>mt</code> fits appear automatically: <code>lt</code> → LT, <code>lt2</code> → MT, <code>mt</code> (the ChRM) → HT, original names kept on export. Preloaded fits never override picks you've already made in the game.</p>
+  <h4>Output</h4>
+  <p><code>⭳ .redo</code> exports every fit in demag_gui format (thermal bounds in K, AF in T) — import it straight into demag_gui. Progress autosaves locally per specimen. Drop an existing .redo with your files to resume previous picks.</p>
+  <p style="margin-top:10px;text-align:right"><button class="btn" onclick="document.getElementById('help-ov').classList.remove('vis')">close</button></p>
+</div></div>
+
+<script>
+'use strict';
+/* ═════════════════════════ math core ═════════════════════════ */
+const D2R = Math.PI/180, R2D = 180/Math.PI;
+function dir2cart(dec, inc, J){
+  J = (J===undefined)?1:J;
+  return [J*Math.cos(inc*D2R)*Math.cos(dec*D2R),
+          J*Math.cos(inc*D2R)*Math.sin(dec*D2R),
+          J*Math.sin(inc*D2R)];
+}
+function cart2dir(c){
+  const [x,y,z]=c, r=Math.hypot(x,y,z);
+  if(r===0) return [0,0,0];
+  let dec=(Math.atan2(y,x)*R2D)%360; if(dec<0)dec+=360;
+  return [dec, Math.asin(z/r)*R2D, r];
+}
+// Jacobi eigen-decomposition for symmetric 3×3. Returns {vals:[desc], vecs:[v1,v2,v3]}
+function eigSym3(A){
+  let a=[[A[0][0],A[0][1],A[0][2]],[A[1][0],A[1][1],A[1][2]],[A[2][0],A[2][1],A[2][2]]];
+  let v=[[1,0,0],[0,1,0],[0,0,1]];
+  for(let sweep=0; sweep<60; sweep++){
+    let off=Math.abs(a[0][1])+Math.abs(a[0][2])+Math.abs(a[1][2]);
+    if(off<1e-14) break;
+    for(let p=0;p<2;p++) for(let q=p+1;q<3;q++){
+      if(Math.abs(a[p][q])<1e-15) continue;
+      const theta=(a[q][q]-a[p][p])/(2*a[p][q]);
+      const t=Math.sign(theta||1)/(Math.abs(theta)+Math.sqrt(theta*theta+1));
+      const c=1/Math.sqrt(t*t+1), s=t*c;
+      for(let k=0;k<3;k++){
+        const akp=a[k][p], akq=a[k][q];
+        a[k][p]=c*akp-s*akq; a[k][q]=s*akp+c*akq;
+      }
+      for(let k=0;k<3;k++){
+        const apk=a[p][k], aqk=a[q][k];
+        a[p][k]=c*apk-s*aqk; a[q][k]=s*apk+c*aqk;
+        const vkp=v[k][p], vkq=v[k][q];
+        v[k][p]=c*vkp-s*vkq; v[k][q]=s*vkp+c*vkq;
+      }
+    }
+  }
+  const pairs=[0,1,2].map(i=>({val:a[i][i], vec:[v[0][i],v[1][i],v[2][i]]}));
+  pairs.sort((x,y)=>y.val-x.val);
+  return {vals:pairs.map(p=>p.val), vecs:pairs.map(p=>p.vec)};
+}
+// Kirschvink DE-BFL free line (never anchored). pts: array of [x,y,z] in measurement order.
+function pcaLine(pts){
+  const n=pts.length;
+  if(n<3) return null;
+  const cm=[0,0,0];
+  pts.forEach(p=>{cm[0]+=p[0];cm[1]+=p[1];cm[2]+=p[2];});
+  cm[0]/=n;cm[1]/=n;cm[2]/=n;
+  const T=[[0,0,0],[0,0,0],[0,0,0]];
+  pts.forEach(p=>{
+    const d=[p[0]-cm[0],p[1]-cm[1],p[2]-cm[2]];
+    for(let i=0;i<3;i++)for(let j=0;j<3;j++)T[i][j]+=d[i]*d[j];
+  });
+  const e=eigSym3(T);
+  let v=e.vecs[0].slice();
+  // orient along demag path: reference = first − last (direction of removed remanence)
+  const R=[pts[0][0]-pts[n-1][0], pts[0][1]-pts[n-1][1], pts[0][2]-pts[n-1][2]];
+  if(v[0]*R[0]+v[1]*R[1]+v[2]*R[2] < 0){ v=[-v[0],-v[1],-v[2]]; }
+  const s=Math.max(e.vals[0],1e-30);
+  const mad=Math.atan(Math.sqrt(Math.max(e.vals[1]+e.vals[2],0)/s))*R2D;
+  // dang: angle between fit direction and centroid vector (origin → CM)
+  const cmr=Math.hypot(cm[0],cm[1],cm[2]);
+  let dang=NaN;
+  if(cmr>0){
+    const dot=(v[0]*cm[0]+v[1]*cm[1]+v[2]*cm[2])/cmr;
+    dang=Math.acos(Math.min(1,Math.max(-1,dot)))*R2D;
+  }
+  const [dec,inc]=cart2dir(v);
+  return {dec,inc,mad,dang,cm,v,n};
+}
+
+/* ═════════════════════════ CIT parsing ═════════════════════════ */
+// treatment field = chars 0..5
+function parseTreat(f6){
+  const t=f6.trim();
+  let m;
+  if(/^NRM/i.test(t)) return {type:'NRM', label:'NRM', K:273, sort:0};
+  if(/^(LN2|LT)/i.test(t)) return {type:'LN2', label:'LN2', K:77, sort:1};
+  if((m=t.match(/^TT\s*([\d.]+)/i))) { const c=parseFloat(m[1]); return {type:'TT', label:'TT'+c, C:c, K:c+273, sort:c}; }
+  if((m=t.match(/^M?AFz?\s*([\d.]+)/i))) { const g=parseFloat(m[1]); return {type:'AF', label:'AF'+g, G:g, mT:g/10, T:g/1e4, sort:g}; }
+  return {type:'OTH', label:t||'?', sort:NaN};
+}
+function parseSpecimenFile(fname, text){
+  const lines=text.split(/\r?\n/).filter(l=>l.trim().length>0);
+  if(lines.length<2) return null;
+  const l1=lines[0].trim().split(/\s+/);
+  const info=lines[1].trim().split(/\s+/).map(Number);
+  // from the end: mass, bed_dip, bed_strike, core_dip, core_strike, [strat]
+  const k=info.length;
+  const hdr={ site:l1[0]||'', mass:info[k-1], bedDip:info[k-2], bedStrike:info[k-3],
+              coreDip:info[k-4], coreStrike:info[k-5], strat:(k>=6?info[0]:null) };
+  const steps=[];
+  for(let i=2;i<lines.length;i++){
+    const ln=lines[i];
+    if(ln.trim().length<10) continue;
+    const treat=parseTreat(ln.slice(0,6));
+    const f=ln.slice(6).trim().split(/\s+/);
+    if(f.length<6) continue;
+    const nums=f.slice(0,8).map(Number);
+    if(nums.slice(0,5).some(isNaN)) continue;
+    steps.push({
+      treat, idx:steps.length,
+      decG:nums[0], incG:nums[1], decT:nums[2], incT:nums[3],
+      J:nums[4], csd:isNaN(nums[5])?null:nums[5],
+      decS:isNaN(nums[6])?nums[0]:nums[6], incS:isNaN(nums[7])?nums[1]:nums[7],
+      skipped:false, raw:ln
+    });
+  }
+  // duplicate-treatment labels: TT360, TT360·2 …
+  const seen={};
+  steps.forEach(s=>{
+    seen[s.treat.label]=(seen[s.treat.label]||0)+1;
+    s.label = seen[s.treat.label]>1 ? s.treat.label+'·'+seen[s.treat.label] : s.treat.label;
+  });
+  // flag suspicious steps: intensity spike >3× previous, or thermal temp out of order
+  for(let i=1;i<steps.length;i++){
+    const a=steps[i-1], b=steps[i];
+    b.warn='';
+    if(a.J>0 && b.J>3*a.J) b.warn='intensity spike ('+(b.J/a.J).toFixed(1)+'× previous) — instrument artifact?';
+    if(b.treat.type==='TT' && a.treat.type==='TT' && b.treat.C < a.treat.C) b.warn='temperature goes backwards — check step order';
+    if(b.treat.type==='TT' && b.treat.C>800) b.warn='implausible temperature (sentinel step?)';
+  }
+  return { name:fname, hdr, steps,
+           fits:{LT:null,MT:null,HT:null}, saved:false, scores:{} };
+}
+function parseSam(text){
+  const lines=text.split(/\r?\n/).map(l=>l.trim()).filter(l=>l.length>0);
+  if(lines.length<3) return null;
+  const geo=lines[1].split(/\s+/).map(Number);
+  return { title:lines[0], lat:geo[0], lon:geo[1], dec:geo[2]||0, files:lines.slice(2) };
+}
+
+/* ═════════════════════════ state ═════════════════════════ */
+const SLOTS=['LT','MT','HT'];
+const SLOTC={LT:getComputedStyle(document.documentElement).getPropertyValue('--lt').trim()||'#3a9d5d',
+             MT:getComputedStyle(document.documentElement).getPropertyValue('--mt').trim()||'#2a6f97',
+             HT:getComputedStyle(document.documentElement).getPropertyValue('--ht').trim()||'#c1121f'};
+const S={
+  sites:{},            // samName → {sam, order:[specNames]}
+  specs:{},            // name → spec object
+  order:[],            // display order
+  cur:null,            // current spec name
+  cs:'geo',            // 'spec'|'geo'|'tc'
+  conv:'NE',
+  armed:null,          // slot being set
+  pendIdx:null,        // first click of bracket
+  score:0, streak:0, best:0,
+  hover:{plot:null, idx:null, t:0},
+  pendingRedo:[],      // redo lines awaiting specimens
+};
+/* ── EMBEDDED REDO ──────────────────────────────────────────────────────────
+   Laos manuscript fits: 2024_Laos_Australasian_Impactor/
+   Magnetometer_Data_corrected/demag_gui.redo — the redo whose bounds produced
+   specimens.txt (2026-08-11), whose filtered mt site means reproduce the
+   manuscript paleomag table (NWF-A 11.2/23.9 α95 11.7 k 43.5, etc).
+   lt → LT slot, lt2 → MT, mt (ChRM) → HT; original names kept on export.
+   Fits auto-apply when matching specimen files are dropped, and never
+   override fits you have already made. */
+const EMBEDDED_REDO = `NWFA-1B	DE-BFL	343	483	lt	#4ED740	g
+NWFA-1B	DE-BFL	723	783	mt	#9840D7	g
+NWFA-2B	DE-BFL	0	483	lt	#4ED740	g
+NWFA-2B	DE-BFL	723	753	mt	#9840D7	g
+NWFA-3B	DE-BFL	77	403	lt	#32CD32	g
+NWFA-3B	DE-BFL	693	783	mt	#800080	g
+NWFA-4B	DE-BFL	343	463	lt	#32CD32	g
+NWFA-4B	DE-BFL	723	783	mt	#800080	g
+NWFA-5B	DE-BFL	0	403	lt	#32CD32	g
+NWFA-5B	DE-BFL	663	753	mt	#9840D7	g
+NWFA-1C	DE-BFL	343	483	lt	#4ED740	g
+NWFA-1C	DE-BFL	633	753	mt	#9840D7	g
+NWFA-2C	DE-BFL	77	463	lt	#32CD32	g
+NWFA-2C	DE-BFL	723	783	mt	#800080	g
+NWFA-4C	DE-BFL	693	783	mt	#800080	g
+NWFA-4C	DE-BFL	0	483	lt	#9840D7	g
+NWFA-5C	DE-BFL	0	343	lt	#32CD32	g
+NWFA-5C	DE-BFL	663	783	mt	#800080	g
+NWFA-1D	DE-BFL	723	783	mt	#800080	g
+NWFA-1D	DE-BFL	343	693	lt	#9840D7	g
+NWFA-2D	DE-BFL	693	783	mt	#800080	g
+NWFA-2D	DE-BFL	77	463	lt	#9840D7	g
+NWFA-1E	DE-BFL	543	783	mt	#9840D7	g
+NWFA-1E	DE-BFL	0	483	lt	#9840D7	g
+NWFA-1F	DE-BFL	693	783	mt	#800080	g
+NWFA-1F	DE-BFL	0	483	lt	#9840D7	g
+NWFA-1G	DE-BFL	723	783	mt	#800080	g
+NWFA-1G	DE-BFL	0	483	lt	#9840D7	g
+NWFA-1H	DE-BFL	0	483	lt	#32CD32	g
+NWFA-1H	DE-BFL	663	753	mt	#9840D7	g
+NWFB-1B	DE-BFL	663	753	mt	#800080	g
+NWFB-1B	DE-BFL	343	433	lt	#9840D7	g
+NWFB-2B	DE-BFL	373	433	lt	#32CD32	g
+NWFB-2B	DE-BFL	663	753	mt	#800080	g
+NWFB-3B	DE-BFL	373	463	lt	#32CD32	g
+NWFB-3B	DE-BFL	603	723	mt	#9840D7	g
+NWFB-1C	DE-BFL	0	403	lt	#4ED740	g
+NWFB-1C	DE-BFL	663	753	mt	#9840D7	g
+NWFB-2C	DE-BFL	343	463	lt	#32CD32	g
+NWFB-2C	DE-BFL	633	753	mt	#800080	g
+NWFB-3C	DE-BFL	373	433	lt	#32CD32	g
+NWFB-3C	DE-BFL	603	723	mt	#9840D7	g
+NWFB-1D	DE-BFL	0	403	lt	#32CD32	g
+NWFB-1D	DE-BFL	663	753	mt	#9840D7	g
+NWFB-2D	DE-BFL	373	433	lt	#32CD32	g
+NWFB-2D	DE-BFL	633	753	mt	#800080	g
+NWFB-3D	DE-BFL	373	463	lt	#32CD32	g
+NWFB-3D	DE-BFL	603	723	mt	#9840D7	g
+NWFB-1E	DE-BFL	343	433	lt	#4ED740	g
+NWFB-1E	DE-BFL	603	723	mt	#9840D7	g
+NWFB-2E	DE-BFL	373	483	lt	#32CD32	g
+NWFB-2E	DE-BFL	633	723	mt	#9840D7	g
+NWFB-3E	DE-BFL	343	463	lt	#32CD32	g
+NWFB-3E	DE-BFL	663	723	mt	#9840D7	g
+NWFB-1F	DE-BFL	373	513	lt	#32CD32	g
+NWFB-1F	DE-BFL	603	723	mt	#9840D7	g
+NWFB-2F	DE-BFL	373	483	lt	#32CD32	g
+NWFB-2F	DE-BFL	633	723	mt	#9840D7	g
+NWFB-3F	DE-BFL	373	463	lt	#32CD32	g
+NWFB-3F	DE-BFL	663	723	mt	#9840D7	g
+NWFB-1G	DE-BFL	373	513	lt	#4ED740	g
+NWFB-1G	DE-BFL	633	753	mt	#9840D7	g
+NWFB-2G	DE-BFL	373	433	lt	#32CD32	g
+NWFB-2G	DE-BFL	633	723	mt	#9840D7	g
+NWFB-3G	DE-BFL	373	543	lt	#4ED740	g
+NWFB-3G	DE-BFL	633	693	mt	#9840D7	g
+NWFB-1H	DE-BFL	603	753	mt	#800080	g
+NWFB-1H	DE-BFL	373	513	lt	#9840D7	g
+NWFB-3H	DE-BFL	633	723	mt	#9840D7	g
+NWFB-3H	DE-BFL	373	513	lt	#9840D7	g
+NWFC-1B	DE-BFL	77	403	lt	#4ED740	g
+NWFC-1B	DE-BFL	723	783	mt	#9840D7	g
+NWFC-2B	DE-BFL	343	463	lt	#32CD32	g
+NWFC-2B	DE-BFL	723	783	mt	#9840D7	g
+NWFC-3B	DE-BFL	343	463	lt	#32CD32	g
+NWFC-3B	DE-BFL	723	783	mt	#9840D7	g
+NWFC-4B	DE-BFL	77	403	lt	#4ED740	g
+NWFC-4B	DE-BFL	693	783	mt	#9840D7	g
+NWFC-5B	DE-BFL	77	433	lt	#32CD32	g
+NWFC-5B	DE-BFL	723	783	mt	#800080	g
+NWFC-6B	DE-BFL	343	463	lt	#32CD32	g
+NWFC-6B	DE-BFL	723	783	mt	#800080	g
+NWFC-7B	DE-BFL	0	403	lt	#4ED740	g
+NWFC-7B	DE-BFL	693	783	mt	#9840D7	g
+NWFC-8B	DE-BFL	403	483	lt	#9840D7	g
+NWFC-8B	DE-BFL	723	783	mt	#9840D7	g
+NWFC-1C	DE-BFL	77	433	lt	#32CD32	g
+NWFC-1C	DE-BFL	723	783	mt	#9840D7	g
+NWFC-2C	DE-BFL	343	483	lt	#4ED740	g
+NWFC-2C	DE-BFL	723	783	mt	#9840D7	g
+NWFC-3C	DE-BFL	343	463	lt	#32CD32	g
+NWFC-3C	DE-BFL	723	783	mt	#9840D7	g
+NWFC-4C	DE-BFL	0	403	lt	#9840D7	g
+NWFC-4C	DE-BFL	693	783	mt	#9840D7	g
+NWFC-5C	DE-BFL	343	463	lt	#32CD32	g
+NWFC-5C	DE-BFL	723	783	mt	#9840D7	g
+NWFC-6C	DE-BFL	373	433	lt	#32CD32	g
+NWFC-6C	DE-BFL	723	783	mt	#800080	g
+NWFC-7C	DE-BFL	723	783	mt	#800080	g
+NWFC-7C	DE-BFL	0	463	lt	#9840D7	g
+NWFC-8C	DE-BFL	373	543	lt	#4ED740	g
+NWFC-8C	DE-BFL	723	783	mt	#9840D7	g
+NWFC-2D	DE-BFL	0	403	lt	#32CD32	g
+NWFC-2D	DE-BFL	693	783	mt	#9840D7	g
+NWFC-3D	DE-BFL	343	463	lt	#32CD32	g
+NWFC-3D	DE-BFL	723	783	mt	#9840D7	g
+NWFC-4D	DE-BFL	0	433	lt	#32CD32	g
+NWFC-4D	DE-BFL	723	783	mt	#9840D7	g
+NWFC-5D	DE-BFL	723	783	mt	#800080	g
+NWFC-5D	DE-BFL	343	433	lt	#9840D7	g
+NWFC-6D	DE-BFL	0	403	lt	#32CD32	g
+NWFC-6D	DE-BFL	723	783	mt	#9840D7	g
+NWFC-7D	DE-BFL	0	403	lt	#32CD32	g
+NWFC-7D	DE-BFL	723	783	mt	#800080	g
+NWFC-8D	DE-BFL	373	433	lt	#4ED740	g
+NWFC-8D	DE-BFL	723	783	mt	#9840D7	g
+NWFC-2E	DE-BFL	0	343	lt	#32CD32	g
+NWFC-2E	DE-BFL	693	783	mt	#9840D7	g
+NWFC-4E	DE-BFL	343	463	lt	#4ED740	g
+NWFC-4E	DE-BFL	723	783	mt	#9840D7	g
+NWFC-5E	DE-BFL	343	463	lt	#4ED740	g
+NWFC-5E	DE-BFL	723	783	mt	#9840D7	g
+NWFC-6E	DE-BFL	723	783	mt	#800080	g
+NWFC-6E	DE-BFL	343	433	lt	#9840D7	g
+NWFC-7E	DE-BFL	77	403	lt	#4ED740	g
+NWFC-7E	DE-BFL	723	783	mt	#9840D7	g
+NWFC-8E	DE-BFL	373	433	lt	#32CD32	g
+NWFC-8E	DE-BFL	693	783	mt	#9840D7	g
+NWFC-2F	DE-BFL	0	343	lt	#32CD32	g
+NWFC-2F	DE-BFL	693	783	mt	#9840D7	g
+NWFC-7F	DE-BFL	723	783	mt	#800080	g
+NWFC-7F	DE-BFL	0	403	lt	#9840D7	g
+NWFC-8F	DE-BFL	343	463	lt	#32CD32	g
+NWFC-8F	DE-BFL	723	783	mt	#9840D7	g
+current_NWFC-8G	DE-BFL	343	403	lt	#4ED740	g
+current_NWFC-8G	DE-BFL	633	783	mt	#9840D7	g
+PKQA-0A	DE-BFL	77	433	lt	#32CD32	g
+PKQA-0A	DE-BFL	693	783	mt	#800080	g
+PKQA-9A	DE-BFL	573	783	mt	#800080	g
+PKQA-9A	DE-BFL	77	403	lt	#9840D7	g
+PKQA-0B	DE-BFL	77	463	lt	#32CD32	g
+PKQA-0B	DE-BFL	693	783	mt	#800080	g
+PKQA-1B	DE-BFL	77	403	lt	#4ED740	g
+PKQA-1B	DE-BFL	603	783	mt	#9840D7	g
+PKQA-2B	DE-BFL	343	433	lt	#4ED740	g
+PKQA-2B	DE-BFL	543	783	mt	#9840D7	g
+PKQA-3B	DE-BFL	573	783	mt	#800080	g
+PKQA-3B	DE-BFL	77	463	lt	#9840D7	g
+PKQA-4B	DE-BFL	0	343	lt	#32CD32	g
+PKQA-4B	DE-BFL	573	783	mt	#800080	g
+PKQA-5B	DE-BFL	0	403	lt	#32CD32	g
+PKQA-5B	DE-BFL	573	783	mt	#800080	g
+PKQA-6B	DE-BFL	573	783	mt	#800080	g
+PKQA-6B	DE-BFL	0	433	lt	#9840D7	g
+PKQA-7B	DE-BFL	633	783	mt	#800080	g
+PKQA-7B	DE-BFL	77	373	lt	#9840D7	g
+PKQA-8B	DE-BFL	0	403	lt	#4ED740	g
+PKQA-8B	DE-BFL	573	783	mt	#800080	g
+PKQA-9B	DE-BFL	77	483	lt	#4ED740	g
+PKQA-9B	DE-BFL	603	753	mt	#9840D7	g
+PKQA-0C	DE-BFL	693	783	mt	#800080	g
+PKQA-0C	DE-BFL	77	403	lt	#32CD32	g
+PKQA-1C	DE-BFL	663	783	mt	#800080	g
+PKQA-1C	DE-BFL	77	433	lt	#9840D7	g
+PKQA-2C	DE-BFL	663	783	mt	#800080	g
+PKQA-2C	DE-BFL	77	433	lt	#9840D7	g
+PKQA-3C	DE-BFL	77	433	lt	#32CD32	g
+PKQA-3C	DE-BFL	663	783	mt	#800080	g
+PKQA-4C	DE-BFL	373	433	lt	#32CD32	g
+PKQA-4C	DE-BFL	663	753	mt	#9840D7	g
+PKQA-5C	DE-BFL	77	483	lt	#32CD32	g
+PKQA-5C	DE-BFL	573	783	mt	#800080	g
+PKQA-6C	DE-BFL	0	483	lt	#32CD32	g
+PKQA-6C	DE-BFL	573	783	mt	#800080	g
+PKQA-7C	DE-BFL	77	403	lt	#32CD32	g
+PKQA-7C	DE-BFL	603	783	mt	#800080	g
+PKQA-8C	DE-BFL	77	433	lt	#32CD32	g
+PKQA-8C	DE-BFL	603	753	mt	#800080	g
+PKQA-9C	DE-BFL	573	783	mt	#800080	g
+PKQA-9C	DE-BFL	0	433	lt	#9840D7	g
+PKQA-0D	DE-BFL	573	783	mt	#800080	g
+PKQA-0D	DE-BFL	0	403	lt2	#9840D7	g
+PKQA-1D	DE-BFL	723	783	mt	#800080	g
+PKQA-1D	DE-BFL	0	373	lt	#9840D7	g
+PKQA-2D	DE-BFL	633	783	mt	#800080	g
+PKQA-3D	DE-BFL	633	783	mt	#800080	g
+PKQA-3D	DE-BFL	77	463	lt	#9840D7	g
+PKQA-4D	DE-BFL	77	403	lt	#9840D7	g
+PKQA-4D	DE-BFL	663	783	mt	#9840D7	g
+PKQA-5D	DE-BFL	77	373	lt	#4ED740	g
+PKQA-5D	DE-BFL	603	693	mt	#9840D7	g
+PKQA-6D	DE-BFL	0	343	lt	#32CD32	g
+PKQA-6D	DE-BFL	513	723	mt	#9840D7	g
+PKQA-7D	DE-BFL	603	783	mt	#800080	g
+PKQA-7D	DE-BFL	77	433	lt	#9840D7	g
+PKQA-8D	DE-BFL	77	373	lt	#32CD32	g
+PKQA-8D	DE-BFL	573	783	mt	#800080	g
+PKQA-9D	DE-BFL	573	783	mt	#800080	g
+PKQA-9D	DE-BFL	77	483	lt	#9840D7	g
+PKQA-0E	DE-BFL	77	463	lt	#32CD32	g
+PKQA-0E	DE-BFL	573	783	mt	#800080	g
+PKQA-0E	DE-BFL	0	403	lt2	#FFBD4C	g
+PKQA-2E	DE-BFL	0	463	lt	#4ED740	g
+PKQA-2E	DE-BFL	603	783	mt	#9840D7	g
+PKQA-3E	DE-BFL	573	783	mt	#800080	g
+PKQA-3E	DE-BFL	77	463	lt	#9840D7	g
+PKQA-4E	DE-BFL	0	403	lt	#9840D7	g
+PKQA-4E	DE-BFL	603	723	mt	#9840D7	g
+PKQA-5E	DE-BFL	77	463	lt	#32CD32	g
+PKQA-5E	DE-BFL	603	753	mt	#9840D7	g
+PKQA-6E	DE-BFL	0	433	lt	#4ED740	g
+PKQA-6E	DE-BFL	603	723	mt	#9840D7	g
+PKQA-7E	DE-BFL	603	783	mt	#800080	g
+PKQA-7E	DE-BFL	0	343	lt	#9840D7	g
+PKQA-8E	DE-BFL	77	433	lt	#4ED740	g
+PKQA-8E	DE-BFL	573	783	mt	#800080	g
+PKQA-9E	DE-BFL	77	433	lt	#4ED740	g
+PKQA-9E	DE-BFL	603	783	mt	#9840D7	g
+PKQA-0F	DE-BFL	603	753	mt	#9840D7	g
+PKQA-0F	DE-BFL	0	343	lt	#32CD32	g
+PKQA-0F	DE-BFL	0	403	lt2	#FFBD4C	g
+PKQA-2F	DE-BFL	573	783	mt	#9840D7	g
+PKQA-2F	DE-BFL	77	403	lt	#9840D7	g
+PKQA-3F	DE-BFL	573	783	mt	#800080	g
+PKQA-3F	DE-BFL	77	463	lt	#9840D7	g
+PKQA-4F	DE-BFL	573	723	mt	#9840D7	g
+PKQA-4F	DE-BFL	77	433	lt	#9840D7	g
+PKQA-5F	DE-BFL	77	433	lt	#4ED740	g
+PKQA-5F	DE-BFL	603	753	mt	#9840D7	g
+PKQA-6F	DE-BFL	723	783	mt	#800080	g
+PKQA-6F	DE-BFL	343	403	lt	#9840D7	g
+PKQA-7F	DE-BFL	603	783	mt	#800080	g
+PKQA-7F	DE-BFL	0	433	lt	#9840D7	g
+PKQA-8F	DE-BFL	77	373	lt	#32CD32	g
+PKQA-8F	DE-BFL	603	753	mt	#800080	g
+PKQA-9F	DE-BFL	77	433	lt	#32CD32	g
+PKQA-9F	DE-BFL	573	783	mt	#800080	g
+PKQA-2G	DE-BFL	0	373	lt	#32CD32	g
+PKQA-2G	DE-BFL	573	783	mt	#800080	g
+PKQA-4G	DE-BFL	573	723	mt	#9840D7	g
+PKQA-4G	DE-BFL	0	343	lt	#9840D7	g
+PKQA-5G	DE-BFL	77	483	lt	#4ED740	g
+PKQA-5G	DE-BFL	603	753	mt	#9840D7	g
+PKQA-6G	DE-BFL	373	433	lt	#32CD32	g
+PKQA-6G	DE-BFL	543	783	mt	#9840D7	g
+PKQA-7G	DE-BFL	603	783	mt	#800080	g
+PKQA-7G	DE-BFL	77	403	lt	#9840D7	g
+PKQA-8G	DE-BFL	77	403	lt	#32CD32	g
+PKQA-8G	DE-BFL	573	723	mt	#800080	g
+PKQA-9G	DE-BFL	77	433	lt	#32CD32	g
+PKQA-9G	DE-BFL	573	783	mt	#800080	g
+PKQA-2H	DE-BFL	573	783	mt	#800080	g
+PKQA-2H	DE-BFL	0	403	lt	#9840D7	g
+PKQA-5H	DE-BFL	77	343	lt	#4ED740	g
+PKQA-5H	DE-BFL	603	723	mt	#9840D7	g
+PKQA-6H	DE-BFL	663	783	mt	#800080	g
+PKQA-6H	DE-BFL	0	433	lt	#9840D7	g
+PKQA-7H	DE-BFL	77	433	lt	#32CD32	g
+PKQA-7H	DE-BFL	603	783	mt	#800080	g
+PKQA-8H	DE-BFL	0	343	lt	#32CD32	g
+PKQA-8H	DE-BFL	573	723	mt	#800080	g
+PKQA-2I	DE-BFL	573	783	mt	#800080	g
+PKQA-2I	DE-BFL	0	463	lt	#9840D7	g
+PKQA-5I	DE-BFL	0	403	lt	#32CD32	g
+PKQA-5I	DE-BFL	573	783	mt	#800080	g
+PKQA-6I	DE-BFL	663	783	mt	#800080	g
+PKQA-6I	DE-BFL	77	403	lt	#9840D7	g
+PKQA-7I	DE-BFL	603	783	mt	#800080	g
+PKQA-7I	DE-BFL	77	403	lt	#9840D7	g
+PKQA-8I	DE-BFL	603	783	mt	#800080	g
+PKQA-8I	DE-BFL	0	483	lt	#9840D7	g
+PKQA-2J	DE-BFL	573	723	mt	#9840D7	g
+PKQA-5J	DE-BFL	77	483	lt	#32CD32	g
+PKQA-5J	DE-BFL	633	723	mt	#9840D7	g
+PKQA-6J	DE-BFL	663	783	mt	#800080	g
+PKQA-6J	DE-BFL	343	433	lt	#9840D7	g
+PKQA-7J	DE-BFL	0	373	lt	#32CD32	g
+PKQA-7J	DE-BFL	633	783	mt	#800080	g
+PKQA-8J	DE-BFL	573	783	mt	#800080	g
+PKQA-8J	DE-BFL	77	483	lt	#9840D7	g
+PKQA-2K	DE-BFL	573	753	mt	#9840D7	g
+PKQA-5K	DE-BFL	77	463	lt	#32CD32	g
+PKQA-5K	DE-BFL	603	723	mt	#9840D7	g
+PKQA-6K	DE-BFL	723	783	mt	#800080	g
+PKQA-6K	DE-BFL	0	403	lt	#9840D7	g
+PKQA-7K	DE-BFL	0	343	lt	#32CD32	g
+PKQA-7K	DE-BFL	573	783	mt	#800080	g
+PKQA-8K	DE-BFL	77	373	lt	#32CD32	g
+PKQA-8K	DE-BFL	603	783	mt	#800080	g
+PKQA-5L	DE-BFL	77	433	lt	#32CD32	g
+PKQA-5L	DE-BFL	513	723	mt	#9840D7	g
+PKQA-8L	DE-BFL	573	783	mt	#800080	g
+PKQA-8L	DE-BFL	0	373	lt	#9840D7	g
+PKQA-5M	DE-BFL	0	373	lt	#32CD32	g
+PKQA-5M	DE-BFL	573	783	mt	#800080	g
+PKQA-5N	DE-BFL	0	463	lt	#32CD32	g
+PKQA-5N	DE-BFL	573	783	mt	#800080	g
+PKQA-5O	DE-BFL	77	463	lt	#32CD32	g
+PKQA-5O	DE-BFL	573	783	mt	#800080	g
+PKQA-5P	DE-BFL	0	373	lt	#32CD32	g
+PKQA-5P	DE-BFL	603	723	mt	#9840D7	g
+PKSB-1B	DE-BFL	77	373	lt	#32CD32	g
+PKSB-1B	DE-BFL	603	693	mt	#9840D7	g
+PKSB-1C	DE-BFL	373	463	lt	#32CD32	g
+PKSB-1C	DE-BFL	633	723	mt	#9840D7	g
+PKSB-1D	DE-BFL	343	463	lt	#32CD32	g
+PKSB-1D	DE-BFL	603	723	mt	#9840D7	g
+PKSB-1E	DE-BFL	343	463	lt	#32CD32	g
+PKSB-1E	DE-BFL	573	693	mt	#9840D7	g
+PKSB-1F	DE-BFL	343	463	lt	#32CD32	g
+PKSB-1F	DE-BFL	573	723	mt	#9840D7	g
+PKSB-1G	DE-BFL	343	403	lt	#32CD32	g
+PKSB-1G	DE-BFL	663	723	mt	#9840D7	g
+PKSB-1H	DE-BFL	343	433	lt	#4ED740	g
+PKSB-1H	DE-BFL	543	693	mt	#9840D7	g
+PKSF-0A	DE-BFL	77	433	lt	#4ED740	g
+PKSF-0A	DE-BFL	633	723	mt	#800080	g
+PKSF-0B	DE-BFL	77	433	lt	#4ED740	g
+PKSF-0B	DE-BFL	633	723	mt	#800080	g
+PKSF-1B	DE-BFL	77	343	lt	#4ED740	g
+PKSF-1B	DE-BFL	663	723	mt	#800080	g
+PKSF-0C	DE-BFL	77	433	lt	#4ED740	g
+PKSF-0C	DE-BFL	633	723	mt	#800080	g
+PKSF-1C	DE-BFL	0	483	lt	#4ED740	g
+PKSF-1C	DE-BFL	633	723	mt	#800080	g
+PKSF-0D	DE-BFL	77	433	lt	#4ED740	g
+PKSF-0D	DE-BFL	633	723	mt	#800080	g
+PKSF-0E	DE-BFL	77	433	lt	#4ED740	g
+PKSF-0E	DE-BFL	633	723	mt	#800080	g
+PKSF-0F	DE-BFL	77	433	lt	#4ED740	g
+PKSF-0F	DE-BFL	633	723	mt	#800080	g
+PKSF-0G	DE-BFL	0	433	lt	#4ED740	g
+PKSF-0G	DE-BFL	633	723	mt	#800080	g
+PKSF-0H	DE-BFL	0	433	lt	#4ED740	g
+PKSF-0H	DE-BFL	633	723	mt	#800080	g
+PKSF-0I	DE-BFL	373	483	lt	#4ED740	g
+PKSF-0I	DE-BFL	633	723	mt	#800080	g
+PKSF-0J	DE-BFL	77	433	lt	#4ED740	g
+PKSF-0J	DE-BFL	633	723	mt	#800080	g
+PKSF-0K	DE-BFL	0	433	lt	#4ED740	g
+PKSF-0K	DE-BFL	633	723	mt	#800080	g
+PKSF-0L	DE-BFL	77	433	lt	#4ED740	g
+PKSF-0L	DE-BFL	633	723	mt	#800080	g
+PKSF-0M	DE-BFL	77	433	lt	#4ED740	g
+PKSF-0M	DE-BFL	633	723	mt	#800080	g
+PKSF-1.B	DE-BFL	0	433	lt	#4ED740	g
+PKSF-1.B	DE-BFL	663	723	mt	#800080	g
+PKSF-1.C	DE-BFL	77	433	lt	#4ED740	g
+PKSF-1.D	DE-BFL	0	433	lt	#4ED740	g
+PKSF-1.D	DE-BFL	633	723	mt	#800080	g
+PKSF-1.E	DE-BFL	77	433	lt	#4ED740	g
+PKSF-1.G	DE-BFL	0	433	lt	#4ED740	g
+PKSF-1.G	DE-BFL	633	723	mt	#800080	g
+PKSF-1.H	DE-BFL	0	433	lt	#4ED740	g
+PKSF-1.H	DE-BFL	633	723	mt	#800080	g
+PKSF-1.I	DE-BFL	0	433	lt	#4ED740	g
+PKSF-1.I	DE-BFL	633	723	mt	#800080	g
+PKSF-1.J	DE-BFL	0	433	lt	#4ED740	g
+PKSF-1.J	DE-BFL	633	723	mt	#800080	g
+PKSF-1.L	DE-BFL	0	433	lt	#4ED740	g
+PKSF-1.L	DE-BFL	633	723	mt	#800080	g
+PKSF-1.M	DE-BFL	0	433	lt	#4ED740	g
+PKSF-1.M	DE-BFL	633	723	mt	#800080	g
+PKSF-1.N	DE-BFL	0	433	lt	#4ED740	g
+PKSF-1.N	DE-BFL	633	723	mt	#800080	g
+PKSF-1.O	DE-BFL	0	433	lt	#4ED740	g
+PKSF-1.O	DE-BFL	633	723	mt	#800080	g
+PKSF-2A	DE-BFL	0	483	lt	#4ED740	g
+PKSF-2A	DE-BFL	633	723	mt	#800080	g
+PKSF-5A	DE-BFL	77	483	lt	#4ED740	g
+PKSF-5A	DE-BFL	633	723	mt	#800080	g
+PKSF-7A	DE-BFL	373	483	lt	#4ED740	g
+PKSF-7A	DE-BFL	633	723	mt	#800080	g
+PKSF-8A	DE-BFL	373	513	lt	#4ED740	g
+PKSF-8A	DE-BFL	633	723	mt	#800080	g
+PKSF-9A	DE-BFL	77	433	lt	#4ED740	g
+PKSF-9A	DE-BFL	603	693	mt	#9840D7	g
+PKSF-2B	DE-BFL	0	433	lt	#4ED740	g
+PKSF-2B	DE-BFL	633	723	mt	#800080	g
+PKSF-3B	DE-BFL	343	483	lt	#4ED740	g
+PKSF-3B	DE-BFL	633	723	mt	#800080	g
+PKSF-4B	DE-BFL	373	573	lt	#4ED740	g
+PKSF-4B	DE-BFL	633	723	mt	#800080	g
+PKSF-5B	DE-BFL	0	483	lt	#4ED740	g
+PKSF-5B	DE-BFL	633	723	mt	#800080	g
+PKSF-6B	DE-BFL	0	433	lt	#4ED740	g
+PKSF-6B	DE-BFL	633	723	mt	#800080	g
+PKSF-7B	DE-BFL	77	513	lt	#4ED740	g
+PKSF-7B	DE-BFL	633	723	mt	#800080	g
+PKSF-8B	DE-BFL	343	513	lt	#4ED740	g
+PKSF-8B	DE-BFL	633	723	mt	#800080	g
+PKSF-9B	DE-BFL	373	483	lt	#4ED740	g
+PKSF-9B	DE-BFL	633	723	mt	#800080	g
+PKSF-2C	DE-BFL	0	433	lt	#4ED740	g
+PKSF-2C	DE-BFL	633	723	mt	#800080	g
+PKSF-3C	DE-BFL	0	483	lt	#4ED740	g
+PKSF-3C	DE-BFL	633	723	mt	#800080	g
+PKSF-4C	DE-BFL	373	483	lt	#4ED740	g
+PKSF-4C	DE-BFL	633	723	mt	#800080	g
+PKSF-5C	DE-BFL	0	483	lt	#4ED740	g
+PKSF-5C	DE-BFL	633	723	mt	#800080	g
+PKSF-6C	DE-BFL	0	433	lt	#4ED740	g
+PKSF-6C	DE-BFL	633	723	mt	#800080	g
+PKSF-7C	DE-BFL	633	723	mt	#800080	g
+PKSF-8C	DE-BFL	373	513	lt	#4ED740	g
+PKSF-8C	DE-BFL	633	723	mt	#800080	g
+PKSF-9C	DE-BFL	633	723	mt	#800080	g
+PKSF-1D	DE-BFL	0	483	lt	#4ED740	g
+PKSF-1D	DE-BFL	633	723	mt	#800080	g
+PKSF-2D	DE-BFL	0	433	lt	#4ED740	g
+PKSF-2D	DE-BFL	633	723	mt	#800080	g
+PKSF-3D	DE-BFL	77	433	lt	#4ED740	g
+PKSF-3D	DE-BFL	633	723	mt	#800080	g
+PKSF-4D	DE-BFL	77	483	lt	#4ED740	g
+PKSF-4D	DE-BFL	633	723	mt	#800080	g
+PKSF-5D	DE-BFL	0	483	lt	#4ED740	g
+PKSF-5D	DE-BFL	633	723	mt	#800080	g
+PKSF-6D	DE-BFL	0	483	lt	#4ED740	g
+PKSF-7D	DE-BFL	373	483	lt	#4ED740	g
+PKSF-7D	DE-BFL	633	723	mt	#800080	g
+PKSF-8D	DE-BFL	343	513	lt	#4ED740	g
+PKSF-8D	DE-BFL	633	723	mt	#800080	g
+PKSF-9D	DE-BFL	373	483	lt	#4ED740	g
+PKSF-9D	DE-BFL	633	723	mt	#800080	g
+PKSF-1E	DE-BFL	0	483	lt	#4ED740	g
+PKSF-1E	DE-BFL	633	723	mt	#800080	g
+PKSF-2E	DE-BFL	0	433	lt	#4ED740	g
+PKSF-2E	DE-BFL	633	723	mt	#800080	g
+PKSF-3E	DE-BFL	0	433	lt	#4ED740	g
+PKSF-3E	DE-BFL	633	723	mt	#800080	g
+PKSF-4E	DE-BFL	373	513	lt	#4ED740	g
+PKSF-4E	DE-BFL	633	723	mt	#800080	g
+PKSF-5E	DE-BFL	77	483	lt	#4ED740	g
+PKSF-5E	DE-BFL	633	723	mt	#800080	g
+PKSF-6E	DE-BFL	373	483	lt	#4ED740	g
+PKSF-6E	DE-BFL	633	723	mt	#800080	g
+PKSF-7E	DE-BFL	373	483	lt	#4ED740	g
+PKSF-7E	DE-BFL	633	723	mt	#800080	g
+PKSF-8E	DE-BFL	343	513	lt	#4ED740	g
+PKSF-8E	DE-BFL	633	723	mt	#800080	g
+PKSF-9E	DE-BFL	373	483	lt	#4ED740	g
+PKSF-9E	DE-BFL	633	723	mt	#800080	g
+PKSF-1F	DE-BFL	77	433	lt	#4ED740	g
+PKSF-1F	DE-BFL	633	723	mt	#800080	g
+PKSF-2F	DE-BFL	0	433	lt	#4ED740	g
+PKSF-2F	DE-BFL	633	723	mt	#800080	g
+PKSF-3F	DE-BFL	77	433	lt	#4ED740	g
+PKSF-3F	DE-BFL	633	723	mt	#800080	g
+PKSF-4F	DE-BFL	343	513	lt	#4ED740	g
+PKSF-4F	DE-BFL	633	723	mt	#800080	g
+PKSF-5F	DE-BFL	0	483	lt	#4ED740	g
+PKSF-5F	DE-BFL	633	723	mt	#800080	g
+PKSF-6F	DE-BFL	0	433	lt	#4ED740	g
+PKSF-6F	DE-BFL	633	723	mt	#800080	g
+PKSF-7F	DE-BFL	373	483	lt	#4ED740	g
+PKSF-7F	DE-BFL	633	723	mt	#800080	g
+PKSF-8F	DE-BFL	373	513	lt	#4ED740	g
+PKSF-8F	DE-BFL	633	723	mt	#800080	g
+PKSF-9F	DE-BFL	373	483	lt	#4ED740	g
+PKSF-9F	DE-BFL	633	723	mt	#800080	g
+PKSF-1G	DE-BFL	0	433	lt	#4ED740	g
+PKSF-1G	DE-BFL	633	723	mt	#800080	g
+PKSF-2G	DE-BFL	0	433	lt	#4ED740	g
+PKSF-2G	DE-BFL	633	723	mt	#800080	g
+PKSF-3G	DE-BFL	0	433	lt	#4ED740	g
+PKSF-3G	DE-BFL	633	723	mt	#800080	g
+PKSF-4G	DE-BFL	0	483	lt	#4ED740	g
+PKSF-4G	DE-BFL	633	723	mt	#800080	g
+PKSF-5G	DE-BFL	0	483	lt	#4ED740	g
+PKSF-5G	DE-BFL	633	723	mt	#800080	g
+PKSF-7G	DE-BFL	343	483	lt	#4ED740	g
+PKSF-8G	DE-BFL	343	513	lt	#4ED740	g
+PKSF-8G	DE-BFL	633	723	mt	#800080	g
+PKSF-9G	DE-BFL	373	483	lt	#4ED740	g
+PKSF-9G	DE-BFL	633	723	mt	#800080	g
+PKSF-1H	DE-BFL	0	433	lt	#4ED740	g
+PKSF-1H	DE-BFL	633	723	mt	#800080	g
+PKSF-2H	DE-BFL	0	433	lt	#4ED740	g
+PKSF-2H	DE-BFL	633	723	mt	#800080	g
+PKSF-3H	DE-BFL	0	483	lt	#4ED740	g
+PKSF-3H	DE-BFL	633	723	mt	#800080	g
+PKSF-4H	DE-BFL	343	483	lt	#4ED740	g
+PKSF-4H	DE-BFL	633	723	mt	#800080	g
+PKSF-5H	DE-BFL	0	483	lt	#4ED740	g
+PKSF-5H	DE-BFL	633	723	mt	#800080	g
+PKSF-7H	DE-BFL	373	483	lt	#4ED740	g
+PKSF-7H	DE-BFL	633	723	mt	#800080	g
+PKSF-9H	DE-BFL	373	483	lt	#4ED740	g
+PKSF-9H	DE-BFL	633	723	mt	#800080	g
+PKSF-1I	DE-BFL	77	433	lt	#4ED740	g
+PKSF-1I	DE-BFL	633	723	mt	#800080	g
+PKSF-2I	DE-BFL	0	433	lt	#4ED740	g
+PKSF-2I	DE-BFL	633	723	mt	#800080	g
+PKSF-3I	DE-BFL	77	433	lt	#4ED740	g
+PKSF-3I	DE-BFL	633	723	mt	#800080	g
+PKSF-4I	DE-BFL	77	433	lt	#4ED740	g
+PKSF-4I	DE-BFL	633	723	mt	#800080	g
+PKSF-5I	DE-BFL	0	483	lt	#4ED740	g
+PKSF-5I	DE-BFL	633	723	mt	#800080	g
+PKSF-7I	DE-BFL	0	433	lt	#4ED740	g
+PKSF-7I	DE-BFL	633	723	mt	#800080	g
+PKSF-9I	DE-BFL	373	483	lt	#4ED740	g
+PKSF-9I	DE-BFL	633	723	mt	#800080	g
+PKSF-1J	DE-BFL	0	433	lt	#4ED740	g
+PKSF-1J	DE-BFL	633	723	mt	#800080	g
+PKSF-2J	DE-BFL	0	433	lt	#4ED740	g
+PKSF-2J	DE-BFL	633	723	mt	#800080	g
+PKSF-3J	DE-BFL	0	483	lt	#4ED740	g
+PKSF-3J	DE-BFL	633	723	mt	#800080	g
+PKSF-4J	DE-BFL	77	483	lt	#4ED740	g
+PKSF-4J	DE-BFL	633	723	mt	#800080	g
+PKSF-5J	DE-BFL	77	483	lt	#4ED740	g
+PKSF-5J	DE-BFL	633	723	mt	#800080	g
+PKSF-1K	DE-BFL	0	433	lt	#4ED740	g
+PKSF-1K	DE-BFL	633	723	mt	#800080	g
+PKSF-2K	DE-BFL	373	483	lt	#4ED740	g
+PKSF-2K	DE-BFL	633	723	mt	#800080	g
+PKSF-3K	DE-BFL	373	483	lt	#4ED740	g
+PKSF-3K	DE-BFL	633	723	mt	#800080	g
+PKSF-4K	DE-BFL	77	483	lt	#4ED740	g
+PKSF-4K	DE-BFL	633	723	mt	#800080	g
+PKSF-5K	DE-BFL	0	483	lt	#4ED740	g
+PKSF-5K	DE-BFL	633	723	mt	#800080	g
+PKSF-1L	DE-BFL	77	433	lt	#4ED740	g
+PKSF-1L	DE-BFL	633	723	mt	#800080	g
+PKSF-1.F	DE-BFL	373	483	lt	#4ED740	g
+PKSF-1.F	DE-BFL	633	723	mt	#9840D7	g
+PKSF-1.K	DE-BFL	373	483	lt	#4ED740	g
+PKSF-1.K	DE-BFL	633	723	mt	#9840D7	g
+PKSF-3L	DE-BFL	0	433	lt	#4ED740	g
+PKSF-3L	DE-BFL	633	723	mt	#800080	g
+PKSF-5L	DE-BFL	77	483	lt	#4ED740	g
+PKSF-5L	DE-BFL	633	723	mt	#800080	g
+PKSG-2A	DE-BFL	543	693	mt	#9840D7	g
+PKSG-2A	DE-BFL	77	463	lt	#9840D7	g
+PKSG-6A	DE-BFL	77	463	lt	#32CD32	g
+PKSG-6A	DE-BFL	573	693	mt	#9840D7	g
+PKSG-1B	DE-BFL	77	463	lt	#32CD32	g
+PKSG-1B	DE-BFL	573	723	mt	#9840D7	g
+PKSG-2B	DE-BFL	543	663	mt	#9840D7	g
+PKSG-2B	DE-BFL	77	373	lt	#9840D7	g
+PKSG-3B	DE-BFL	0	403	lt	#32CD32	g
+PKSG-3B	DE-BFL	663	723	mt	#9840D7	g
+PKSG-4B	DE-BFL	0	433	lt	#4ED740	g
+PKSG-4B	DE-BFL	633	723	mt	#9840D7	g
+PKSG-5B	DE-BFL	77	433	lt	#4ED740	g
+PKSG-5B	DE-BFL	633	723	mt	#9840D7	g
+PKSG-6B	DE-BFL	573	693	mt	#9840D7	g
+PKSG-7B	DE-BFL	573	723	mt	#9840D7	g
+PKSG-8B	DE-BFL	0	433	lt	#32CD32	g
+PKSG-8B	DE-BFL	573	723	mt	#9840D7	g
+PKSG-1C	DE-BFL	77	463	lt	#32CD32	g
+PKSG-1C	DE-BFL	633	723	mt	#9840D7	g
+PKSG-2C	DE-BFL	77	343	lt	#32CD32	g
+PKSG-2C	DE-BFL	543	693	mt	#9840D7	g
+PKSG-3C	DE-BFL	0	433	lt	#4ED740	g
+PKSG-3C	DE-BFL	603	693	mt	#9840D7	g
+PKSG-4C	DE-BFL	343	603	lt	#32CD32	g
+PKSG-4C	DE-BFL	663	723	mt	#9840D7	g
+PKSG-5C	DE-BFL	0	433	lt	#4ED740	g
+PKSG-5C	DE-BFL	573	723	mt	#9840D7	g
+PKSG-6C	DE-BFL	0	403	lt	#4ED740	g
+PKSG-6C	DE-BFL	573	723	mt	#9840D7	g
+PKSG-7C	DE-BFL	0	433	lt	#4ED740	g
+PKSG-7C	DE-BFL	633	723	mt	#9840D7	g
+PKSG-8C	DE-BFL	0	403	lt	#4ED740	g
+PKSG-8C	DE-BFL	573	723	mt	#9840D7	g
+PKSG-1D	DE-BFL	77	463	lt	#32CD32	g
+PKSG-1D	DE-BFL	573	723	mt	#9840D7	g
+PKSG-2D	DE-BFL	77	343	lt	#32CD32	g
+PKSG-2D	DE-BFL	543	693	mt	#9840D7	g
+PKSG-3D	DE-BFL	0	433	lt	#32CD32	g
+PKSG-3D	DE-BFL	633	723	mt	#9840D7	g
+PKSG-4D	DE-BFL	0	433	lt	#32CD32	g
+PKSG-4D	DE-BFL	663	723	mt	#9840D7	g
+PKSG-5D	DE-BFL	0	403	lt	#4ED740	g
+PKSG-5D	DE-BFL	573	723	mt	#9840D7	g
+PKSG-8D	DE-BFL	0	403	lt	#4ED740	g
+PKSG-8D	DE-BFL	573	723	mt	#9840D7	g
+PKSG-1E	DE-BFL	77	463	lt	#32CD32	g
+PKSG-1E	DE-BFL	693	723	mt	#9840D7	g
+PKSG-2E	DE-BFL	633	693	mt	#9840D7	g
+PKSG-2E	DE-BFL	77	373	lt	#9840D7	g
+PKSG-3E	DE-BFL	0	433	lt	#4ED740	g
+PKSG-3E	DE-BFL	603	663	mt	#9840D7	g
+PKSG-4E	DE-BFL	0	433	lt	#32CD32	g
+PKSG-4E	DE-BFL	633	723	mt	#9840D7	g
+PKSG-1F	DE-BFL	77	463	lt	#4ED740	g
+PKSG-1F	DE-BFL	693	723	mt	#9840D7	g
+PKSG-2F	DE-BFL	543	693	mt	#9840D7	g
+PKSG-2F	DE-BFL	0	403	lt	#9840D7	g
+PKSG-4F	DE-BFL	0	433	lt	#4ED740	g
+PKSG-4F	DE-BFL	633	723	mt	#9840D7	g
+PKSG-1G	DE-BFL	77	463	lt	#4ED740	g
+PKSG-1G	DE-BFL	693	723	mt	#9840D7	g
+PKSG-2G	DE-BFL	0	403	lt	#4ED740	g
+PKSG-2G	DE-BFL	573	693	mt	#9840D7	g
+PKSH-1B	DE-BFL	373	433	lt	#32CD32	g
+PKSH-1B	DE-BFL	573	723	mt	#9840D7	g
+PKSH-2B	DE-BFL	373	433	lt	#32CD32	g
+PKSH-2B	DE-BFL	663	723	mt	#9840D7	g
+PKSH-3B	DE-BFL	373	433	lt	#4ED740	g
+PKSH-3B	DE-BFL	663	723	mt	#9840D7	g
+PKSH-1C	DE-BFL	543	723	mt	#9840D7	g
+PKSH-2C	DE-BFL	373	433	lt	#32CD32	g
+PKSH-2C	DE-BFL	693	723	mt	#9840D7	g
+PKSH-3C	DE-BFL	543	693	mt	#9840D7	g
+PKSH-1D	DE-BFL	573	723	mt	#9840D7	g
+PKSH-2D	DE-BFL	373	433	lt	#4ED740	g
+PKSH-2D	DE-BFL	543	723	mt	#9840D7	g
+PKSH-3D	DE-BFL	543	693	mt	#9840D7	g
+PKSH-1E	DE-BFL	543	723	mt	#9840D7	g
+PKSH-3E	DE-BFL	373	433	lt	#4ED740	g
+PKSH-3E	DE-BFL	663	723	mt	#9840D7	g
+PKSH-1F	DE-BFL	373	433	lt	#32CD32	g
+PKSH-1F	DE-BFL	543	693	mt	#9840D7	g
+PKSH-2F	DE-BFL	373	433	lt	#4ED740	g
+PKSH-2F	DE-BFL	603	723	mt	#9840D7	g
+PKSH-3F	DE-BFL	663	723	mt	#9840D7	g
+PKSH-1G	DE-BFL	373	433	lt	#4ED740	g
+PKSH-1G	DE-BFL	573	723	mt	#9840D7	g
+PKSH-2G	DE-BFL	373	433	lt	#32CD32	g
+PKSH-1H	DE-BFL	373	433	lt	#4ED740	g
+PKSH-1H	DE-BFL	543	723	mt	#9840D7	g
+PKSH-2H	DE-BFL	373	433	lt	#32CD32	g
+PKSH-2H	DE-BFL	573	723	mt	#9840D7	g
+PKSH-1I	DE-BFL	373	433	lt	#32CD32	g
+PKSH-1I	DE-BFL	573	723	mt	#9840D7	g
+PKSH-2I	DE-BFL	373	433	lt	#32CD32	g
+PKSH-2I	DE-BFL	543	693	mt	#9840D7	g
+PKSH-1J	DE-BFL	373	433	lt	#32CD32	g
+PKSH-1J	DE-BFL	543	723	mt	#9840D7	g
+PKSH-2J	DE-BFL	513	663	mt	#9840D7	g
+PKSH-1K	DE-BFL	373	433	lt	#32CD32	g
+PKSH-1K	DE-BFL	573	723	mt	#9840D7	g
+PKSH-1L	DE-BFL	373	433	lt	#32CD32	g
+PKSH-1L	DE-BFL	543	693	mt	#9840D7	g
+PKSI-1B	DE-BFL	0	463	lt	#32CD32	g
+PKSI-1B	DE-BFL	663	723	mt	#9840D7	g
+PKSI-1C	DE-BFL	0	463	lt	#32CD32	g
+PKSI-1C	DE-BFL	663	723	mt	#9840D7	g
+PKSI-1D	DE-BFL	0	463	lt	#32CD32	g
+PKSI-1D	DE-BFL	633	723	mt	#9840D7	g
+PKSI-1E	DE-BFL	0	403	lt	#4ED740	g
+PKSI-1E	DE-BFL	663	723	mt	#9840D7	g
+PKSI-1F	DE-BFL	0	463	lt	#32CD32	g
+PKSI-1F	DE-BFL	663	723	mt	#9840D7	g
+PKSI-1G	DE-BFL	77	403	lt	#4ED740	g
+PKSJ-1A	DE-BFL	77	433	lt	#32CD32	g
+PKSJ-1A	DE-BFL	663	723	Fit 2	#9840D7	g
+PKSJ-1B	DE-BFL	77	433	lt	#32CD32	g
+PKSJ-1B	DE-BFL	663	723	mt	#9840D7	g
+PKSJ-2B	DE-BFL	343	433	lt	#32CD32	g
+PKSJ-2B	DE-BFL	603	723	mt	#9840D7	g
+PKSJ-3B	DE-BFL	343	403	lt	#9840D7	g
+PKSJ-3B	DE-BFL	663	723	mt	#9840D7	g
+PKSJ-1C	DE-BFL	77	403	lt	#32CD32	g
+PKSJ-1C	DE-BFL	543	723	mt	#9840D7	g
+PKSJ-2C	DE-BFL	77	403	lt	#32CD32	g
+PKSJ-2C	DE-BFL	603	723	mt	#9840D7	g
+PKSJ-3C	DE-BFL	343	403	lt	#32CD32	g
+PKSJ-3C	DE-BFL	603	723	mt	#9840D7	g
+PKSJ-1D	DE-BFL	0	403	lt	#32CD32	g
+PKSJ-1D	DE-BFL	573	723	mt	#9840D7	g
+PKSJ-2D	DE-BFL	77	403	lt	#32CD32	g
+PKSJ-2D	DE-BFL	603	723	Fit 2	#9840D7	g
+PKSJ-3D	DE-BFL	77	433	lt	#32CD32	g
+PKSJ-3D	DE-BFL	603	723	mt	#9840D7	g
+PKSJ-2E	DE-BFL	77	403	lt	#32CD32	g
+PKSJ-2E	DE-BFL	603	723	mt	#9840D7	g
+PKSJ-3E	DE-BFL	77	433	lt	#4ED740	g
+PKSJ-3E	DE-BFL	603	723	mt	#9840D7	g
+PKSK-1A	DE-BFL	0	433	lt	#32CD32	g
+PKSK-1A	DE-BFL	543	723	mt	#9840D7	g
+PKSK-2A	DE-BFL	343	403	lt	#32CD32	g
+PKSK-2A	DE-BFL	513	693	mt	#9840D7	g
+PKSK-1B	DE-BFL	543	723	mt	#9840D7	g
+PKSK-1B	DE-BFL	77	433	lt	#9840D7	g
+PKSK-2B	DE-BFL	373	433	lt	#32CD32	g
+PKSK-2B	DE-BFL	543	723	mt	#9840D7	g
+PKSK-1C	DE-BFL	343	403	lt	#32CD32	g
+PKSK-1C	DE-BFL	543	723	mt	#9840D7	g
+PKSK-2C	DE-BFL	0	403	lt	#4ED740	g
+PKSK-2C	DE-BFL	573	633	mt	#800080	g
+PKSK-2D	DE-BFL	543	693	mt	#9840D7	g
+PKSK-2D	DE-BFL	77	403	lt	#9840D7	g
+PKSK-2E	DE-BFL	543	723	mt	#9840D7	g
+PKSK-2E	DE-BFL	0	403	lt	#9840D7	g
+PKSK-2F	DE-BFL	543	693	mt	#9840D7	g
+PKSK-2F	DE-BFL	0	403	lt	#9840D7	g
+WBEA-1B	DE-BFL	0	343	lt	#32CD32	g
+WBEA-1B	DE-BFL-O	633	723	mt	#9840D7	g
+WBEA-2B	DE-BFL	343	463	lt	#32CD32	g
+WBEA-2B	DE-BFL	723	783	mt	#800080	g
+WBEA-1C	DE-BFL	0	343	lt	#32CD32	g
+WBEA-1C	DE-BFL	633	693	mt	#9840D7	g
+WBEA-2C	DE-BFL	693	783	mt	#800080	g
+WBEA-2C	DE-BFL	403	483	lt	#9840D7	g
+WBEA-1D	DE-BFL	0	343	lt	#32CD32	g
+WBEA-1D	DE-BFL	633	693	mt	#9840D7	g
+WBEA-2D	DE-BFL	343	403	lt	#4ED740	g
+WBEA-2D	DE-BFL	723	783	mt	#9840D7	g
+WBEA-1E	DE-BFL	0	343	lt	#32CD32	g
+WBEA-1E	DE-BFL	573	663	mt	#9840D7	g
+WBEA-1F	DE-BFL	573	663	mt	#4ED740	g
+WBEA-1G	DE-BFL	343	483	lt	#32CD32	g
+WBEA-1G	DE-BFL	663	723	mt	#9840D7	g
+WBEA-1H	DE-BFL	373	543	lt	#32CD32	g
+WBEA-1H	DE-BFL	633	723	mt	#9840D7	g
+WBEA-1I	DE-BFL	343	403	lt	#32CD32	g
+WBEA-1I	DE-BFL	633	723	mt	#9840D7	g`;
+EMBEDDED_REDO.split('\n').forEach(l=>{ if(l.trim()) S.pendingRedo.push(l); });
+function lsGet(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
+function lsSet(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }
+function specKey(sp){ return 'fitquest:'+(sp.hdr.site||'')+':'+sp.name; }
+
+/* ═════════════════════════ file loading ═════════════════════════ */
+const dz=document.getElementById('drop-zone'), fi=document.getElementById('file-input');
+dz.onclick=()=>fi.click();
+dz.ondragover=e=>{e.preventDefault();dz.classList.add('over');};
+dz.ondragleave=()=>dz.classList.remove('over');
+dz.ondrop=e=>{e.preventDefault();dz.classList.remove('over');loadFiles(e.dataTransfer.files);};
+fi.onchange=()=>loadFiles(fi.files);
+document.body.addEventListener('dragover',e=>e.preventDefault());
+document.body.addEventListener('drop',e=>e.preventDefault());
+
+async function loadFiles(fileList){
+  const files=[...fileList];
+  const sams=[], redos=[], others=[];
+  for(const f of files){
+    const n=f.name.toLowerCase();
+    if(n.endsWith('.sam')) sams.push(f);
+    else if(n.endsWith('.redo')) redos.push(f);
+    else if(n.endsWith('.rmg')||n.endsWith('.up')||n.endsWith('.stat')||n.endsWith('.log')||n.endsWith('.magic')||n.endsWith('.txt')||n.endsWith('.csv')||n.endsWith('.png')) continue;
+    else others.push(f);
+  }
+  let nLoaded=0;
+  for(const f of sams){
+    const sam=parseSam(await f.text());
+    if(sam) S.sites[f.name]={sam, order:sam.files.slice()};
+  }
+  for(const f of others){
+    const sp=parseSpecimenFile(f.name, await f.text());
+    if(sp && !(sp.name in S.specs)){ S.specs[sp.name]=sp; restoreSpec(sp); nLoaded++; }
+  }
+  for(const f of redos){
+    const txt=await f.text();
+    txt.split(/\r?\n/).forEach(l=>{ if(l.trim()) S.pendingRedo.push(l); });
+  }
+  applyPendingRedo();
+  rebuildOrder();
+  if(!S.cur){
+    const first=S.order.find(n=>S.specs[n].steps.length>0);
+    if(first) selectSpec(first);
+  }
+  renderQueue(); renderAll();
+  toast(nLoaded+' specimen file'+(nLoaded===1?'':'s')+' loaded'+(redos.length?' · redo imported':''));
+}
+function rebuildOrder(){
+  const placed=new Set(); S.order=[];
+  Object.values(S.sites).forEach(site=>{
+    site.order.forEach(n=>{ if(S.specs[n] && !placed.has(n)){ S.order.push(n); placed.add(n);} });
+  });
+  Object.keys(S.specs).sort().forEach(n=>{ if(!placed.has(n)){ S.order.push(n); placed.add(n);} });
+}
+// match a redo bound value to a step index (tmin→first ≥, tmax→last ≤)
+function boundToIdx(sp, val, isMax){
+  const v=parseFloat(val);
+  const keyOf=s=> s.treat.type==='AF' ? s.treat.T : (s.treat.type==='NRM'?0:s.treat.K);
+  let best=null;
+  sp.steps.forEach((s,i)=>{
+    const k=keyOf(s);
+    const ok = isMax ? k<=v+1e-9 : k>=v-1e-9;
+    if(ok && (best===null || (isMax? k>=keyOf(sp.steps[best]) : (best===null)))) {
+      if(isMax) best=i; else if(best===null) best=i;
+    }
+  });
+  return best;
+}
+// redo fit names → slots: lt→LT, lt2→MT, mt→HT (mt is the ChRM / terminal), else first free
+function slotForRedoName(sp, nm){
+  const n=(nm||'').toLowerCase();
+  if(SLOTS.includes(nm)) return nm;
+  if(n==='lt') return 'LT';
+  if(n==='lt2') return 'MT';
+  if(n==='mt'||n==='ht'||n==='chrm') return 'HT';
+  return sp.fits.LT===null?'LT':sp.fits.MT===null?'MT':sp.fits.HT===null?'HT':null;
+}
+function applyPendingRedo(){
+  const rest=[];
+  S.pendingRedo.forEach(line=>{
+    const f=line.split('\t');
+    let name=f[0]; if(name.startsWith('current_')) name=name.slice(8);
+    const sp=S.specs[name];
+    if(!sp || f.length<5){ if(f.length>=5) rest.push(line); return; }
+    if(sp._hadLocal) return;   // never clobber fits you already made/saved
+    const slot=slotForRedoName(sp, f[4]);
+    if(!slot || sp.fits[slot]) return;
+    const i0=boundToIdx(sp,f[2],false), i1=boundToIdx(sp,f[3],true);
+    if(i0!==null && i1!==null && i1>i0) sp.fits[slot]={i0,i1,name:f[4],color:f[5]||SLOTC[slot]};
+  });
+  S.pendingRedo=rest;
+}
+function restoreSpec(sp){
+  const raw=lsGet(specKey(sp));
+  if(!raw) return;
+  try{
+    const d=JSON.parse(raw);
+    (d.skips||[]).forEach(i=>{ if(sp.steps[i]) sp.steps[i].skipped=true; });
+    let any=false;
+    SLOTS.forEach(k=>{ if(d.fits && d.fits[k]){ sp.fits[k]=d.fits[k]; any=true; } });
+    sp.saved=!!d.saved;
+    sp._hadLocal=any||sp.saved;
+  }catch(e){}
+}
+function persistSpec(sp){
+  lsSet(specKey(sp), JSON.stringify({
+    skips:sp.steps.filter(s=>s.skipped).map(s=>s.idx),
+    fits:sp.fits, saved:sp.saved
+  }));
+}
+
+/* ═════════════════════════ fitting & grading ═════════════════════════ */
+function stepCart(sp, s, cs){
+  const dec = cs==='spec'?s.decS : cs==='tc'?s.decT : s.decG;
+  const inc = cs==='spec'?s.incS : cs==='tc'?s.incT : s.incG;
+  return dir2cart(dec,inc,s.J);
+}
+function segSteps(sp, fit){
+  return sp.steps.slice(fit.i0, fit.i1+1);
+}
+function lastAliveIdx(sp){
+  for(let i=sp.steps.length-1;i>=0;i--) if(!sp.steps[i].skipped) return i;
+  return -1;
+}
+// terminal slot = valid fit whose i1 reaches the last surviving step; fall back to highest i1
+function terminalSlot(sp){
+  const la=lastAliveIdx(sp);
+  let best=null, bestI1=-1;
+  SLOTS.forEach(k=>{
+    const f=sp.fits[k];
+    if(!f) return;
+    if(f.i1>=bestI1){ bestI1=f.i1; best=k; }
+  });
+  if(best===null) return null;
+  return {slot:best, reaches: sp.fits[best].i1>=la && la>=0};
+}
+function computeFit(sp, slot){
+  const fit=sp.fits[slot];
+  if(!fit) return null;
+  const seg=segSteps(sp,fit);
+  const used=seg.filter(s=>!s.skipped);
+  const out={slot, seg, used, nTotal:seg.length, nUsed:used.length, warns:[]};
+  if(used.length<3){ out.invalid='need ≥3 points ('+used.length+' in segment)'; return out; }
+  ['geo','tc','spec'].forEach(cs=>{
+    out[cs]=pcaLine(used.map(s=>stepCart(sp,s,cs)));
+  });
+  const skipFrac=1-used.length/seg.length;
+  if(skipFrac>0.25) out.warns.push((100*skipFrac).toFixed(0)+'% of segment skipped — beyond ~25% the line is wrong, not the points (grade capped)');
+  if(used.some(s=>s.warn && s.warn.includes('spike'))) out.warns.push('segment contains an intensity-spike step — possible instrument artifact');
+  out.capped = skipFrac>0.25;
+  return out;
+}
+function gradeOf(score){ return score>=95?'S':score>=85?'A':score>=70?'B':score>=50?'C':score>=30?'D':'F'; }
+function scoreFit(sp, slot, res, term){
+  if(!res || res.invalid) return null;
+  const r=res[S.cs==='spec'?'spec':S.cs];  // grade in active coord system (MAD/dang rotation-invariant)
+  const isTerm = term && term.slot===slot && term.reaches;
+  let sc=100 - 6*r.mad;
+  if(isTerm && isFinite(r.dang)) sc -= 2*Math.max(0, r.dang-5);
+  sc += Math.min(10, 2*Math.max(0, r.n-3));
+  sc=Math.max(0,Math.round(sc));
+  const usable = isTerm && r.mad<=10 && isFinite(r.dang) && r.dang<=15;
+  if(usable) sc+=15;
+  if(res.capped) sc=Math.min(sc,69);
+  return {score:Math.min(sc,120), grade:gradeOf(Math.min(sc,100)), usable, isTerm, mad:r.mad, dang:r.dang};
+}
+
+/* ═════════════════════════ rendering: queue ═════════════════════════ */
+function renderQueue(){
+  const list=document.getElementById('spec-list');
+  list.innerHTML='';
+  if(S.order.length===0) return;
+  const bySite={};
+  S.order.forEach(n=>{
+    const site=S.specs[n].hdr.site||'—';
+    (bySite[site]=bySite[site]||[]).push(n);
+  });
+  Object.entries(bySite).forEach(([site,names])=>{
+    const h=document.createElement('div'); h.className='site-hdr'; h.textContent=site;
+    list.appendChild(h);
+    names.forEach(n=>{
+      const sp=S.specs[n];
+      const d=document.createElement('div');
+      d.className='spec-item'+(n===S.cur?' sel':'')+(sp.steps.length===0?' nodata':'');
+      let badge='';
+      if(sp.saved && sp.lastGrade) badge='<span class="grade-badge g-'+sp.lastGrade+'">'+sp.lastGrade+'</span>';
+      else if(SLOTS.some(k=>sp.fits[k])) badge='<span class="grade-badge" style="color:var(--amb)">…</span>';
+      d.innerHTML='<span class="name">'+n+'</span><span class="meta">'+sp.steps.length+'</span>'+badge+(sp.saved?'<span style="color:var(--ac);font-size:10px">✓</span>':'');
+      if(sp.steps.length>0) d.onclick=()=>selectSpec(n);
+      list.appendChild(d);
+    });
+  });
+  const total=S.order.filter(n=>S.specs[n].steps.length>0).length;
+  const done=S.order.filter(n=>S.specs[n].saved).length;
+  const pw=document.getElementById('progress-wrap');
+  if(total>0){
+    pw.style.display='block';
+    document.getElementById('progress-fill').style.width=(100*done/total)+'%';
+    document.getElementById('progress-txt').textContent=done+' / '+total+' fitted';
+  }
+}
+
+/* ═════════════════════════ rendering: plots ═════════════════════════ */
+function themeColors(){
+  const cs=getComputedStyle(document.documentElement);
+  return {bg:cs.getPropertyValue('--bg').trim(), tx:cs.getPropertyValue('--tx').trim(),
+          tx2:cs.getPropertyValue('--tx2').trim(), tx3:cs.getPropertyValue('--tx3').trim(),
+          bdr:cs.getPropertyValue('--bdr').trim(), red:cs.getPropertyValue('--red').trim(),
+          amb:cs.getPropertyValue('--amb').trim()};
+}
+function convAxes(){
+  switch(S.conv){
+    case 'EN': return {x:'E', h:'N', lab:'x=E, y=N (solid) / Up (open)'};
+    case 'ROT': return {x:'H′', h:'⊥', lab:'x along NRM dec'};
+    default: return {x:'N', h:'E', lab:'x=N, y=E (solid) / Up (open)'};
+  }
+}
+function zijXY(sp, s){
+  const c=stepCart(sp,s,S.cs);     // [N,E,Down]
+  let x,hy;
+  if(S.conv==='EN'){ x=c[1]; hy=c[0]; }
+  else if(S.conv==='ROT'){
+    const s0=sp.steps.find(q=>!q.skipped)||sp.steps[0];
+    const d0=(S.cs==='spec'?s0.decS:S.cs==='tc'?s0.decT:s0.decG)*D2R;
+    x =  c[0]*Math.cos(d0)+c[1]*Math.sin(d0);
+    hy= -c[0]*Math.sin(d0)+c[1]*Math.cos(d0);
+  }
+  else { x=c[0]; hy=c[1]; }
+  return {x, hy, vy:-c[2]};        // Up positive
+}
+function slotOfStep(sp, idx){
+  for(const k of SLOTS){
+    const f=sp.fits[k];
+    if(f && idx>=f.i0 && idx<=f.i1) return k;
+  }
+  return null;
+}
+function hoverTxt(sp,s){
+  return s.label+'<br>J='+s.J.toExponential(2)+(s.csd!==null?' · csd '+s.csd.toFixed(1)+'°':'')+
+    '<br>D/I geo '+s.decG.toFixed(1)+'/'+s.incG.toFixed(1)+(s.skipped?'<br><b>SKIPPED</b>':'')+
+    (s.warn?'<br>⚠ '+s.warn:'')+'<br><i>right-click to '+(s.skipped?'unskip':'skip')+'</i>';
+}
+function markerColors(sp, fillWhenNone){
+  const t=themeColors();
+  return sp.steps.map(s=>{
+    if(s.skipped) return t.red;
+    const sl=slotOfStep(sp,s.idx);
+    return sl?SLOTC[sl]:fillWhenNone;
+  });
+}
+function markerSymbols(sp, base, open){
+  return sp.steps.map(s=> s.skipped ? 'x' : (open?base+'-open':base));
+}
+function plotZij(sp){
+  const t=themeColors(), ca=convAxes();
+  document.getElementById('zij-sub').textContent=ca.lab+' · '+S.cs;
+  const P=sp.steps.map(s=>zijXY(sp,s));
+  const xs=P.map(p=>p.x), hys=P.map(p=>p.hy), vys=P.map(p=>p.vy);
+  const cd=sp.steps.map(s=>s.idx);
+  const txt=sp.steps.map(s=>hoverTxt(sp,s));
+  const colH=markerColors(sp,t.tx), colV=markerColors(sp,t.tx);
+  const alive=sp.steps.map((s,i)=>!s.skipped?i:null).filter(i=>i!==null);
+  const data=[
+    {x:alive.map(i=>xs[i]),y:alive.map(i=>hys[i]),mode:'lines',type:'scatter',hoverinfo:'skip',
+     line:{color:t.tx3,width:1},showlegend:false},
+    {x:alive.map(i=>xs[i]),y:alive.map(i=>vys[i]),mode:'lines',type:'scatter',hoverinfo:'skip',
+     line:{color:t.tx3,width:1,dash:'dot'},showlegend:false},
+    {x:xs,y:hys,customdata:cd,text:txt,hoverinfo:'text',mode:'markers',type:'scatter',name:'horizontal',
+     marker:{size:7,color:colH,symbol:sp.steps.map(s=>s.skipped?'x':'square'),line:{width:1,color:t.bdr}}},
+    {x:xs,y:vys,customdata:cd,text:txt,hoverinfo:'text',mode:'markers',type:'scatter',name:'vertical',
+     marker:{size:7,symbol:sp.steps.map(s=>s.skipped?'x':'circle-open'),color:colV,line:{width:1.5,color:colV}}},
+  ];
+  // fit overlays: line over each segment, positioned on the segment centroid
+  SLOTS.forEach(k=>{
+    const res=sp._res && sp._res[k];
+    if(!res || res.invalid) return;
+    const r=res[S.cs==='spec'?'spec':S.cs];
+    const pts=res.used.map(s=>stepCart(sp,s,S.cs));
+    const ts=pts.map(p=>(p[0]-r.cm[0])*r.v[0]+(p[1]-r.cm[1])*r.v[1]+(p[2]-r.cm[2])*r.v[2]);
+    const t0=Math.min(...ts), t1=Math.max(...ts);
+    [t0,t1].forEach(()=>{});
+    const ends=[t0,t1].map(tt=>[r.cm[0]+tt*r.v[0], r.cm[1]+tt*r.v[1], r.cm[2]+tt*r.v[2]]);
+    const exy=ends.map(c=>{
+      const fake={decS:0,incS:0,decG:0,incG:0,decT:0,incT:0,J:1};
+      // reuse zijXY math manually:
+      let x,hy;
+      if(S.conv==='EN'){ x=c[1]; hy=c[0]; }
+      else if(S.conv==='ROT'){
+        const s0=sp.steps.find(q=>!q.skipped)||sp.steps[0];
+        const d0=(S.cs==='spec'?s0.decS:S.cs==='tc'?s0.decT:s0.decG)*D2R;
+        x=c[0]*Math.cos(d0)+c[1]*Math.sin(d0); hy=-c[0]*Math.sin(d0)+c[1]*Math.cos(d0);
+      } else { x=c[0]; hy=c[1]; }
+      return {x,hy,vy:-c[2]};
+    });
+    data.push({x:exy.map(p=>p.x),y:exy.map(p=>p.hy),mode:'lines',type:'scatter',hoverinfo:'skip',
+               line:{color:SLOTC[k],width:2.5},showlegend:false});
+    data.push({x:exy.map(p=>p.x),y:exy.map(p=>p.vy),mode:'lines',type:'scatter',hoverinfo:'skip',
+               line:{color:SLOTC[k],width:2.5,dash:'dash'},showlegend:false});
+  });
+  const layout={
+    paper_bgcolor:'rgba(0,0,0,0)',plot_bgcolor:'rgba(0,0,0,0)',
+    font:{family:'IBM Plex Mono',size:9,color:t.tx2},
+    margin:{l:42,r:12,t:24,b:34},showlegend:false,
+    xaxis:{title:{text:ca.x,font:{size:9}},zeroline:true,zerolinecolor:t.bdr,zerolinewidth:1.5,gridcolor:t.bdr,griddash:'dot'},
+    yaxis:{title:{text:ca.h+' / Up',font:{size:9}},zeroline:true,zerolinecolor:t.bdr,zerolinewidth:1.5,gridcolor:t.bdr,griddash:'dot',scaleanchor:'x',scaleratio:1},
+    dragmode:'pan',
+  };
+  Plotly.react('zij',data,layout,{displayModeBar:false,responsive:true,scrollZoom:true});
+}
+function eqXY(dec,inc){
+  const r=Math.sqrt(2)*Math.sin((90-Math.abs(inc))*D2R/2); // =1 at inc 0
+  return {x:r*Math.sin(dec*D2R), y:r*Math.cos(dec*D2R)};
+}
+function plotEq(sp){
+  const t=themeColors();
+  const circ={x:[],y:[]};
+  for(let a=0;a<=360;a+=3){ circ.x.push(Math.sin(a*D2R)); circ.y.push(Math.cos(a*D2R)); }
+  const di=sp.steps.map(s=>({dec:(S.cs==='spec'?s.decS:S.cs==='tc'?s.decT:s.decG), inc:(S.cs==='spec'?s.incS:S.cs==='tc'?s.incT:s.incG)}));
+  const P=di.map(d=>eqXY(d.dec,d.inc));
+  const data=[
+    {x:circ.x,y:circ.y,mode:'lines',hoverinfo:'skip',line:{color:t.bdr,width:1},type:'scatter'},
+    {x:[-1,1,null,0,0],y:[0,0,null,-1,1],mode:'lines',hoverinfo:'skip',line:{color:t.bdr,width:.5,dash:'dot'},type:'scatter'},
+    {x:sp.steps.filter(s=>!s.skipped).map(s=>P[s.idx].x),y:sp.steps.filter(s=>!s.skipped).map(s=>P[s.idx].y),
+     mode:'lines',type:'scatter',hoverinfo:'skip',line:{color:t.tx3,width:.7},showlegend:false},
+    {x:P.map(p=>p.x),y:P.map(p=>p.y),customdata:sp.steps.map(s=>s.idx),
+     text:sp.steps.map(s=>hoverTxt(sp,s)),hoverinfo:'text',
+     mode:'markers',type:'scatter',
+     marker:{size:7,color:markerColors(sp,t.tx),
+       symbol:sp.steps.map((s,i)=> s.skipped?'x': (di[i].inc>=0?'circle':'circle-open')),
+       line:{width:1.2,color:markerColors(sp,t.tx)}}},
+  ];
+  SLOTS.forEach(k=>{
+    const res=sp._res && sp._res[k];
+    if(!res||res.invalid) return;
+    const r=res[S.cs==='spec'?'spec':S.cs];
+    const p=eqXY(r.dec,r.inc);
+    data.push({x:[p.x],y:[p.y],mode:'markers',type:'scatter',hoverinfo:'text',
+      text:[k+' fit<br>D '+r.dec.toFixed(1)+' / I '+r.inc.toFixed(1)+'<br>MAD '+r.mad.toFixed(1)+'°'],
+      marker:{size:13,symbol:r.inc>=0?'star':'star-open',color:SLOTC[k],line:{width:1,color:SLOTC[k]}},showlegend:false});
+  });
+  Plotly.react('eq',data,{
+    paper_bgcolor:'rgba(0,0,0,0)',plot_bgcolor:'rgba(0,0,0,0)',
+    font:{family:'IBM Plex Mono',size:9,color:t.tx2},
+    margin:{l:10,r:10,t:20,b:10},showlegend:false,
+    xaxis:{visible:false,range:[-1.12,1.12]},
+    yaxis:{visible:false,range:[-1.12,1.12],scaleanchor:'x',scaleratio:1},
+    dragmode:false,
+  },{displayModeBar:false,responsive:true});
+}
+function plotDecay(sp){
+  const t=themeColors();
+  const Jmax=Math.max(...sp.steps.map(s=>s.J),1e-30);
+  const data=[
+    {x:sp.steps.filter(s=>!s.skipped).map(s=>s.idx), y:sp.steps.filter(s=>!s.skipped).map(s=>s.J/Jmax),
+     mode:'lines',type:'scatter',hoverinfo:'skip',line:{color:t.tx3,width:1},showlegend:false},
+    {x:sp.steps.map(s=>s.idx), y:sp.steps.map(s=>s.J/Jmax),
+     customdata:sp.steps.map(s=>s.idx), text:sp.steps.map(s=>hoverTxt(sp,s)),hoverinfo:'text',
+     mode:'markers',type:'scatter',
+     marker:{size:6,color:markerColors(sp,t.tx),symbol:sp.steps.map(s=>s.skipped?'x':'circle'),line:{width:1,color:t.bdr}}},
+  ];
+  const shapes=SLOTS.filter(k=>sp.fits[k]).map(k=>({
+    type:'rect',x0:sp.fits[k].i0-0.4,x1:sp.fits[k].i1+0.4,y0:0,y1:1,yref:'paper',
+    fillcolor:SLOTC[k],opacity:0.10,line:{width:0}
+  }));
+  Plotly.react('dec',data,{
+    paper_bgcolor:'rgba(0,0,0,0)',plot_bgcolor:'rgba(0,0,0,0)',
+    font:{family:'IBM Plex Mono',size:8.5,color:t.tx2},
+    margin:{l:38,r:8,t:20,b:52},showlegend:false,shapes,
+    xaxis:{tickmode:'array',tickvals:sp.steps.map(s=>s.idx),ticktext:sp.steps.map(s=>s.label),tickangle:-60,gridcolor:t.bdr,griddash:'dot'},
+    yaxis:{title:{text:'J/J<sub>max</sub>',font:{size:9}},gridcolor:t.bdr,griddash:'dot',rangemode:'tozero'},
+    dragmode:false,
+  },{displayModeBar:false,responsive:true});
+}
+
+/* ═════════════════════════ rendering: console & strip ═════════════════════════ */
+function renderSlots(sp){
+  const host=document.getElementById('slots');
+  host.innerHTML='';
+  const term=sp?terminalSlot(sp):null;
+  let nFits=0, anyUsable=false, specTotal=0;
+  SLOTS.forEach(k=>{
+    const res=sp?(sp._res&&sp._res[k]):null;
+    const d=document.createElement('div');
+    d.className='slot'+(S.armed===k?' armed':'')+((sp&&sp.fits[k])?' hasfit':'');
+    d.style.setProperty('--slotc',SLOTC[k]);
+    let body='';
+    if(sp){
+      const f=sp.fits[k];
+      const b0=f?sp.steps[f.i0].label:'', b1=f?sp.steps[f.i1].label:'';
+      body+='<div class="bnd-row">'+
+        '<input placeholder="from" data-slot="'+k+'" data-end="0" value="'+b0+'" list="dl-steps">'+
+        '<input placeholder="to" data-slot="'+k+'" data-end="1" value="'+b1+'" list="dl-steps"></div>';
+      if(res){
+        if(res.invalid){
+          body+='<div class="fit-stats crit-bad">'+res.invalid+'</div>';
+        } else {
+          const rG=res.geo, rT=res.tc;
+          const isTerm=term&&term.slot===k&&term.reaches;
+          const sc=scoreFit(sp,k,res,term);
+          nFits++;
+          if(sc){ specTotal+=sc.score; if(sc.usable) anyUsable=true; }
+          const madCls=(rG.mad<=10)?'crit-ok':'crit-bad';
+          const repG = k==='LT', hl=(x,on)=> on?'<b>'+x+'</b>':x;
+          body+='<div class="fit-stats">'+
+            (sc?'<span class="slot-grade g-'+sc.grade+'" style="color:'+(sc.grade==='S'?'var(--amb)':sc.grade==='A'?'var(--ac)':sc.grade==='F'||sc.grade==='D'?'var(--red)':'var(--tx)')+'">'+sc.grade+'<span style="font-size:8px"> '+sc.score+'</span></span>':'')+
+            hl('geo  D '+rG.dec.toFixed(1)+' / I '+rG.inc.toFixed(1), repG)+'<br>'+
+            hl('tilt D '+rT.dec.toFixed(1)+' / I '+rT.inc.toFixed(1), !repG)+'<br>'+
+            'MAD <span class="'+madCls+'">'+rG.mad.toFixed(1)+'°</span>'+
+            (isTerm?' · dang <span class="'+(rG.dang<=15?'crit-ok':'crit-bad')+'">'+rG.dang.toFixed(1)+'°</span>':'')+
+            ' · n='+res.nUsed+(res.nTotal>res.nUsed?'/'+res.nTotal:'')+
+            (isTerm?' · <span style="color:var(--tx3)">terminal</span>':'')+
+            '</div>';
+          if(res.warns.length) body+='<div class="fit-warn">⚠ '+res.warns.join('<br>⚠ ')+'</div>';
+          if(isTerm && sc && sc.usable) body+='<div style="color:var(--amb);font-size:9px;margin-top:3px">★ USABLE ChRM</div>';
+        }
+      } else if(S.armed===k){
+        body+='<div class="fit-stats" style="color:var(--tx3)">click two points to bracket…'+(S.pendIdx!==null?' (from '+sp.steps[S.pendIdx].label+')':'')+'</div>';
+      }
+    }
+    const orig=(sp&&sp.fits[k]&&sp.fits[k].name&&sp.fits[k].name!==k)?'<span style="font-size:8px;color:var(--tx3)">·'+sp.fits[k].name+'</span>':'';
+    d.innerHTML='<div class="slot-hdr"><span class="slot-dot"></span><span class="slot-name">'+k+orig+'</span>'+
+      '<span class="slot-armtag">ARMED — pick 2 points</span>'+
+      ((sp&&sp.fits[k])?'<span class="slot-x" title="clear fit">×</span>':'')+'</div>'+
+      '<div class="slot-body">'+body+'</div>';
+    d.querySelector('.slot-hdr').onclick=e=>{
+      if(e.target.classList.contains('slot-x')){ clearFit(k); return; }
+      armSlot(S.armed===k?null:k);
+    };
+    d.querySelectorAll('input').forEach(inp=>{
+      inp.onclick=e=>e.stopPropagation();
+      inp.onchange=()=>applyTypedBound(inp.dataset.slot, +inp.dataset.end, inp.value);
+    });
+    host.appendChild(d);
+  });
+  // datalist
+  let dl=document.getElementById('dl-steps');
+  if(!dl){ dl=document.createElement('datalist'); dl.id='dl-steps'; document.body.appendChild(dl); }
+  dl.innerHTML=sp?sp.steps.map(s=>'<option value="'+s.label+'">').join(''):'';
+  document.getElementById('sum-fits').textContent=nFits+' fit'+(nFits===1?'':'s')+(nFits?' · '+specTotal+' pts':'');
+  document.getElementById('sum-chrm').innerHTML=anyUsable?'<span style="color:var(--amb)">★ ChRM</span>':'';
+  document.getElementById('save-btn').disabled=!(sp&&nFits>0);
+  sp&&(sp._specTotal=specTotal)&&(sp._anyUsable=anyUsable);
+  if(sp){ sp._specTotal=specTotal; sp._anyUsable=anyUsable; }
+}
+function renderStrip(sp){
+  const host=document.getElementById('step-strip');
+  host.innerHTML='';
+  if(!sp){ host.innerHTML='<span style="color:var(--tx3);font-size:10px">load files to begin…</span>'; return; }
+  sp.steps.forEach(s=>{
+    const c=document.createElement('div');
+    const sl=slotOfStep(sp,s.idx);
+    c.className='chip'+(s.skipped?' skipped':'')+(sl?' in'+sl:'')+(S.pendIdx===s.idx?' pend':'')+(s.warn?' warnstep':'');
+    c.innerHTML=s.label+'<span class="j">'+s.J.toExponential(1)+'</span>';
+    c.title=(s.warn?('⚠ '+s.warn+'\n'):'')+'click: bracket bound (arm a slot first) · right-click: skip';
+    c.onclick=()=>pointClicked(s.idx);
+    c.oncontextmenu=e=>{e.preventDefault();toggleSkip(s.idx);};
+    host.appendChild(c);
+  });
+}
+function renderAll(){
+  const sp=S.cur?S.specs[S.cur]:null;
+  if(sp){
+    sp._res={};
+    SLOTS.forEach(k=>{ sp._res[k]=sp.fits[k]?computeFit(sp,k):null; });
+    document.getElementById('spec-title').textContent=sp.name;
+    plotZij(sp); plotEq(sp); plotDecay(sp);
+  } else {
+    document.getElementById('spec-title').textContent='';
+  }
+  renderSlots(sp); renderStrip(sp);
+  document.getElementById('hud-score').textContent=S.score;
+  document.getElementById('hud-streak').textContent=S.streak;
+  document.getElementById('hud-best').textContent=S.best;
+  document.getElementById('streak-pill').classList.toggle('hot',S.streak>=3);
+}
+
+/* ═════════════════════════ interaction ═════════════════════════ */
+function selectSpec(name){
+  S.cur=name; S.armed=null; S.pendIdx=null;
+  renderQueue(); renderAll();
+}
+function armSlot(k){
+  S.armed=k; S.pendIdx=null;
+  renderSlots(S.cur?S.specs[S.cur]:null); renderStrip(S.cur?S.specs[S.cur]:null);
+}
+function pointClicked(idx){
+  const sp=S.specs[S.cur];
+  if(!sp) return;
+  if(!S.armed){ toast('arm a slot first (click LT / MT / HT, or press 1/2/3)'); return; }
+  if(S.pendIdx===null){
+    S.pendIdx=idx;
+    renderStrip(sp); renderSlots(sp);
+  } else {
+    const i0=Math.min(S.pendIdx,idx), i1=Math.max(S.pendIdx,idx);
+    sp.fits[S.armed]={i0,i1};
+    const done=S.armed;
+    S.pendIdx=null; S.armed=null;
+    persistSpec(sp);
+    renderAll();
+    toast(done+' fit set: '+sp.steps[i0].label+' → '+sp.steps[i1].label);
+  }
+}
+function toggleSkip(idx){
+  const sp=S.specs[S.cur];
+  if(!sp||!sp.steps[idx]) return;
+  sp.steps[idx].skipped=!sp.steps[idx].skipped;
+  persistSpec(sp);
+  renderAll();
+}
+function clearFit(k){
+  const sp=S.specs[S.cur];
+  if(!sp) return;
+  sp.fits[k]=null; persistSpec(sp); renderAll();
+}
+function applyTypedBound(slot, end, val){
+  const sp=S.specs[S.cur];
+  if(!sp) return;
+  const v=val.trim().toLowerCase();
+  let idx=sp.steps.findIndex(s=>s.label.toLowerCase()===v);
+  if(idx<0){
+    if(v==='nrm') idx=sp.steps.findIndex(s=>s.treat.type==='NRM');
+    else if(v==='ln2'||v==='lt'||v==='77') idx=sp.steps.findIndex(s=>s.treat.type==='LN2');
+    else {
+      const m=v.match(/^([\d.]+)\s*(g|mt|c)?/);
+      if(m){
+        const num=parseFloat(m[1]), unit=m[2]||'c';
+        let bestD=1e18;
+        sp.steps.forEach((s,i)=>{
+          let key=null;
+          if(unit==='c'&&s.treat.type==='TT') key=s.treat.C;
+          if(unit==='g'&&s.treat.type==='AF') key=s.treat.G;
+          if(unit==='mt'&&s.treat.type==='AF') key=s.treat.mT;
+          if(key!==null && Math.abs(key-num)<bestD){ bestD=Math.abs(key-num); idx=i; }
+        });
+      }
+    }
+  }
+  if(idx<0){ toast('step not recognized: '+val); renderSlots(sp); return; }
+  const f=sp.fits[slot]||{i0:idx,i1:idx};
+  if(end===0) f.i0=idx; else f.i1=idx;
+  if(f.i1<f.i0){ const t=f.i0; f.i0=f.i1; f.i1=t; }
+  sp.fits[slot]=f;
+  persistSpec(sp); renderAll();
+}
+
+// plot click + right-click wiring
+function wirePlot(id){
+  const gd=document.getElementById(id);
+  gd.on('plotly_click', ev=>{
+    const p=ev.points&&ev.points[0];
+    if(p&&p.customdata!==undefined) pointClicked(p.customdata);
+  });
+  gd.on('plotly_hover', ev=>{
+    const p=ev.points&&ev.points[0];
+    if(p&&p.customdata!==undefined) S.hover={plot:id, idx:p.customdata, t:Date.now()};
+  });
+  gd.parentElement.addEventListener('contextmenu', e=>{
+    e.preventDefault();
+    // fresh hover → use it
+    if(S.hover.plot===id && Date.now()-S.hover.t<2500){ toggleSkip(S.hover.idx); return; }
+    // fallback: nearest point in pixel space
+    const sp=S.cur?S.specs[S.cur]:null;
+    if(!sp||!gd._fullLayout) return;
+    const fl=gd._fullLayout, xa=fl.xaxis, ya=fl.yaxis;
+    const rect=gd.getBoundingClientRect();
+    const px=e.clientX-rect.left, py=e.clientY-rect.top;
+    let best=null,bestD=18*18;
+    (gd.data||[]).forEach(tr=>{
+      if(!tr.customdata) return;
+      tr.x.forEach((xv,i)=>{
+        const X=xa.d2p(xv)+xa._offset, Y=ya.d2p(tr.y[i])+ya._offset;
+        const d=(X-px)*(X-px)+(Y-py)*(Y-py);
+        if(d<bestD){ bestD=d; best=tr.customdata[i]; }
+      });
+    });
+    if(best!==null) toggleSkip(best);
+  });
+}
+
+/* ═════════════════════════ save / score / advance ═════════════════════════ */
+function saveSpec(){
+  const sp=S.specs[S.cur];
+  if(!sp) return;
+  const pts=sp._specTotal||0;
+  const wasUsable=!!sp._anyUsable;
+  const prev=sp.saved?(sp.lastPts||0):0;
+  sp.saved=true;
+  sp.lastPts=pts;
+  // specimen grade = average of fit grades weight: use max fit grade logic → from points/numFits
+  const nFits=SLOTS.filter(k=>sp.fits[k]&&sp._res[k]&&!sp._res[k].invalid).length;
+  sp.lastGrade=gradeOf(Math.min(100, nFits?Math.round(pts/nFits):0));
+  S.score+=pts-prev;
+  if(wasUsable){ S.streak+=1; } else { S.streak=0; }
+  S.best=Math.max(S.best,S.streak);
+  lsSet('fitquest:session',JSON.stringify({score:S.score,streak:S.streak,best:S.best}));
+  persistSpec(sp);
+  showScore(pts, wasUsable, sp.lastGrade);
+  renderQueue();
+  // advance to next unsaved specimen with data
+  const i=S.order.indexOf(S.cur);
+  for(let j=1;j<=S.order.length;j++){
+    const n=S.order[(i+j)%S.order.length];
+    if(!S.specs[n].saved && S.specs[n].steps.length>0){ selectSpec(n); return; }
+  }
+  renderAll();
+  toast('queue complete — export your .redo!');
+}
+function showScore(pts, usable, grade){
+  const pop=document.getElementById('score-pop');
+  pop.querySelector('.big').textContent='+'+pts;
+  pop.querySelector('.tag').textContent=usable?'★ CLEAN ChRM · grade '+grade+' · streak '+(S.streak):'grade '+grade;
+  pop.classList.toggle('chrm',usable);
+  pop.classList.add('show');
+  setTimeout(()=>pop.classList.remove('show'),1400);
+}
+let toastTimer=null;
+function toast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('vis');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.classList.remove('vis'),2200);
+}
+
+/* ═════════════════════════ redo export ═════════════════════════ */
+function boundRedoVal(step){
+  const tr=step.treat;
+  if(tr.type==='TT') return (tr.C+273).toFixed(0);
+  if(tr.type==='AF') return (tr.T).toExponential(2);
+  if(tr.type==='LN2') return '77';
+  return '0';
+}
+function exportRedo(){
+  const lines=[];
+  S.order.forEach(n=>{
+    const sp=S.specs[n];
+    SLOTS.forEach(k=>{
+      const f=sp.fits[k];
+      if(!f) return;
+      const res=computeFit(sp,k);
+      if(!res||res.invalid) return;
+      lines.push([sp.name,'DE-BFL',boundRedoVal(sp.steps[f.i0]),boundRedoVal(sp.steps[f.i1]),f.name||k,f.color||SLOTC[k],'g'].join('\t'));
+    });
+  });
+  if(!lines.length){ toast('no valid fits to export yet'); return; }
+  const blob=new Blob([lines.join('\n')+'\n'],{type:'text/plain'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  const site=Object.keys(S.sites)[0];
+  a.download='fitquest'+(site?'_'+site.replace(/\.sam$/i,''):'')+'.redo';
+  a.click();
+  URL.revokeObjectURL(a.href);
+  toast(lines.length+' fits exported (demag_gui format)');
+}
+
+/* ═════════════════════════ global wiring ═════════════════════════ */
+document.getElementById('save-btn').onclick=saveSpec;
+document.getElementById('redo-btn').onclick=exportRedo;
+document.getElementById('help-btn').onclick=()=>document.getElementById('help-ov').classList.add('vis');
+document.getElementById('help-ov').onclick=e=>{ if(e.target.id==='help-ov') e.target.classList.remove('vis'); };
+document.getElementById('theme-btn').onclick=()=>{
+  document.documentElement.classList.toggle('light');
+  renderAll();
+};
+document.querySelectorAll('.coord-btn').forEach(b=>{
+  b.onclick=()=>{
+    document.querySelectorAll('.coord-btn').forEach(x=>x.classList.remove('on'));
+    b.classList.add('on');
+    S.cs=b.dataset.cs;
+    renderAll();
+  };
+});
+document.getElementById('zij-conv').onchange=e=>{ S.conv=e.target.value; renderAll(); };
+document.addEventListener('keydown',e=>{
+  if(e.target.tagName==='INPUT'||e.target.tagName==='SELECT') return;
+  if(e.key==='1') armSlot(S.armed==='LT'?null:'LT');
+  else if(e.key==='2') armSlot(S.armed==='MT'?null:'MT');
+  else if(e.key==='3') armSlot(S.armed==='HT'?null:'HT');
+  else if(e.key==='s'||e.key==='S'){ if(!document.getElementById('save-btn').disabled) saveSpec(); }
+  else if(e.key==='ArrowRight'||e.key==='ArrowLeft'){
+    const avail=S.order.filter(n=>S.specs[n].steps.length>0);
+    if(!avail.length) return;
+    let i=avail.indexOf(S.cur);
+    i=(i+(e.key==='ArrowRight'?1:-1)+avail.length)%avail.length;
+    selectSpec(avail[i]);
+  }
+  else if(e.key==='Escape'){ armSlot(null); document.getElementById('help-ov').classList.remove('vis'); }
+});
+// init empty plots & wire interactions once
+['zij','eq','dec'].forEach(id=>{
+  Plotly.newPlot(id,[],{paper_bgcolor:'rgba(0,0,0,0)',plot_bgcolor:'rgba(0,0,0,0)',
+    xaxis:{visible:false},yaxis:{visible:false},margin:{l:0,r:0,t:0,b:0}},
+    {displayModeBar:false,responsive:true}).then(()=>wirePlot(id));
+});
+// restore session HUD
+(function(){
+  const raw=lsGet('fitquest:session');
+  if(raw){ try{ const d=JSON.parse(raw); S.score=d.score||0; S.streak=d.streak||0; S.best=d.best||0; }catch(e){} }
+  renderAll();
+})();
+window.addEventListener('resize',()=>{['zij','eq','dec'].forEach(id=>{const el=document.getElementById(id); if(el&&el.data)Plotly.Plots.resize(el);});});
+</script>
+</body>
+</html>

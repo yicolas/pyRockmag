@@ -1,0 +1,4 @@
+Sample     Sig/Drift     Sig/Holder     Sig/Ind     Sig/Noise     CSD     HorizErrAng     Up/Down
+Greg001.cor     85910     99999     099.6     086.2     000.7     000.0     0.000
+Greg001.cor     99999     99999     099.5     086.2     000.7     000.0     0.000
+Greg001.cor     99999     99999     097.0     084.0     000.7     000.0     0.000

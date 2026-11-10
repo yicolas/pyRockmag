@@ -1,0 +1,4 @@
+Sample     Sig/Drift     Sig/Holder     Sig/Ind     Sig/Noise     CSD     HorizErrAng     Up/Down
+Komat003.cor     99999     99999     116.5     100.0     000.6     000.0     0.000
+Komat003.cor     99999     99999     116.5     100.2     000.6     000.0     0.000
+Komat003.cor     99999     99999     113.6     097.9     000.6     000.0     0.000
